@@ -278,4 +278,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get unlock => 'فتح';
+
+  @override
+  String get notifications => 'الإشعارات';
+
+  @override
+  String get notificationsSubtitle => 'تفعيل تذكيرات الديون المستحقة';
 }

@@ -88,5 +88,7 @@
   "reversal": "Reversal",
   "adjustment": "Adjustment",
   "enterPin": "Enter PIN",
-  "unlock": "Unlock"
+  "unlock": "Unlock",
+  "notifications": "Notifications",
+  "notificationsSubtitle": "Enable debt due reminders"
 }

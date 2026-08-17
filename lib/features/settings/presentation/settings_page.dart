@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/localization/l10n_extension.dart';
+import '../../../core/notifications/notification_provider.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/theme_provider.dart';
+import '../../dashboard/providers/analytics_providers.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -22,15 +24,19 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final l10n = context.l10n;
     final logger = ref.read(loggingServiceProvider);
     logger.info('Starting ledger integrity check');
+
     setState(() {
       _isLoading = true;
       _violations = null;
     });
+
     final checker = ref.read(ledgerIntegrityCheckerProvider);
     try {
       final result = await checker.check();
       logger.info('Integrity check completed. Violations: ${result.length}');
-      setState(() => _violations = result);
+      setState(() {
+        _violations = result;
+      });
     } catch (e) {
       logger.error('Integrity check failed', error: e);
       if (mounted) {
@@ -89,6 +95,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final l10n = context.l10n;
     final themeMode = ref.watch(themeModeProvider);
     final locale = ref.watch(localeProvider);
+    final notificationsEnabled = ref.watch(notificationsEnabledProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -126,6 +133,29 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   }
                 },
               ),
+            ),
+            const Divider(),
+            SwitchListTile(
+              title: Text(l10n.notifications),
+              subtitle: Text(l10n.notificationsSubtitle),
+              secondary: const Icon(Icons.notifications),
+              value: notificationsEnabled,
+              onChanged: (value) async {
+                await ref.read(notificationsEnabledProvider.notifier).set(value);
+                await saveNotificationsEnabled(value);
+
+                final notificationService = ref.read(notificationServiceProvider);
+                if (value) {
+                  final debts = await ref.read(allDebtsProvider.future);
+                  final balances = await ref.read(balancesByDebtProvider.future);
+                  await notificationService.scheduleUpcomingDebtReminders(
+                    debts: debts,
+                    balances: balances,
+                  );
+                } else {
+                  await notificationService.cancelAllReminders();
+                }
+              },
             ),
             const Divider(),
             ListTile(

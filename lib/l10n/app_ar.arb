@@ -88,5 +88,7 @@
   "reversal": "عكس",
   "enterPin": "أدخل PIN",
   "unlock": "فتح",
-  "adjustment": "تسوية"
+  "adjustment": "تسوية",
+  "notifications": "الإشعارات",
+  "notificationsSubtitle": "تفعيل تذكيرات الديون المستحقة"
 }
