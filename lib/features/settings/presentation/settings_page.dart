@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/providers.dart';
+import '../../../core/theme/theme_provider.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -86,6 +87,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeMode = ref.watch(themeModeProvider);
+    final locale = ref.watch(localeProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -96,9 +100,34 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: ListView(
           children: [
+            SwitchListTile(
+              title: const Text('Dark Mode'),
+              secondary: const Icon(Icons.dark_mode),
+              value: themeMode == ThemeMode.dark,
+              onChanged: (value) {
+                ref.read(themeModeProvider.notifier).state =
+                    value ? ThemeMode.dark : ThemeMode.light;
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.language),
+              title: const Text('Language'),
+              trailing: DropdownButton<Locale>(
+                value: locale,
+                items: const [
+                  DropdownMenuItem(value: Locale('en'), child: Text('English')),
+                  DropdownMenuItem(value: Locale('ar'), child: Text('العربية')),
+                ],
+                onChanged: (value) {
+                  if (value != null) {
+                    ref.read(localeProvider.notifier).state = value;
+                  }
+                },
+              ),
+            ),
+            const Divider(),
             ListTile(
               leading: const Icon(Icons.lock),
               title: const Text('Change PIN'),
@@ -120,32 +149,23 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             if (_isLoading)
               const Center(child: CircularProgressIndicator())
             else if (_violations != null)
-              Expanded(
-                child: _violations!.isEmpty
-                    ? const Center(
-                        child: Text(
-                          'All good! No violations found.',
-                          style: TextStyle(fontSize: 16, color: Colors.green),
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: _violations!.length,
-                        itemBuilder: (context, index) {
-                          final v = _violations![index];
-                          return Card(
-                            margin: const EdgeInsets.symmetric(vertical: 4),
-                            child: ListTile(
-                              leading: const Icon(
-                                Icons.error_outline,
-                                color: Colors.red,
-                              ),
-                              title: Text(v.type.name),
-                              subtitle: Text(v.message),
-                            ),
-                          );
-                        },
-                      ),
-              ),
+              if (_violations!.isEmpty)
+                const Center(
+                  child: Text(
+                    'All good! No violations found.',
+                    style: TextStyle(fontSize: 16, color: Colors.green),
+                  ),
+                )
+              else
+                ...(_violations!.map(
+                  (v) => Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.error_outline, color: Colors.red),
+                      title: Text(v.type.name),
+                      subtitle: Text(v.message),
+                    ),
+                  ),
+                )),
           ],
         ),
       ),
