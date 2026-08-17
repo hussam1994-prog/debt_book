@@ -35,6 +35,16 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
         title: const Text('People'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.bar_chart),
+            tooltip: 'Reports',
+            onPressed: () => context.go('/reports'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.receipt_long),
+            tooltip: 'All Debts',
+            onPressed: () => context.go('/all-debts'),
+          ),
+          IconButton(
             icon: const Icon(Icons.dashboard),
             tooltip: 'Dashboard',
             onPressed: () => context.go('/dashboard'),

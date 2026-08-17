@@ -11,10 +11,15 @@ import '../features/dashboard/presentation/dashboard_page.dart';
 import '../features/backup/presentation/backup_page.dart';
 import '../features/insights/presentation/insights_page.dart';
 import '../features/reports/presentation/reports_page.dart';
+import '../features/debts/presentation/all_debts_page.dart';
 
 final router = GoRouter(
   initialLocation: '/',
   routes: [
+    GoRoute(
+      path: '/all-debts',
+      builder: (context, state) => const AllDebtsPage(),
+    ),
     GoRoute(
       path: '/reports',
       builder: (context, state) => const ReportsPage(),

@@ -103,3 +103,16 @@ final last7DaysPaymentsProvider = FutureProvider<List<Payment>>((ref) async {
   final cutoff = now.subtract(const Duration(days: 7));
   return payments.where((p) => p.paymentDate.isAfter(cutoff)).toList();
 });
+
+final allDebtsWithPersonNameProvider = FutureProvider<List<(Debt, String)>>((ref) async {
+  final debts = await ref.watch(allDebtsProvider.future);
+  final personRepo = ref.watch(personRepositoryProvider);
+  final result = <(Debt, String)>[];
+
+  for (final debt in debts) {
+    final person = await personRepo.findById(debt.personId);
+    final personName = person?.name ?? 'Unknown';
+    result.add((debt, personName));
+  }
+  return result;
+});

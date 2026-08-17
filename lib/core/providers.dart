@@ -5,8 +5,9 @@ import '../core/observability/logging_service.dart';
 import '../core/observability/metrics_service.dart';
 import '../core/backup/backup_service.dart';
 import '../core/security/security_service.dart';
-
+import '../core/export/export_service.dart';
 import '../core/database/app_database.dart';
+
 import '../data/repositories/person_repository_impl.dart';
 import '../data/repositories/debt_repository_impl.dart';
 import '../data/repositories/payment_repository_impl.dart';
@@ -172,4 +173,8 @@ final deleteDebtProvider = Provider<DeleteDebt>((ref) {
     balanceCalculator: ref.watch(balanceCalculatorProvider),
     uuidGenerator: ref.watch(uuidGeneratorProvider),
   );
+});
+
+final exportServiceProvider = Provider<ExportService>((ref) {
+  return ExportService();
 });

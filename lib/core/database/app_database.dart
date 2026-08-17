@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
@@ -33,7 +34,6 @@ part 'app_database.g.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
-  /// مُنشئ للاختبارات باستخدام قاعدة بيانات في الذاكرة.
   AppDatabase.memory() : super(NativeDatabase.memory());
 
   @override
@@ -44,20 +44,22 @@ class AppDatabase extends _$AppDatabase {
         onCreate: (m) async {
           await m.createAll();
         },
-        onUpgrade: (m, from, to) async {
-          // سندير الترقيات المستقبلية هنا
-        },
+        onUpgrade: (m, from, to) async {},
       );
 
   static QueryExecutor _openConnection() {
-    if (Platform.isIOS || Platform.isAndroid) {
+    if (!kIsWeb &&
+        (Platform.isWindows ||
+            Platform.isLinux ||
+            Platform.isMacOS ||
+            Platform.isAndroid ||
+            Platform.isIOS)) {
       return LazyDatabase(() async {
         final dir = await getApplicationDocumentsDirectory();
         final file = File(p.join(dir.path, 'debt_book.sqlite'));
         return NativeDatabase.createInBackground(file);
       });
     }
-    // لسطح المكتب أو الاختبار
     return NativeDatabase.memory();
   }
 }

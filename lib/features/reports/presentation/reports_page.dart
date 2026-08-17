@@ -3,15 +3,58 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../dashboard/providers/analytics_providers.dart';
 
-class ReportsPage extends ConsumerWidget {
+class ReportsPage extends ConsumerStatefulWidget {
   const ReportsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ReportsPage> createState() => _ReportsPageState();
+}
+
+class _ReportsPageState extends ConsumerState<ReportsPage> {
+  Future<void> _exportToCsv() async {
+    try {
+      final allDebts = await ref.read(allDebtsProvider.future);
+      final balances = await ref.read(balancesByDebtProvider.future);
+      final personRepo = ref.read(personRepositoryProvider);
+
+      final rows = <Map<String, String>>[];
+      for (final debt in allDebts) {
+        final person = await personRepo.findById(debt.personId);
+        final balance = balances[debt.id] ?? Money.zero;
+        rows.add({
+          'person': person?.name ?? 'Unknown',
+          'description': debt.description ?? '',
+          'originalAmount': '${debt.amount.amount}',
+          'balance': '${balance.amount}',
+          'status': debt.status.name,
+          'dueDate': debt.dueDate?.toIso8601String() ?? '',
+        });
+      }
+
+      final exportService = ref.read(exportServiceProvider);
+      final file = await exportService.exportDebtsToCsv(rows: rows);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('CSV exported to: ${file.path}')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Export failed: $e')),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final allDebtsAsync = ref.watch(allDebtsProvider);
     final balancesAsync = ref.watch(balancesByDebtProvider);
     final overdueAsync = ref.watch(overdueDebtsProvider);
@@ -23,20 +66,27 @@ class ReportsPage extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/'),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.file_download),
+            tooltip: 'Export CSV',
+            onPressed: _exportToCsv,
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Overview', style: AppTextStyles.headline2),
+            Text('Overview', style: AppTextStyles.headline2),
             const SizedBox(height: AppSpacing.sm),
             _SummarySection(
               allDebtsAsync: allDebtsAsync,
               balancesAsync: balancesAsync,
             ),
             const SizedBox(height: AppSpacing.lg),
-            const Text('Overdue Debts', style: AppTextStyles.headline2),
+            Text('Overdue Debts', style: AppTextStyles.headline2),
             const SizedBox(height: AppSpacing.sm),
             overdueAsync.when(
               data: (debts) {

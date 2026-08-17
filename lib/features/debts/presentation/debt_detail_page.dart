@@ -258,67 +258,69 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
 
   void _showAdjustmentDialog(BuildContext context, WidgetRef ref) {
     final amountController = TextEditingController();
-    final isIncrease = ValueNotifier<bool>(true);
+    bool isIncrease = true;
 
     showDialog(
       context: context,
       builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('Add Adjustment'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: amountController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Amount (IQD)'),
-              ),
-              const SizedBox(height: 8),
-              ValueListenableBuilder<bool>(
-                valueListenable: isIncrease,
-                builder: (context, value, _) {
-                  return Row(
+        return StatefulBuilder(
+          builder: (dialogContext, setDialogState) {
+            return AlertDialog(
+              title: const Text('Add Adjustment'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: amountController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(labelText: 'Amount (IQD)'),
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
                     children: [
-                      SwitchListTile(
-                        title: const Text('Increase'),
-                        value: isIncrease.value,
-                        onChanged: (v) => isIncrease.value = v,
+                      ChoiceChip(
+                        label: const Text('Increase'),
+                        selected: isIncrease,
+                        onSelected: (_) => setDialogState(() => isIncrease = true),
                       ),
-                      SwitchListTile(
-                        title: const Text('Decrease'),
-                        value: !isIncrease.value,
-                        onChanged: (v) => isIncrease.value = !v,
+                      ChoiceChip(
+                        label: const Text('Decrease'),
+                        selected: !isIncrease,
+                        onSelected: (_) => setDialogState(() => isIncrease = false),
                       ),
                     ],
-                  );
-                },
+                  ),
+                ],
               ),
-            ],
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
-            ElevatedButton(
-              onPressed: () async {
-                final amount = int.tryParse(amountController.text);
-                if (amount == null || amount <= 0) return;
-                final isIncreaseValue = isIncrease.value;
-                final adjustmentAmount = isIncreaseValue ? amount : -amount;
-                final addAdjustment = ref.read(addAdjustmentProvider);
-                await addAdjustment(
-                  debtId: widget.debtId,
-                  amount: Money(amount: adjustmentAmount),
-                );
-                ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
-                if (dialogContext.mounted) Navigator.pop(dialogContext);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Adjustment added')),
-                  );
-                }
-              },
-              child: const Text('Save'),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final amount = int.tryParse(amountController.text);
+                    if (amount == null || amount <= 0) return;
+                    final adjustmentAmount = isIncrease ? amount : -amount;
+                    final addAdjustment = ref.read(addAdjustmentProvider);
+                    await addAdjustment(
+                      debtId: widget.debtId,
+                      amount: Money(amount: adjustmentAmount),
+                    );
+                    ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
+                    if (dialogContext.mounted) Navigator.pop(dialogContext);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Adjustment added')),
+                      );
+                    }
+                  },
+                  child: const Text('Save'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
