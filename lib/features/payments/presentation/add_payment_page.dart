@@ -68,6 +68,7 @@ class _AddPaymentPageState extends ConsumerState<AddPaymentPage> {
                   );
                   ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
                   ref.invalidate(paymentsForDebtProvider(widget.debtId));
+                  ref.invalidate(balanceForDebtProvider(widget.debtId));
                   if (context.mounted) context.pop();
                 } catch (e) {
                   if (context.mounted) {
