@@ -241,6 +241,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Language'**
   String get language;
+
+  /// No description provided for @paid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get paid;
+
+  /// No description provided for @paymentsLast7Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments (Last 7 Days)'**
+  String get paymentsLast7Days;
+
+  /// No description provided for @overview.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get overview;
+
+  /// No description provided for @totalDebts.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Debts'**
+  String get totalDebts;
 }
 
 class _AppLocalizationsDelegate

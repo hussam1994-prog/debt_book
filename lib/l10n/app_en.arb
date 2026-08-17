@@ -23,5 +23,9 @@
   "searchHint": "Search by name or phone...",
   "logout": "Logout",
   "darkMode": "Dark Mode",
-  "language": "Language"
+  "language": "Language",
+  "paid": "Paid",
+  "paymentsLast7Days": "Payments (Last 7 Days)",
+  "overview": "Overview",
+  "totalDebts": "Total Debts"
 }

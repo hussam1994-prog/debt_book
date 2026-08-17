@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/localization/l10n_extension.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_card.dart';
@@ -29,29 +30,30 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
   @override
   Widget build(BuildContext context) {
     final peopleAsync = ref.watch(peopleProvider);
+    final l10n = context.l10n;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('People'),
+        title: Text(l10n.people),
         actions: [
           IconButton(
-            icon: const Icon(Icons.bar_chart),
-            tooltip: 'Reports',
-            onPressed: () => context.go('/reports'),
-          ),
-          IconButton(
             icon: const Icon(Icons.receipt_long),
-            tooltip: 'All Debts',
+            tooltip: l10n.allDebts,
             onPressed: () => context.go('/all-debts'),
           ),
           IconButton(
             icon: const Icon(Icons.dashboard),
-            tooltip: 'Dashboard',
+            tooltip: l10n.dashboard,
             onPressed: () => context.go('/dashboard'),
           ),
           IconButton(
+            icon: const Icon(Icons.bar_chart),
+            tooltip: l10n.reports,
+            onPressed: () => context.go('/reports'),
+          ),
+          IconButton(
             icon: const Icon(Icons.settings),
-            tooltip: 'Settings',
+            tooltip: l10n.settings,
             onPressed: () => context.go('/settings'),
           ),
         ],
@@ -64,7 +66,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Search by name or phone...',
+                hintText: l10n.searchHint,
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -91,9 +93,9 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                       }).toList();
 
                 if (filtered.isEmpty) {
-                  return const EmptyState(
+                  return EmptyState(
                     icon: Icons.search,
-                    title: 'No results',
+                    title: l10n.noPeople,
                     subtitle: 'No people match your search.',
                   );
                 }
@@ -156,12 +158,13 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
   void _showAddPersonDialog(BuildContext context) {
     final nameController = TextEditingController();
     final phoneController = TextEditingController();
+    final l10n = context.l10n;
 
     showDialog(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Add Person'),
+          title: Text(l10n.addPerson),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -179,7 +182,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -195,7 +198,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                 ref.invalidate(peopleProvider);
                 if (dialogContext.mounted) Navigator.pop(dialogContext);
               },
-              child: const Text('Save'),
+              child: Text(l10n.save),
             ),
           ],
         );

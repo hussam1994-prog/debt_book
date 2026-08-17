@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/localization/l10n_extension.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/empty_state.dart';
@@ -13,6 +14,7 @@ class DashboardPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final outstandingAsync = ref.watch(totalOutstandingProvider);
     final paidAsync = ref.watch(totalPaidProvider);
     final peopleCountAsync = ref.watch(peopleWithDebtsCountProvider);
@@ -21,7 +23,7 @@ class DashboardPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        title: Text(l10n.dashboard),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/'),
@@ -35,19 +37,19 @@ class DashboardPage extends ConsumerWidget {
             Row(
               children: [
                 _StatCard(
-                  label: 'Outstanding',
+                  label: l10n.balance,
                   valueAsync: outstandingAsync,
                   icon: Icons.receipt_long,
                   color: AppColors.error,
                 ),
                 _StatCard(
-                  label: 'Paid',
+                  label: l10n.paid,
                   valueAsync: paidAsync,
                   icon: Icons.payments,
                   color: Colors.green,
                 ),
                 _StatCard(
-                  label: 'People',
+                  label: l10n.people,
                   valueAsync: peopleCountAsync,
                   icon: Icons.people,
                   color: AppColors.primary,
@@ -56,18 +58,18 @@ class DashboardPage extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.lg),
-            const Text('Payments (Last 7 Days)', style: AppTextStyles.headline2),
+            Text(l10n.paymentsLast7Days, style: AppTextStyles.headline2),
             const SizedBox(height: AppSpacing.sm),
             _BarChart(paymentsAsync: last7PaymentsAsync),
             const SizedBox(height: AppSpacing.lg),
-            const Text('Overdue Debts', style: AppTextStyles.headline2),
+            Text(l10n.noOverdue, style: AppTextStyles.headline2),
             const SizedBox(height: AppSpacing.sm),
             overdueAsync.when(
               data: (debts) {
                 if (debts.isEmpty) {
-                  return const EmptyState(
+                  return EmptyState(
                     icon: Icons.check_circle_outline,
-                    title: 'No overdue debts',
+                    title: l10n.noOverdue,
                   );
                 }
                 return Column(
@@ -112,7 +114,9 @@ class _StatCard extends ConsumerWidget {
             const SizedBox(height: 4),
             valueAsync.when(
               data: (value) {
-                final display = isMoney ? '${(value as Money).amount} IQD' : '$value';
+                final display = isMoney
+                    ? '${(value as Money).amount} IQD'
+                    : '$value';
                 return Text(
                   display,
                   style: AppTextStyles.headline2.copyWith(fontSize: 14),
@@ -163,12 +167,14 @@ class _BarChart extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: List.generate(days.length, (index) {
                 final dayLabel = '${days[index].day}/${days[index].month}';
-                final barHeight = maxVal == 0 ? 1.0 : (totals[index] / maxVal * 80);
+                final barHeight =
+                    maxVal == 0 ? 1.0 : (totals[index] / maxVal * 80);
                 return Expanded(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('${totals[index]}', style: const TextStyle(fontSize: 10)),
+                      Text('${totals[index]}',
+                          style: const TextStyle(fontSize: 10)),
                       const SizedBox(height: 4),
                       Container(
                         height: barHeight + 1,

@@ -79,4 +79,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get language => 'Language';
+
+  @override
+  String get paid => 'Paid';
+
+  @override
+  String get paymentsLast7Days => 'Payments (Last 7 Days)';
+
+  @override
+  String get overview => 'Overview';
+
+  @override
+  String get totalDebts => 'Total Debts';
 }

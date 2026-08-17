@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/localization/l10n_extension.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/empty_state.dart';
@@ -55,13 +56,14 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final allDebtsAsync = ref.watch(allDebtsProvider);
     final balancesAsync = ref.watch(balancesByDebtProvider);
     final overdueAsync = ref.watch(overdueDebtsProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reports'),
+        title: Text(l10n.reports),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/'),
@@ -79,21 +81,21 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Overview', style: AppTextStyles.headline2),
+            Text(l10n.overview, style: AppTextStyles.headline2),
             const SizedBox(height: AppSpacing.sm),
             _SummarySection(
               allDebtsAsync: allDebtsAsync,
               balancesAsync: balancesAsync,
             ),
             const SizedBox(height: AppSpacing.lg),
-            Text('Overdue Debts', style: AppTextStyles.headline2),
+            Text(l10n.noOverdue, style: AppTextStyles.headline2),
             const SizedBox(height: AppSpacing.sm),
             overdueAsync.when(
               data: (debts) {
                 if (debts.isEmpty) {
-                  return const EmptyState(
+                  return EmptyState(
                     icon: Icons.check_circle_outline,
-                    title: 'No overdue debts',
+                    title: l10n.noOverdue,
                   );
                 }
                 return Column(
@@ -121,10 +123,12 @@ class _SummarySection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+
     return Row(
       children: [
         _StatBox(
-          label: 'Total Debts',
+          label: l10n.totalDebts,
           valueAsync: allDebtsAsync.when(
             data: (debts) => AsyncData(debts.length),
             loading: () => const AsyncLoading(),
@@ -135,7 +139,7 @@ class _SummarySection extends ConsumerWidget {
           isMoney: false,
         ),
         _StatBox(
-          label: 'Outstanding',
+          label: l10n.balance,
           valueAsync: balancesAsync.when(
             data: (balances) {
               var total = 0;

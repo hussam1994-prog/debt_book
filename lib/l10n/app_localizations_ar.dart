@@ -79,4 +79,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get language => 'اللغة';
+
+  @override
+  String get paid => 'المدفوع';
+
+  @override
+  String get paymentsLast7Days => 'دفعات آخر 7 أيام';
+
+  @override
+  String get overview => 'نظرة عامة';
+
+  @override
+  String get totalDebts => 'إجمالي الديون';
 }

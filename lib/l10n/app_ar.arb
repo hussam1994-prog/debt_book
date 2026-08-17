@@ -23,5 +23,9 @@
   "searchHint": "ابحث بالاسم أو رقم الهاتف...",
   "logout": "تسجيل الخروج",
   "darkMode": "الوضع الداكن",
-  "language": "اللغة"
+  "language": "اللغة",
+  "paid": "المدفوع",
+  "paymentsLast7Days": "دفعات آخر 7 أيام",
+  "overview": "نظرة عامة",
+  "totalDebts": "إجمالي الديون"
 }
