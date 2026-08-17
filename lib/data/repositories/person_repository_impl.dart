@@ -1,7 +1,7 @@
 import 'package:domain/domain.dart';
+import 'package:drift/drift.dart';
 import '../../core/database/app_database.dart';
 import '../mappers/person_mapper.dart';
-import 'package:drift/drift.dart';
 
 class PersonRepositoryImpl implements PersonRepository {
   final AppDatabase _db;
@@ -19,14 +19,10 @@ class PersonRepositoryImpl implements PersonRepository {
             notes: Value(person.notes),
             createdAt: person.createdAt.millisecondsSinceEpoch,
             updatedAt: person.updatedAt.millisecondsSinceEpoch,
-            // ⬇️ version و isDeleted عندهم withDefault بالجدول → لازم Value()
             version: Value(person.version),
             isDeleted: Value(person.isDeleted),
             deletedAt: Value(person.deletedAt?.millisecondsSinceEpoch),
           ),
-          // ⚠️ ملاحظة: لو "save" تُستخدم أيضاً للتحديث بوجود نفس id،
-          // insert() الافتراضي بيفشل. لو تحتاج upsert أضف:
-          // mode: InsertMode.insertOrReplace
         );
   }
 
@@ -43,5 +39,34 @@ class PersonRepositoryImpl implements PersonRepository {
   Future<List<Person>> findAll() async {
     final rows = await _db.select(_db.persons).get();
     return rows.map(PersonMapper.fromRow).toList();
+  }
+
+  @override
+  Future<void> update(Person person) async {
+    await (_db.update(_db.persons)
+          ..where((t) => t.id.equals(person.id.value)))
+        .write(PersonsCompanion(
+          name: Value(person.name),
+          phone: Value(person.phone),
+          email: Value(person.email),
+          notes: Value(person.notes),
+          updatedAt: Value(person.updatedAt.millisecondsSinceEpoch),
+          version: Value(person.version),
+          isDeleted: Value(person.isDeleted),
+          deletedAt: Value(person.deletedAt?.millisecondsSinceEpoch),
+        ));
+  }
+
+  @override
+  Future<void> softDelete(PersonId id) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await (_db.update(_db.persons)
+          ..where((t) => t.id.equals(id.value)))
+        .write(PersonsCompanion(
+          isDeleted: Value(true),
+          deletedAt: Value(now),
+          updatedAt: Value(now),
+          version: Value(1),
+        ));
   }
 }

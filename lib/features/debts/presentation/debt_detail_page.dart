@@ -8,22 +8,45 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../people/providers/people_providers.dart';
 
-class DebtDetailPage extends ConsumerWidget {
+class DebtDetailPage extends ConsumerStatefulWidget {
   final DebtId debtId;
   const DebtDetailPage({super.key, required this.debtId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final debtAsync = ref.watch(debtRepositoryProvider).findById(debtId);
-    final entriesAsync = ref.watch(ledgerEntriesForDebtProvider(debtId));
-    final paymentsAsync = ref.watch(paymentsForDebtProvider(debtId));
+  ConsumerState<DebtDetailPage> createState() => _DebtDetailPageState();
+}
+
+class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
+  Debt? _debt;
+
+  @override
+  Widget build(BuildContext context) {
+    final debtAsync = ref.watch(debtRepositoryProvider).findById(widget.debtId);
+    final entriesAsync = ref.watch(ledgerEntriesForDebtProvider(widget.debtId));
+    final paymentsAsync = ref.watch(paymentsForDebtProvider(widget.debtId));
     final getBalance = ref.read(getBalanceProvider);
-    final balanceAsync = getBalance(debtId);
+    final balanceAsync = getBalance(widget.debtId);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Debt Details'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/'),
+        ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              if (_debt != null) _showEditDebtDialog(_debt!);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () {
+              if (_debt != null) _confirmDeleteDebt(_debt!);
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.tune),
             tooltip: 'Add Adjustment',
@@ -32,44 +55,7 @@ class DebtDetailPage extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.cancel_outlined),
             tooltip: 'Cancel Debt',
-            onPressed: () async {
-              final confirmed = await showDialog<bool>(
-                context: context,
-                builder: (dialogContext) => AlertDialog(
-                  title: const Text('Cancel Debt'),
-                  content: const Text('Are you sure you want to cancel this debt?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(dialogContext, false),
-                      child: const Text('No'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => Navigator.pop(dialogContext, true),
-                      child: const Text('Yes'),
-                    ),
-                  ],
-                ),
-              );
-              if (confirmed != true) return;
-
-              final cancelDebt = ref.read(cancelDebtProvider);
-              try {
-                await cancelDebt(debtId);
-                ref.invalidate(ledgerEntriesForDebtProvider(debtId));
-                ref.invalidate(paymentsForDebtProvider(debtId));
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Debt cancelled')),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error: $e')),
-                  );
-                }
-              }
-            },
+            onPressed: () => _confirmCancelDebt(),
           ),
         ],
       ),
@@ -77,6 +63,9 @@ class DebtDetailPage extends ConsumerWidget {
         future: debtAsync,
         builder: (context, debtSnapshot) {
           final debt = debtSnapshot.data;
+          if (debt != null) {
+            _debt = debt;
+          }
           return Column(
             children: [
               if (debt != null)
@@ -146,12 +135,123 @@ class DebtDetailPage extends ConsumerWidget {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go('/debt/${debtId.value}/add-payment'),
+        onPressed: () => context.go('/debt/${widget.debtId.value}/add-payment'),
         backgroundColor: AppColors.primary,
         icon: const Icon(Icons.add),
         label: const Text('Add Payment'),
       ),
     );
+  }
+
+  void _showEditDebtDialog(Debt debt) {
+    final descriptionController = TextEditingController(text: debt.description);
+    final dueDateController = TextEditingController(
+      text: debt.dueDate != null ? debt.dueDate.toString() : '',
+    );
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Edit Debt'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(labelText: 'Description'),
+            ),
+            TextField(
+              controller: dueDateController,
+              decoration: const InputDecoration(labelText: 'Due Date (YYYY-MM-DD)'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () async {
+              final now = DateTime.now();
+              DateTime? dueDate;
+              if (dueDateController.text.trim().isNotEmpty) {
+                dueDate = DateTime.tryParse(dueDateController.text.trim());
+              }
+              final updatedDebt = Debt(
+                id: debt.id,
+                personId: debt.personId,
+                description: descriptionController.text.trim().isEmpty
+                    ? null
+                    : descriptionController.text.trim(),
+                amount: debt.amount,
+                dueDate: dueDate,
+                status: debt.status,
+                createdAt: debt.createdAt,
+                updatedAt: now,
+                version: debt.version + 1,
+                isDeleted: debt.isDeleted,
+                deletedAt: debt.deletedAt,
+              );
+              final repo = ref.read(debtRepositoryProvider);
+              await repo.updateDebt(updatedDebt);
+              ref.invalidate(debtRepositoryProvider);
+              if (dialogContext.mounted) Navigator.pop(dialogContext);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _confirmDeleteDebt(Debt debt) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete Debt'),
+        content: const Text('This will cancel the debt and zero out balance. Are you sure?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    final deleteDebt = ref.read(deleteDebtProvider);
+    await deleteDebt(debt.id);
+    ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
+    ref.invalidate(paymentsForDebtProvider(widget.debtId));
+    if (context.mounted) context.go('/');
+  }
+
+  Future<void> _confirmCancelDebt() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Cancel Debt'),
+        content: const Text('Are you sure you want to cancel this debt?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('No')),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    final cancelDebt = ref.read(cancelDebtProvider);
+    await cancelDebt(widget.debtId);
+    ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
+    ref.invalidate(paymentsForDebtProvider(widget.debtId));
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Debt cancelled')),
+      );
+    }
   }
 
   void _showAdjustmentDialog(BuildContext context, WidgetRef ref) {
@@ -182,13 +282,13 @@ class DebtDetailPage extends ConsumerWidget {
                         groupValue: isIncrease.value,
                         onChanged: (v) => isIncrease.value = v!,
                       ),
-                      const Text('Increase debt'),
+                      const Text('Increase'),
                       Radio<bool>(
                         value: false,
                         groupValue: isIncrease.value,
                         onChanged: (v) => isIncrease.value = v!,
                       ),
-                      const Text('Decrease debt'),
+                      const Text('Decrease'),
                     ],
                   );
                 },
@@ -196,10 +296,7 @@ class DebtDetailPage extends ConsumerWidget {
             ],
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Cancel'),
-            ),
+            TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
             ElevatedButton(
               onPressed: () async {
                 final amount = int.tryParse(amountController.text);
@@ -207,25 +304,16 @@ class DebtDetailPage extends ConsumerWidget {
                 final isIncreaseValue = isIncrease.value;
                 final adjustmentAmount = isIncreaseValue ? amount : -amount;
                 final addAdjustment = ref.read(addAdjustmentProvider);
-                try {
-                  await addAdjustment(
-                    debtId: debtId,
-                    amount: Money(amount: adjustmentAmount),
+                await addAdjustment(
+                  debtId: widget.debtId,
+                  amount: Money(amount: adjustmentAmount),
+                );
+                ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
+                if (dialogContext.mounted) Navigator.pop(dialogContext);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Adjustment added')),
                   );
-                  ref.invalidate(ledgerEntriesForDebtProvider(debtId));
-                  if (dialogContext.mounted) Navigator.pop(dialogContext);
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Adjustment added')),
-                    );
-                  }
-                } catch (e) {
-                  if (dialogContext.mounted) Navigator.pop(dialogContext);
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error: $e')),
-                    );
-                  }
                 }
               },
               child: const Text('Save'),
@@ -294,21 +382,13 @@ class DebtDetailPage extends ConsumerWidget {
                       icon: const Icon(Icons.undo, color: AppColors.error),
                       onPressed: () async {
                         final reversePayment = ref.read(reversePaymentProvider);
-                        try {
-                          await reversePayment(payment.id);
-                          ref.invalidate(ledgerEntriesForDebtProvider(debtId));
-                          ref.invalidate(paymentsForDebtProvider(debtId));
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Payment reversed')),
-                            );
-                          }
-                        } catch (e) {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error: $e')),
-                            );
-                          }
+                        await reversePayment(payment.id);
+                        ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
+                        ref.invalidate(paymentsForDebtProvider(widget.debtId));
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Payment reversed')),
+                          );
                         }
                       },
                     ),

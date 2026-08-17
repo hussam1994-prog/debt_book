@@ -34,26 +34,16 @@ final personRepositoryProvider = Provider<PersonRepository>((ref) {
   return PersonRepositoryImpl(ref.watch(appDatabaseProvider));
 });
 
-// ⬇️ الإصلاح: إضافة uuidGeneratorProvider كوسيط ثاني — كان ناقص
 final debtRepositoryProvider = Provider<DebtRepository>((ref) {
-  return DebtRepositoryImpl(
-    ref.watch(appDatabaseProvider),
-    ref.watch(uuidGeneratorProvider),
-  );
+  return DebtRepositoryImpl(ref.watch(appDatabaseProvider));
 });
 
 final paymentRepositoryProvider = Provider<PaymentRepository>((ref) {
-  return PaymentRepositoryImpl(
-    ref.watch(appDatabaseProvider),
-    ref.watch(uuidGeneratorProvider),
-  );
+  return PaymentRepositoryImpl(ref.watch(appDatabaseProvider));
 });
 
 final ledgerRepositoryProvider = Provider<LedgerRepository>((ref) {
-  return LedgerRepositoryImpl(
-    ref.watch(appDatabaseProvider),
-    ref.watch(uuidGeneratorProvider),
-  );
+  return LedgerRepositoryImpl(ref.watch(appDatabaseProvider));
 });
 
 final createPersonProvider = Provider<CreatePerson>((ref) {
@@ -164,5 +154,22 @@ final smartInsightsServiceProvider = Provider<SmartInsightsService>((ref) {
   return SmartInsightsService(
     riskAnalyzer: ref.watch(debtRiskAnalyzerProvider),
     predictionService: ref.watch(paymentPredictionServiceProvider),
+  );
+});
+
+final updatePersonProvider = Provider<UpdatePerson>((ref) {
+  return UpdatePerson(ref.watch(personRepositoryProvider));
+});
+
+final deletePersonProvider = Provider<DeletePerson>((ref) {
+  return DeletePerson(ref.watch(personRepositoryProvider));
+});
+
+final deleteDebtProvider = Provider<DeleteDebt>((ref) {
+  return DeleteDebt(
+    debtRepository: ref.watch(debtRepositoryProvider),
+    ledgerRepository: ref.watch(ledgerRepositoryProvider),
+    balanceCalculator: ref.watch(balanceCalculatorProvider),
+    uuidGenerator: ref.watch(uuidGeneratorProvider),
   );
 });

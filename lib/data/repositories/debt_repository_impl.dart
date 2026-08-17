@@ -1,18 +1,12 @@
 import 'package:domain/domain.dart';
-import '../../core/database/app_database.dart';
 import 'package:drift/drift.dart';
+import '../../core/database/app_database.dart';
 import '../mappers/debt_mapper.dart';
-
-// ⚠️ ملاحظة: كل كود sync_queue محذوف مؤقتاً من هذا الملف.
-// السبب: يعتمد على SyncOperationType و toJsonForSync() من حزمة
-// packages/contracts غير المبنية بعد. سيُعاد بمرحلة 6-7 بخارطة الطريق.
-// UuidGenerator أبقيناه بالكونستركتور لأنه هيُستخدم وقتها.
 
 class DebtRepositoryImpl implements DebtRepository {
   final AppDatabase _db;
-  final UuidGenerator _uuidGenerator;
 
-  DebtRepositoryImpl(this._db, this._uuidGenerator);
+  DebtRepositoryImpl(this._db);
 
   @override
   Future<void> createDebt(Debt debt, LedgerEntry initialEntry) async {
@@ -48,8 +42,6 @@ class DebtRepositoryImpl implements DebtRepository {
               serverSequence: Value(initialEntry.serverSequence),
             ),
           );
-
-      // TODO(Phase 6-7): إضافة قيد sync_queue هنا بعد بناء packages/contracts
     });
   }
 
@@ -71,12 +63,16 @@ class DebtRepositoryImpl implements DebtRepository {
   }
 
   @override
+  Future<List<Debt>> findAll() async {
+    final rows = await _db.select(_db.debts).get();
+    return rows.map(DebtMapper.fromRow).toList();
+  }
+
+  @override
   Future<void> updateDebt(Debt debt) async {
-    await _db.transaction(() async {
-      await (_db.update(_db.debts)
-            ..where((t) => t.id.equals(debt.id.value)))
-          .write(
-        DebtsCompanion(
+    await (_db.update(_db.debts)
+          ..where((t) => t.id.equals(debt.id.value)))
+        .write(DebtsCompanion(
           personId: Value(debt.personId.value),
           description: Value(debt.description),
           amount: Value(debt.amount.amount),
@@ -87,16 +83,20 @@ class DebtRepositoryImpl implements DebtRepository {
           version: Value(debt.version),
           isDeleted: Value(debt.isDeleted),
           deletedAt: Value(debt.deletedAt?.millisecondsSinceEpoch),
-        ),
-      );
-
-      // TODO(Phase 6-7): إضافة قيد sync_queue هنا بعد بناء packages/contracts
-    });
+        ));
   }
 
   @override
-  Future<List<Debt>> findAll() async {
-    final rows = await _db.select(_db.debts).get();
-    return rows.map(DebtMapper.fromRow).toList();
+  Future<void> softDelete(DebtId id) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await (_db.update(_db.debts)
+          ..where((t) => t.id.equals(id.value)))
+        .write(DebtsCompanion(
+          isDeleted: Value(true),
+          deletedAt: Value(now),
+          updatedAt: Value(now),
+          status: Value('cancelled'),
+          version: Value(1),
+        ));
   }
 }

@@ -1,16 +1,12 @@
 import 'package:domain/domain.dart';
-import '../../core/database/app_database.dart';
 import 'package:drift/drift.dart';
+import '../../core/database/app_database.dart';
 import '../mappers/payment_mapper.dart';
-
-// ⚠️ ملاحظة: كل كود sync_queue محذوف مؤقتاً من هذا الملف — نفس سبب
-// debt_repository_impl.dart (يعتمد على packages/contracts غير المبنية بعد).
 
 class PaymentRepositoryImpl implements PaymentRepository {
   final AppDatabase _db;
-  final UuidGenerator _uuidGenerator;
 
-  PaymentRepositoryImpl(this._db, this._uuidGenerator);
+  PaymentRepositoryImpl(this._db);
 
   @override
   Future<void> recordPayment(Payment payment, LedgerEntry paymentEntry) async {
@@ -46,8 +42,6 @@ class PaymentRepositoryImpl implements PaymentRepository {
               serverSequence: Value(paymentEntry.serverSequence),
             ),
           );
-
-      // TODO(Phase 6-7): إضافة قيد sync_queue هنا بعد بناء packages/contracts
     });
   }
 
@@ -58,34 +52,6 @@ class PaymentRepositoryImpl implements PaymentRepository {
         .getSingleOrNull();
     if (row == null) return null;
     return PaymentMapper.fromRow(row);
-  }
-
-  @override
-  Future<void> softDeletePayment(PaymentId id) async {
-    await _db.transaction(() async {
-      final paymentRow = await (_db.select(_db.payments)
-            ..where((t) => t.id.equals(id.value)))
-          .getSingleOrNull();
-
-      if (paymentRow == null) {
-        return;
-      }
-      final payment = PaymentMapper.fromRow(paymentRow);
-      final now = DateTime.now();
-      final newVersion = payment.version + 1;
-
-      await (_db.update(_db.payments)..where((t) => t.id.equals(id.value)))
-          .write(
-        PaymentsCompanion(
-          isDeleted: const Value(true),
-          deletedAt: Value(now.millisecondsSinceEpoch),
-          updatedAt: Value(now.millisecondsSinceEpoch),
-          version: Value(newVersion),
-        ),
-      );
-
-      // TODO(Phase 6-7): إضافة قيد sync_queue هنا بعد بناء packages/contracts
-    });
   }
 
   @override
@@ -100,5 +66,18 @@ class PaymentRepositoryImpl implements PaymentRepository {
   Future<List<Payment>> findAll() async {
     final rows = await _db.select(_db.payments).get();
     return rows.map(PaymentMapper.fromRow).toList();
+  }
+
+  @override
+  Future<void> softDeletePayment(PaymentId id) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await (_db.update(_db.payments)
+          ..where((t) => t.id.equals(id.value)))
+        .write(PaymentsCompanion(
+          isDeleted: Value(true),
+          deletedAt: Value(now),
+          updatedAt: Value(now),
+          version: Value(1),
+        ));
   }
 }

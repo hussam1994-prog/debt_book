@@ -9,14 +9,21 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../providers/people_providers.dart';
 
-class PersonDetailPage extends ConsumerWidget {
+class PersonDetailPage extends ConsumerStatefulWidget {
   final PersonId personId;
   const PersonDetailPage({super.key, required this.personId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final personAsync = ref.watch(personRepositoryProvider).findById(personId);
-    final debtsAsync = ref.watch(debtsForPersonProvider(personId));
+  ConsumerState<PersonDetailPage> createState() => _PersonDetailPageState();
+}
+
+class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
+  Person? _person;
+
+  @override
+  Widget build(BuildContext context) {
+    final personAsync = ref.watch(personRepositoryProvider).findById(widget.personId);
+    final debtsAsync = ref.watch(debtsForPersonProvider(widget.personId));
 
     return Scaffold(
       appBar: AppBar(
@@ -25,11 +32,28 @@ class PersonDetailPage extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/'),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              if (_person != null) _showEditPersonDialog(_person!);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () {
+              if (_person != null) _confirmDeletePerson(_person!);
+            },
+          ),
+        ],
       ),
       body: FutureBuilder<Person?>(
         future: personAsync,
         builder: (context, personSnapshot) {
           final person = personSnapshot.data;
+          if (person != null) {
+            _person = person; // نخزنه للاستخدام في الأزرار
+          }
           return Column(
             children: [
               if (person != null)
@@ -96,12 +120,82 @@ class PersonDetailPage extends ConsumerWidget {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go('/person/${personId.value}/add-debt'),
+        onPressed: () => context.go('/person/${widget.personId.value}/add-debt'),
         backgroundColor: AppColors.primary,
         icon: const Icon(Icons.add),
         label: const Text('Add Debt'),
       ),
     );
+  }
+
+  void _showEditPersonDialog(Person person) {
+    final nameController = TextEditingController(text: person.name);
+    final phoneController = TextEditingController(text: person.phone);
+    final emailController = TextEditingController(text: person.email);
+    final notesController = TextEditingController(text: person.notes);
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Edit Person'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Name')),
+            TextField(controller: phoneController, decoration: const InputDecoration(labelText: 'Phone')),
+            TextField(controller: emailController, decoration: const InputDecoration(labelText: 'Email')),
+            TextField(controller: notesController, decoration: const InputDecoration(labelText: 'Notes')),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () async {
+              final updatedPerson = Person(
+                id: person.id,
+                name: nameController.text.trim(),
+                phone: phoneController.text.trim().isEmpty ? null : phoneController.text.trim(),
+                email: emailController.text.trim().isEmpty ? null : emailController.text.trim(),
+                notes: notesController.text.trim().isEmpty ? null : notesController.text.trim(),
+                createdAt: person.createdAt,
+                updatedAt: DateTime.now(),
+                version: person.version + 1,
+                isDeleted: person.isDeleted,
+                deletedAt: person.deletedAt,
+              );
+              final updatePerson = ref.read(updatePersonProvider);
+              await updatePerson(updatedPerson);
+              ref.invalidate(personRepositoryProvider);
+              if (dialogContext.mounted) Navigator.pop(dialogContext);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _confirmDeletePerson(Person person) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete Person'),
+        content: const Text('Are you sure? This will hide the person and all related data.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    final deletePerson = ref.read(deletePersonProvider);
+    await deletePerson(person.id);
+    ref.invalidate(peopleProvider);
+    if (context.mounted) context.go('/');
   }
 }
 
