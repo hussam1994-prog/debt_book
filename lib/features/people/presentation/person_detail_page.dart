@@ -63,7 +63,7 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
                     children: [
                       CircleAvatar(
                         radius: 32,
-                        backgroundColor: AppColors.primary.withOpacity(0.1),
+                        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                         child: Text(
                           person.name.substring(0, 1).toUpperCase(),
                           style: const TextStyle(
