@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/localization/l10n_extension.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/empty_state.dart';
@@ -21,6 +22,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final debtAsync = ref.watch(debtRepositoryProvider).findById(widget.debtId);
     final entriesAsync = ref.watch(ledgerEntriesForDebtProvider(widget.debtId));
     final paymentsAsync = ref.watch(paymentsForDebtProvider(widget.debtId));
@@ -29,7 +31,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Debt Details'),
+        title: Text(l10n.debtDetails),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/'),
@@ -37,24 +39,26 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
+            tooltip: l10n.edit,
             onPressed: () {
               if (_debt != null) _showEditDebtDialog(_debt!);
             },
           ),
           IconButton(
             icon: const Icon(Icons.delete),
+            tooltip: l10n.deleteDebt,
             onPressed: () {
               if (_debt != null) _confirmDeleteDebt(_debt!);
             },
           ),
           IconButton(
             icon: const Icon(Icons.tune),
-            tooltip: 'Add Adjustment',
+            tooltip: l10n.addAdjustment,
             onPressed: () => _showAdjustmentDialog(context, ref),
           ),
           IconButton(
             icon: const Icon(Icons.cancel_outlined),
-            tooltip: 'Cancel Debt',
+            tooltip: l10n.cancelDebt,
             onPressed: () => _confirmCancelDebt(),
           ),
         ],
@@ -78,7 +82,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            debt.description ?? 'Debt',
+                            debt.description ?? l10n.description,
                             style: AppTextStyles.headline2,
                           ),
                           const SizedBox(height: 8),
@@ -87,7 +91,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                             builder: (context, balanceSnapshot) {
                               final balance = balanceSnapshot.data;
                               return Text(
-                                'Balance: ${balance != null ? balance.amount : "---"} IQD',
+                                '${l10n.balance}: ${balance != null ? balance.amount : "---"} IQD',
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -98,7 +102,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                           ),
                           if (debt.dueDate != null)
                             Text(
-                              'Due: ${_formatDate(debt.dueDate!)}',
+                              '${l10n.dueDate}: ${_formatDate(debt.dueDate!)}',
                               style: AppTextStyles.bodyMedium,
                             ),
                         ],
@@ -112,10 +116,10 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                   length: 2,
                   child: Column(
                     children: [
-                      const TabBar(
+                      TabBar(
                         tabs: [
-                          Tab(text: 'Ledger'),
-                          Tab(text: 'Payments'),
+                          Tab(text: l10n.ledger),
+                          Tab(text: l10n.payments),
                         ],
                       ),
                       Expanded(
@@ -138,12 +142,27 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         onPressed: () => context.go('/debt/${widget.debtId.value}/add-payment'),
         backgroundColor: AppColors.primary,
         icon: const Icon(Icons.add),
-        label: const Text('Add Payment'),
+        label: Text(l10n.addPayment),
       ),
     );
   }
 
+  String _entryTypeLabel(LedgerEntryType type) {
+    final l10n = context.l10n;
+    switch (type) {
+      case LedgerEntryType.debt_creation:
+        return l10n.debtCreation;
+      case LedgerEntryType.payment:
+        return l10n.payment;
+      case LedgerEntryType.reversal:
+        return l10n.reversal;
+      case LedgerEntryType.adjustment:
+        return l10n.adjustment;
+    }
+  }
+
   void _showEditDebtDialog(Debt debt) {
+    final l10n = context.l10n;
     final descriptionController = TextEditingController(text: debt.description);
     final dueDateController = TextEditingController(
       text: debt.dueDate != null ? debt.dueDate.toString() : '',
@@ -152,22 +171,24 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Edit Debt'),
+        title: Text(l10n.edit),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: descriptionController,
-              decoration: const InputDecoration(labelText: 'Description'),
+              decoration: InputDecoration(labelText: l10n.description),
             ),
             TextField(
               controller: dueDateController,
-              decoration: const InputDecoration(labelText: 'Due Date (YYYY-MM-DD)'),
+              decoration: InputDecoration(labelText: l10n.dueDateHint),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(l10n.cancel)),
           ElevatedButton(
             onPressed: () async {
               final now = DateTime.now();
@@ -195,7 +216,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
               ref.invalidate(debtRepositoryProvider);
               if (dialogContext.mounted) Navigator.pop(dialogContext);
             },
-            child: const Text('Save'),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -203,16 +224,19 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
   }
 
   Future<void> _confirmDeleteDebt(Debt debt) async {
+    final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Debt'),
-        content: const Text('This will cancel the debt and zero out balance. Are you sure?'),
+        title: Text(l10n.deleteDebt),
+        content: Text(l10n.confirmDeleteDebt),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(l10n.cancel)),
           ElevatedButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Delete'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -228,16 +252,19 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
   }
 
   Future<void> _confirmCancelDebt() async {
+    final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Cancel Debt'),
-        content: const Text('Are you sure you want to cancel this debt?'),
+        title: Text(l10n.cancelDebt),
+        content: Text(l10n.confirmCancelDebt),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('No')),
+          TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(l10n.cancel)),
           ElevatedButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Yes'),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -251,12 +278,13 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
     ref.invalidate(paymentsForDebtProvider(widget.debtId));
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Debt cancelled')),
+        SnackBar(content: Text(l10n.debtCancelled)),
       );
     }
   }
 
   void _showAdjustmentDialog(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final amountController = TextEditingController();
     bool isIncrease = true;
 
@@ -266,28 +294,30 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         return StatefulBuilder(
           builder: (dialogContext, setDialogState) {
             return AlertDialog(
-              title: const Text('Add Adjustment'),
+              title: Text(l10n.addAdjustment),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
                     controller: amountController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'Amount (IQD)'),
+                    decoration: InputDecoration(labelText: l10n.adjustmentAmount),
                   ),
                   const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
                     children: [
                       ChoiceChip(
-                        label: const Text('Increase'),
+                        label: Text(l10n.increase),
                         selected: isIncrease,
-                        onSelected: (_) => setDialogState(() => isIncrease = true),
+                        onSelected: (_) =>
+                            setDialogState(() => isIncrease = true),
                       ),
                       ChoiceChip(
-                        label: const Text('Decrease'),
+                        label: Text(l10n.decrease),
                         selected: !isIncrease,
-                        onSelected: (_) => setDialogState(() => isIncrease = false),
+                        onSelected: (_) =>
+                            setDialogState(() => isIncrease = false),
                       ),
                     ],
                   ),
@@ -295,9 +325,8 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(dialogContext),
-                  child: const Text('Cancel'),
-                ),
+                    onPressed: () => Navigator.pop(dialogContext),
+                    child: Text(l10n.cancel)),
                 ElevatedButton(
                   onPressed: () async {
                     final amount = int.tryParse(amountController.text);
@@ -312,11 +341,11 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                     if (dialogContext.mounted) Navigator.pop(dialogContext);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Adjustment added')),
+                        SnackBar(content: Text(l10n.adjustmentAdded)),
                       );
                     }
                   },
-                  child: const Text('Save'),
+                  child: Text(l10n.save),
                 ),
               ],
             );
@@ -334,10 +363,12 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
   }
 
   Widget _buildLedgerList(AsyncValue<List<LedgerEntry>> entriesAsync) {
+    final l10n = context.l10n;
     return entriesAsync.when(
       data: (entries) {
         if (entries.isEmpty) {
-          return const EmptyState(icon: Icons.list_alt, title: 'No Ledger Entries');
+          return EmptyState(
+              icon: Icons.list_alt, title: l10n.noLedgerEntries);
         }
         return ListView.builder(
           itemCount: entries.length,
@@ -345,10 +376,14 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
             final entry = entries[index];
             return ListTile(
               leading: Icon(
-                entry.amount.amount >= 0 ? Icons.add_circle : Icons.remove_circle,
-                color: entry.amount.amount >= 0 ? AppColors.error : Colors.green,
+                entry.amount.amount >= 0
+                    ? Icons.add_circle
+                    : Icons.remove_circle,
+                color: entry.amount.amount >= 0
+                    ? AppColors.error
+                    : Colors.green,
               ),
-              title: Text(entry.entryType.name),
+              title: Text(_entryTypeLabel(entry.entryType)),
               subtitle: Text('${entry.amount.amount} IQD'),
               trailing: Text(_formatDate(entry.createdAt)),
             );
@@ -365,10 +400,11 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
     AsyncValue<List<Payment>> paymentsAsync,
     WidgetRef ref,
   ) {
+    final l10n = context.l10n;
     return paymentsAsync.when(
       data: (payments) {
         if (payments.isEmpty) {
-          return const EmptyState(icon: Icons.payment, title: 'No Payments');
+          return EmptyState(icon: Icons.payment, title: l10n.noPayments);
         }
         return ListView.builder(
           itemCount: payments.length,
@@ -376,7 +412,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
             final payment = payments[index];
             return ListTile(
               leading: const Icon(Icons.payment, color: AppColors.primary),
-              title: Text('Payment ${payment.amount.amount} IQD'),
+              title: Text('${l10n.payments} ${payment.amount.amount} IQD'),
               subtitle: Text(payment.paymentDate.toString()),
               trailing: payment.isDeleted
                   ? const Icon(Icons.block, color: AppColors.textSecondary)
@@ -386,11 +422,13 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                         final reversePayment = ref.read(reversePaymentProvider);
                         await reversePayment(payment.id);
                         if (!mounted) return;
-                        ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
-                        ref.invalidate(paymentsForDebtProvider(widget.debtId));
+                        ref.invalidate(
+                            ledgerEntriesForDebtProvider(widget.debtId));
+                        ref.invalidate(
+                            paymentsForDebtProvider(widget.debtId));
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Payment reversed')),
+                            SnackBar(content: Text(l10n.paymentReversed)),
                           );
                         }
                       },
@@ -404,5 +442,6 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
     );
   }
 
-  String _formatDate(DateTime date) => '${date.day}/${date.month}/${date.year}';
+  String _formatDate(DateTime date) =>
+      '${date.day}/${date.month}/${date.year}';
 }

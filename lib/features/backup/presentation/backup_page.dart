@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/localization/l10n_extension.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/empty_state.dart';
@@ -31,9 +32,9 @@ class _BackupPageState extends ConsumerState<BackupPage> {
   }
 
   Future<void> _createBackup() async {
+    final l10n = context.l10n;
     final logger = ref.read(loggingServiceProvider);
     logger.info('Creating backup');
-
     setState(() => _isLoading = true);
     try {
       final backupService = ref.read(backupServiceProvider);
@@ -41,7 +42,7 @@ class _BackupPageState extends ConsumerState<BackupPage> {
       logger.info('Backup created');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Backup created: ${file.path.split('/').last}')),
+          SnackBar(content: Text('${l10n.backupCreated}: ${file.path.split('/').last}')),
         );
       }
       await _loadBackups();
@@ -49,7 +50,7 @@ class _BackupPageState extends ConsumerState<BackupPage> {
       logger.error('Backup failed', error: e);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Backup failed: $e')),
+          SnackBar(content: Text('${l10n.backupFailed}: $e')),
         );
       }
     } finally {
@@ -58,23 +59,21 @@ class _BackupPageState extends ConsumerState<BackupPage> {
   }
 
   Future<void> _restoreBackup(File file) async {
+    final l10n = context.l10n;
     final logger = ref.read(loggingServiceProvider);
     logger.info('Restoring backup');
-
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Restore Backup'),
-        content: const Text('This will replace all current data. Are you sure?'),
+        title: Text(l10n.restore),
+        content: Text(l10n.confirmRestore),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Cancel'),
-          ),
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(l10n.cancel)),
           ElevatedButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Restore'),
-          ),
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: Text(l10n.restore)),
         ],
       ),
     );
@@ -87,14 +86,14 @@ class _BackupPageState extends ConsumerState<BackupPage> {
       logger.info('Backup restored');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Backup restored. Restart the app to apply changes.')),
+          SnackBar(content: Text(l10n.backupRestored)),
         );
       }
     } catch (e) {
       logger.error('Restore failed', error: e);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Restore failed: $e')),
+          SnackBar(content: Text('${l10n.restoreFailed}: $e')),
         );
       }
     } finally {
@@ -104,9 +103,10 @@ class _BackupPageState extends ConsumerState<BackupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Backup & Restore'),
+        title: Text(l10n.backupRestore),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/settings'),
@@ -121,16 +121,16 @@ class _BackupPageState extends ConsumerState<BackupPage> {
                   child: ElevatedButton.icon(
                     onPressed: _createBackup,
                     icon: const Icon(Icons.backup),
-                    label: const Text('Create Backup'),
+                    label: Text(l10n.createBackup),
                   ),
                 ),
                 const Divider(),
                 Expanded(
                   child: _backups == null || _backups!.isEmpty
-                      ? const EmptyState(
+                      ? EmptyState(
                           icon: Icons.backup_outlined,
-                          title: 'No backups',
-                          subtitle: 'Create your first backup to keep your data safe.',
+                          title: l10n.noBackups,
+                          subtitle: l10n.noBackups,
                         )
                       : ListView.builder(
                           itemCount: _backups!.length,
@@ -138,7 +138,8 @@ class _BackupPageState extends ConsumerState<BackupPage> {
                             final file = _backups![index];
                             final date = file.lastModifiedSync();
                             return ListTile(
-                              leading: const Icon(Icons.backup, color: AppColors.primary),
+                              leading:
+                                  const Icon(Icons.backup, color: AppColors.primary),
                               title: Text(file.path.split('/').last),
                               subtitle: Text(
                                   '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute}'),
@@ -152,7 +153,8 @@ class _BackupPageState extends ConsumerState<BackupPage> {
                                   IconButton(
                                     icon: const Icon(Icons.delete),
                                     onPressed: () async {
-                                      final backupService = ref.read(backupServiceProvider);
+                                      final backupService =
+                                          ref.read(backupServiceProvider);
                                       await backupService.deleteBackup(file);
                                       await _loadBackups();
                                     },

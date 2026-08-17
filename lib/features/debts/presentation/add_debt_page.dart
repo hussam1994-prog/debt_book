@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/localization/l10n_extension.dart';
 import '../../../core/providers.dart';
 import '../../people/providers/people_providers.dart';
 
@@ -27,30 +28,34 @@ class _AddDebtPageState extends ConsumerState<AddDebtPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Debt')),
+      appBar: AppBar(
+        title: Text(l10n.addDebt),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/person/${widget.personId.value}'),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
               controller: descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Description (optional)',
-              ),
+              decoration: InputDecoration(labelText: l10n.descriptionOptional),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: amountController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Amount (IQD)'),
+              decoration: InputDecoration(labelText: l10n.amount),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () async {
                 final amount = int.tryParse(amountController.text);
                 if (amount == null || amount <= 0) return;
-
                 final createDebt = ref.read(createDebtProvider);
                 try {
                   await createDebt(
@@ -70,7 +75,7 @@ class _AddDebtPageState extends ConsumerState<AddDebtPage> {
                   }
                 }
               },
-              child: const Text('Save Debt'),
+              child: Text(l10n.save),
             ),
           ],
         ),

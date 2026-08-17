@@ -91,4 +91,185 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get totalDebts => 'إجمالي الديون';
+
+  @override
+  String get ledger => 'دفتر الأستاذ';
+
+  @override
+  String get payments => 'الدفعات';
+
+  @override
+  String get noLedgerEntries => 'لا توجد قيود';
+
+  @override
+  String get noPayments => 'لا توجد دفعات';
+
+  @override
+  String get addAdjustment => 'إضافة تسوية';
+
+  @override
+  String get cancelDebt => 'إلغاء الدين';
+
+  @override
+  String get deleteDebt => 'حذف الدين';
+
+  @override
+  String get confirmDeleteDebt =>
+      'سيتم إلغاء الدين وتصفية الرصيد. هل أنت متأكد؟';
+
+  @override
+  String get confirmCancelDebt => 'هل أنت متأكد من إلغاء هذا الدين؟';
+
+  @override
+  String get confirmDeletePerson =>
+      'هل أنت متأكد؟ سيتم إخفاء الشخص وجميع البيانات المرتبطة.';
+
+  @override
+  String get wrongPin => 'رقم PIN خاطئ';
+
+  @override
+  String get locked => 'مقفل';
+
+  @override
+  String get setPin => 'تعيين PIN';
+
+  @override
+  String get newPin => 'PIN جديد';
+
+  @override
+  String get backupRestore => 'النسخ الاحتياطي والاستعادة';
+
+  @override
+  String get createBackup => 'إنشاء نسخة احتياطية';
+
+  @override
+  String get noBackups => 'لا توجد نسخ احتياطية';
+
+  @override
+  String get restore => 'استعادة';
+
+  @override
+  String get backup => 'نسخة احتياطية';
+
+  @override
+  String get exportCsv => 'تصدير CSV';
+
+  @override
+  String get csvExported => 'تم التصدير إلى:';
+
+  @override
+  String get exportFailed => 'فشل التصدير:';
+
+  @override
+  String get adjustmentAmount => 'المبلغ (دينار)';
+
+  @override
+  String get increase => 'زيادة';
+
+  @override
+  String get decrease => 'تخفيض';
+
+  @override
+  String get submitPayment => 'إرسال الدفعة';
+
+  @override
+  String get amount => 'المبلغ';
+
+  @override
+  String get phone => 'الهاتف';
+
+  @override
+  String get email => 'البريد الإلكتروني';
+
+  @override
+  String get notes => 'ملاحظات';
+
+  @override
+  String get name => 'الاسم';
+
+  @override
+  String get enterName => 'الاسم';
+
+  @override
+  String get phoneOptional => 'الهاتف (اختياري)';
+
+  @override
+  String get dueDateHint => 'تاريخ الاستحقاق (YYYY-MM-DD)';
+
+  @override
+  String get descriptionOptional => 'الوصف (اختياري)';
+
+  @override
+  String get debtDetails => 'تفاصيل الدين';
+
+  @override
+  String get debtCancelled => 'تم إلغاء الدين';
+
+  @override
+  String get adjustmentAdded => 'تمت إضافة التسوية';
+
+  @override
+  String get paymentReversed => 'تم عكس الدفعة';
+
+  @override
+  String get smartInsights => 'رؤى ذكية';
+
+  @override
+  String get noInsights => 'لا توجد رؤى';
+
+  @override
+  String get backupCreated => 'تم إنشاء النسخة الاحتياطية';
+
+  @override
+  String get backupFailed => 'فشل إنشاء النسخة الاحتياطية';
+
+  @override
+  String get restoreFailed => 'فشلت الاستعادة';
+
+  @override
+  String get backupRestored =>
+      'تمت الاستعادة. أعد تشغيل التطبيق لتطبيق التغييرات.';
+
+  @override
+  String get deleteBackup => 'حذف النسخة الاحتياطية';
+
+  @override
+  String get confirmRestore =>
+      'سيتم استبدال جميع البيانات الحالية. هل أنت متأكد؟';
+
+  @override
+  String get confirmDeleteBackup => 'حذف هذه النسخة الاحتياطية؟';
+
+  @override
+  String get allGood => 'كل شيء تمام! لا توجد مخالفات.';
+
+  @override
+  String get runIntegrity => 'تشغيل فحص سلامة الدفتر';
+
+  @override
+  String get pinSetSuccess => 'تم تعيين PIN بنجاح';
+
+  @override
+  String get personDetails => 'تفاصيل الشخص';
+
+  @override
+  String get rejectOverpayment => 'رفض الدفع الزائد';
+
+  @override
+  String get capAtZero => 'تغطية عند الصفر';
+
+  @override
+  String get allowOverpayment => 'السماح بالدفع الزائد';
+
+  @override
+  String get debtCreation => 'إنشاء دين';
+
+  @override
+  String get payment => 'دفعة';
+
+  @override
+  String get reversal => 'عكس';
+
+  @override
+  String get adjustment => 'تسوية';
 }

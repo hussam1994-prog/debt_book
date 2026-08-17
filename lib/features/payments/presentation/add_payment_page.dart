@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/localization/l10n_extension.dart';
 import '../../../core/providers.dart';
 import '../../people/providers/people_providers.dart';
 
@@ -19,9 +20,22 @@ class _AddPaymentPageState extends ConsumerState<AddPaymentPage> {
   OverpaymentPolicy policy = OverpaymentPolicy.reject;
 
   @override
+  void dispose() {
+    amountController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Payment')),
+      appBar: AppBar(
+        title: Text(l10n.addPayment),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/debt/${widget.debtId.value}'),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -29,7 +43,7 @@ class _AddPaymentPageState extends ConsumerState<AddPaymentPage> {
             TextField(
               controller: amountController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Amount (IQD)'),
+              decoration: InputDecoration(labelText: l10n.amount),
             ),
             const SizedBox(height: 16),
             DropdownButton<OverpaymentPolicy>(
@@ -39,18 +53,18 @@ class _AddPaymentPageState extends ConsumerState<AddPaymentPage> {
                   policy = newPolicy!;
                 });
               },
-              items: const [
+              items: [
                 DropdownMenuItem(
                   value: OverpaymentPolicy.reject,
-                  child: Text('Reject overpayment'),
+                  child: Text(l10n.rejectOverpayment),
                 ),
                 DropdownMenuItem(
                   value: OverpaymentPolicy.cap_at_zero,
-                  child: Text('Cap at zero'),
+                  child: Text(l10n.capAtZero),
                 ),
                 DropdownMenuItem(
                   value: OverpaymentPolicy.allow,
-                  child: Text('Allow overpayment'),
+                  child: Text(l10n.allowOverpayment),
                 ),
               ],
             ),
@@ -78,7 +92,7 @@ class _AddPaymentPageState extends ConsumerState<AddPaymentPage> {
                   }
                 }
               },
-              child: const Text('Submit Payment'),
+              child: Text(l10n.submitPayment),
             ),
           ],
         ),

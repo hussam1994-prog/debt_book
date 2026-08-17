@@ -265,6 +265,360 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Total Debts'**
   String get totalDebts;
+
+  /// No description provided for @ledger.
+  ///
+  /// In en, this message translates to:
+  /// **'Ledger'**
+  String get ledger;
+
+  /// No description provided for @payments.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments'**
+  String get payments;
+
+  /// No description provided for @noLedgerEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'No Ledger Entries'**
+  String get noLedgerEntries;
+
+  /// No description provided for @noPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'No Payments'**
+  String get noPayments;
+
+  /// No description provided for @addAdjustment.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Adjustment'**
+  String get addAdjustment;
+
+  /// No description provided for @cancelDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Debt'**
+  String get cancelDebt;
+
+  /// No description provided for @deleteDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Debt'**
+  String get deleteDebt;
+
+  /// No description provided for @confirmDeleteDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'This will cancel the debt and zero out balance. Are you sure?'**
+  String get confirmDeleteDebt;
+
+  /// No description provided for @confirmCancelDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to cancel this debt?'**
+  String get confirmCancelDebt;
+
+  /// No description provided for @confirmDeletePerson.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure? This will hide the person and all related data.'**
+  String get confirmDeletePerson;
+
+  /// No description provided for @wrongPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong PIN'**
+  String get wrongPin;
+
+  /// No description provided for @locked.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked'**
+  String get locked;
+
+  /// No description provided for @setPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Set PIN'**
+  String get setPin;
+
+  /// No description provided for @newPin.
+  ///
+  /// In en, this message translates to:
+  /// **'New PIN'**
+  String get newPin;
+
+  /// No description provided for @backupRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup & Restore'**
+  String get backupRestore;
+
+  /// No description provided for @createBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Backup'**
+  String get createBackup;
+
+  /// No description provided for @noBackups.
+  ///
+  /// In en, this message translates to:
+  /// **'No backups'**
+  String get noBackups;
+
+  /// No description provided for @restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get restore;
+
+  /// No description provided for @backup.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup'**
+  String get backup;
+
+  /// No description provided for @exportCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Export CSV'**
+  String get exportCsv;
+
+  /// No description provided for @csvExported.
+  ///
+  /// In en, this message translates to:
+  /// **'CSV exported to:'**
+  String get csvExported;
+
+  /// No description provided for @exportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed:'**
+  String get exportFailed;
+
+  /// No description provided for @adjustmentAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount (IQD)'**
+  String get adjustmentAmount;
+
+  /// No description provided for @increase.
+  ///
+  /// In en, this message translates to:
+  /// **'Increase'**
+  String get increase;
+
+  /// No description provided for @decrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrease'**
+  String get decrease;
+
+  /// No description provided for @submitPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Payment'**
+  String get submitPayment;
+
+  /// No description provided for @amount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get amount;
+
+  /// No description provided for @phone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get phone;
+
+  /// No description provided for @email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// No description provided for @notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get notes;
+
+  /// No description provided for @name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get name;
+
+  /// No description provided for @enterName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get enterName;
+
+  /// No description provided for @phoneOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone (optional)'**
+  String get phoneOptional;
+
+  /// No description provided for @dueDateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Due Date (YYYY-MM-DD)'**
+  String get dueDateHint;
+
+  /// No description provided for @descriptionOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
+  String get descriptionOptional;
+
+  /// No description provided for @debtDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Debt Details'**
+  String get debtDetails;
+
+  /// No description provided for @debtCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Debt cancelled'**
+  String get debtCancelled;
+
+  /// No description provided for @adjustmentAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjustment added'**
+  String get adjustmentAdded;
+
+  /// No description provided for @paymentReversed.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment reversed'**
+  String get paymentReversed;
+
+  /// No description provided for @smartInsights.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Insights'**
+  String get smartInsights;
+
+  /// No description provided for @noInsights.
+  ///
+  /// In en, this message translates to:
+  /// **'No insights'**
+  String get noInsights;
+
+  /// No description provided for @backupCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup created'**
+  String get backupCreated;
+
+  /// No description provided for @backupFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup failed'**
+  String get backupFailed;
+
+  /// No description provided for @restoreFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore failed'**
+  String get restoreFailed;
+
+  /// No description provided for @backupRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup restored. Restart the app to apply changes.'**
+  String get backupRestored;
+
+  /// No description provided for @deleteBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete backup'**
+  String get deleteBackup;
+
+  /// No description provided for @confirmRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'This will replace all current data. Are you sure?'**
+  String get confirmRestore;
+
+  /// No description provided for @confirmDeleteBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this backup?'**
+  String get confirmDeleteBackup;
+
+  /// No description provided for @allGood.
+  ///
+  /// In en, this message translates to:
+  /// **'All good! No violations found.'**
+  String get allGood;
+
+  /// No description provided for @runIntegrity.
+  ///
+  /// In en, this message translates to:
+  /// **'Run Ledger Integrity Check'**
+  String get runIntegrity;
+
+  /// No description provided for @pinSetSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN set successfully'**
+  String get pinSetSuccess;
+
+  /// No description provided for @personDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Person Details'**
+  String get personDetails;
+
+  /// No description provided for @rejectOverpayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject overpayment'**
+  String get rejectOverpayment;
+
+  /// No description provided for @capAtZero.
+  ///
+  /// In en, this message translates to:
+  /// **'Cap at zero'**
+  String get capAtZero;
+
+  /// No description provided for @allowOverpayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow overpayment'**
+  String get allowOverpayment;
+
+  /// No description provided for @debtCreation.
+  ///
+  /// In en, this message translates to:
+  /// **'Debt Creation'**
+  String get debtCreation;
+
+  /// No description provided for @payment.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get payment;
+
+  /// No description provided for @reversal.
+  ///
+  /// In en, this message translates to:
+  /// **'Reversal'**
+  String get reversal;
+
+  /// No description provided for @adjustment.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjustment'**
+  String get adjustment;
 }
 
 class _AppLocalizationsDelegate

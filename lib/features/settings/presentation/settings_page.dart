@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/localization/l10n_extension.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/theme_provider.dart';
 
@@ -18,21 +19,18 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   bool _isLoading = false;
 
   Future<void> _runIntegrityCheck() async {
+    final l10n = context.l10n;
     final logger = ref.read(loggingServiceProvider);
     logger.info('Starting ledger integrity check');
-
     setState(() {
       _isLoading = true;
       _violations = null;
     });
-
     final checker = ref.read(ledgerIntegrityCheckerProvider);
     try {
       final result = await checker.check();
       logger.info('Integrity check completed. Violations: ${result.length}');
-      setState(() {
-        _violations = result;
-      });
+      setState(() => _violations = result);
     } catch (e) {
       logger.error('Integrity check failed', error: e);
       if (mounted) {
@@ -46,23 +44,24 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   void _showSetPinDialog(BuildContext context) {
+    final l10n = context.l10n;
     final pinController = TextEditingController();
     showDialog(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Set PIN'),
+          title: Text(l10n.setPin),
           content: TextField(
             controller: pinController,
             keyboardType: TextInputType.number,
             obscureText: true,
             maxLength: 4,
-            decoration: const InputDecoration(labelText: 'New PIN'),
+            decoration: InputDecoration(labelText: l10n.newPin),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -73,11 +72,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 if (dialogContext.mounted) Navigator.pop(dialogContext);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('PIN set successfully')),
+                    SnackBar(content: Text(l10n.pinSetSuccess)),
                   );
                 }
               },
-              child: const Text('Save'),
+              child: Text(l10n.save),
             ),
           ],
         );
@@ -87,12 +86,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final themeMode = ref.watch(themeModeProvider);
     final locale = ref.watch(localeProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(l10n.settings),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/'),
@@ -103,7 +103,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         child: ListView(
           children: [
             SwitchListTile(
-              title: const Text('Dark Mode'),
+              title: Text(l10n.darkMode),
               secondary: const Icon(Icons.dark_mode),
               value: themeMode == ThemeMode.dark,
               onChanged: (value) {
@@ -113,7 +113,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             ),
             ListTile(
               leading: const Icon(Icons.language),
-              title: const Text('Language'),
+              title: Text(l10n.language),
               trailing: DropdownButton<Locale>(
                 value: locale,
                 items: const [
@@ -130,37 +130,38 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.lock),
-              title: const Text('Change PIN'),
+              title: Text(l10n.setPin),
               onTap: () => _showSetPinDialog(context),
             ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.backup),
-              title: const Text('Backup & Restore'),
+              title: Text(l10n.backupRestore),
               onTap: () => context.go('/backup'),
             ),
             const Divider(),
             ElevatedButton.icon(
               onPressed: _isLoading ? null : _runIntegrityCheck,
               icon: const Icon(Icons.fact_check),
-              label: const Text('Run Ledger Integrity Check'),
+              label: Text(l10n.runIntegrity),
             ),
             const SizedBox(height: 24),
             if (_isLoading)
               const Center(child: CircularProgressIndicator())
             else if (_violations != null)
               if (_violations!.isEmpty)
-                const Center(
+                Center(
                   child: Text(
-                    'All good! No violations found.',
-                    style: TextStyle(fontSize: 16, color: Colors.green),
+                    l10n.allGood,
+                    style: const TextStyle(fontSize: 16, color: Colors.green),
                   ),
                 )
               else
                 ...(_violations!.map(
                   (v) => Card(
                     child: ListTile(
-                      leading: const Icon(Icons.error_outline, color: Colors.red),
+                      leading:
+                          const Icon(Icons.error_outline, color: Colors.red),
                       title: Text(v.type.name),
                       subtitle: Text(v.message),
                     ),

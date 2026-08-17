@@ -1,7 +1,9 @@
+import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/localization/l10n_extension.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/empty_state.dart';
@@ -12,11 +14,12 @@ class InsightsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final insightsAsync = ref.watch(insightsProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Smart Insights'),
+        title: Text(l10n.smartInsights),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/'),
@@ -25,10 +28,10 @@ class InsightsPage extends ConsumerWidget {
       body: insightsAsync.when(
         data: (insights) {
           if (insights.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.lightbulb_outline,
-              title: 'No insights',
-              subtitle: 'Everything looks good!',
+              title: l10n.noInsights,
+              subtitle: l10n.noInsights,
             );
           }
           return ListView.builder(

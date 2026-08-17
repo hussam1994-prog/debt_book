@@ -91,4 +91,185 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get totalDebts => 'Total Debts';
+
+  @override
+  String get ledger => 'Ledger';
+
+  @override
+  String get payments => 'Payments';
+
+  @override
+  String get noLedgerEntries => 'No Ledger Entries';
+
+  @override
+  String get noPayments => 'No Payments';
+
+  @override
+  String get addAdjustment => 'Add Adjustment';
+
+  @override
+  String get cancelDebt => 'Cancel Debt';
+
+  @override
+  String get deleteDebt => 'Delete Debt';
+
+  @override
+  String get confirmDeleteDebt =>
+      'This will cancel the debt and zero out balance. Are you sure?';
+
+  @override
+  String get confirmCancelDebt => 'Are you sure you want to cancel this debt?';
+
+  @override
+  String get confirmDeletePerson =>
+      'Are you sure? This will hide the person and all related data.';
+
+  @override
+  String get wrongPin => 'Wrong PIN';
+
+  @override
+  String get locked => 'Locked';
+
+  @override
+  String get setPin => 'Set PIN';
+
+  @override
+  String get newPin => 'New PIN';
+
+  @override
+  String get backupRestore => 'Backup & Restore';
+
+  @override
+  String get createBackup => 'Create Backup';
+
+  @override
+  String get noBackups => 'No backups';
+
+  @override
+  String get restore => 'Restore';
+
+  @override
+  String get backup => 'Backup';
+
+  @override
+  String get exportCsv => 'Export CSV';
+
+  @override
+  String get csvExported => 'CSV exported to:';
+
+  @override
+  String get exportFailed => 'Export failed:';
+
+  @override
+  String get adjustmentAmount => 'Amount (IQD)';
+
+  @override
+  String get increase => 'Increase';
+
+  @override
+  String get decrease => 'Decrease';
+
+  @override
+  String get submitPayment => 'Submit Payment';
+
+  @override
+  String get amount => 'Amount';
+
+  @override
+  String get phone => 'Phone';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get notes => 'Notes';
+
+  @override
+  String get name => 'Name';
+
+  @override
+  String get enterName => 'Name';
+
+  @override
+  String get phoneOptional => 'Phone (optional)';
+
+  @override
+  String get dueDateHint => 'Due Date (YYYY-MM-DD)';
+
+  @override
+  String get descriptionOptional => 'Description (optional)';
+
+  @override
+  String get debtDetails => 'Debt Details';
+
+  @override
+  String get debtCancelled => 'Debt cancelled';
+
+  @override
+  String get adjustmentAdded => 'Adjustment added';
+
+  @override
+  String get paymentReversed => 'Payment reversed';
+
+  @override
+  String get smartInsights => 'Smart Insights';
+
+  @override
+  String get noInsights => 'No insights';
+
+  @override
+  String get backupCreated => 'Backup created';
+
+  @override
+  String get backupFailed => 'Backup failed';
+
+  @override
+  String get restoreFailed => 'Restore failed';
+
+  @override
+  String get backupRestored =>
+      'Backup restored. Restart the app to apply changes.';
+
+  @override
+  String get deleteBackup => 'Delete backup';
+
+  @override
+  String get confirmRestore =>
+      'This will replace all current data. Are you sure?';
+
+  @override
+  String get confirmDeleteBackup => 'Delete this backup?';
+
+  @override
+  String get allGood => 'All good! No violations found.';
+
+  @override
+  String get runIntegrity => 'Run Ledger Integrity Check';
+
+  @override
+  String get pinSetSuccess => 'PIN set successfully';
+
+  @override
+  String get personDetails => 'Person Details';
+
+  @override
+  String get rejectOverpayment => 'Reject overpayment';
+
+  @override
+  String get capAtZero => 'Cap at zero';
+
+  @override
+  String get allowOverpayment => 'Allow overpayment';
+
+  @override
+  String get debtCreation => 'Debt Creation';
+
+  @override
+  String get payment => 'Payment';
+
+  @override
+  String get reversal => 'Reversal';
+
+  @override
+  String get adjustment => 'Adjustment';
 }

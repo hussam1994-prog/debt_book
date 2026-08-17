@@ -96,7 +96,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                   return EmptyState(
                     icon: Icons.search,
                     title: l10n.noPeople,
-                    subtitle: 'No people match your search.',
+                    subtitle: l10n.noPeople,
                   );
                 }
 
@@ -170,12 +170,12 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
+                decoration: InputDecoration(labelText: l10n.name),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: phoneController,
-                decoration: const InputDecoration(labelText: 'Phone (optional)'),
+                decoration: InputDecoration(labelText: l10n.phoneOptional),
               ),
             ],
           ),
