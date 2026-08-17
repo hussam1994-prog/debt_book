@@ -29,14 +29,14 @@ class ReportsPage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Overview', style: AppTextStyles.headline2),
+            const Text('Overview', style: AppTextStyles.headline2),
             const SizedBox(height: AppSpacing.sm),
             _SummarySection(
               allDebtsAsync: allDebtsAsync,
               balancesAsync: balancesAsync,
             ),
             const SizedBox(height: AppSpacing.lg),
-            Text('Overdue Debts', style: AppTextStyles.headline2),
+            const Text('Overdue Debts', style: AppTextStyles.headline2),
             const SizedBox(height: AppSpacing.sm),
             overdueAsync.when(
               data: (debts) {

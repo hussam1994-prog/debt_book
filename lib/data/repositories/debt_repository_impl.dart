@@ -92,11 +92,11 @@ class DebtRepositoryImpl implements DebtRepository {
     await (_db.update(_db.debts)
           ..where((t) => t.id.equals(id.value)))
         .write(DebtsCompanion(
-          isDeleted: Value(true),
+          isDeleted: const Value(true),
           deletedAt: Value(now),
           updatedAt: Value(now),
-          status: Value('cancelled'),
-          version: Value(1),
+          status: const Value('cancelled'),
+          version: const Value(1),
         ));
   }
 }

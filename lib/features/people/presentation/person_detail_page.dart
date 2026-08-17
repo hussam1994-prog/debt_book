@@ -194,8 +194,9 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
 
     final deletePerson = ref.read(deletePersonProvider);
     await deletePerson(person.id);
+    if (!mounted) return;
     ref.invalidate(peopleProvider);
-    if (context.mounted) context.go('/');
+    context.go('/'); 
   }
 }
 

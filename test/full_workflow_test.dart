@@ -8,7 +8,6 @@ import 'package:mobile/core/providers.dart';
 import 'package:mobile/data/repositories/person_repository_impl.dart';
 import 'package:mobile/data/repositories/debt_repository_impl.dart';
 import 'package:mobile/data/repositories/payment_repository_impl.dart';
-import 'package:mobile/data/repositories/ledger_repository_impl.dart';
 import 'package:mobile/features/people/presentation/person_detail_page.dart';
 
 void main() {
@@ -16,7 +15,6 @@ void main() {
   late PersonRepositoryImpl personRepo;
   late DebtRepositoryImpl debtRepo;
   late PaymentRepositoryImpl paymentRepo;
-  late LedgerRepositoryImpl ledgerRepo;
   late UuidGenerator uuidGen;
 
   setUp(() {
@@ -24,7 +22,6 @@ void main() {
     personRepo = PersonRepositoryImpl(db);
     debtRepo = DebtRepositoryImpl(db);
     paymentRepo = PaymentRepositoryImpl(db);
-    ledgerRepo = LedgerRepositoryImpl(db);
     uuidGen = DefaultUuidGenerator();
   });
 

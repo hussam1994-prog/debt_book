@@ -74,10 +74,10 @@ class PaymentRepositoryImpl implements PaymentRepository {
     await (_db.update(_db.payments)
           ..where((t) => t.id.equals(id.value)))
         .write(PaymentsCompanion(
-          isDeleted: Value(true),
+          isDeleted: const Value(true),
           deletedAt: Value(now),
           updatedAt: Value(now),
-          version: Value(1),
+          version: const Value(1),
         ));
   }
 }

@@ -13,11 +13,20 @@ class LockScreen extends ConsumerStatefulWidget {
 class _LockScreenState extends ConsumerState<LockScreen> {
   final _pinController = TextEditingController();
 
+  @override
+  void dispose() {
+    _pinController.dispose();
+    super.dispose();
+  }
+
   Future<void> _unlock() async {
     final security = ref.read(securityServiceProvider);
     final pin = _pinController.text;
-    if (await security.verifyPin(pin)) {
-      // فتح التطبيق
+
+    final verified = await security.verifyPin(pin);
+    if (!mounted) return;
+
+    if (verified) {
       Navigator.of(context).pop(true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

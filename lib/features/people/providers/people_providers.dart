@@ -25,7 +25,7 @@ final paymentsForDebtProvider = FutureProvider.family<List<Payment>, DebtId>((re
 
 final balanceForDebtProvider = FutureProvider.family<Money, DebtId>((ref, debtId) async {
   final ledgerRepo = ref.watch(ledgerRepositoryProvider);
-  final calculator = const BalanceCalculator();
+  const calculator = BalanceCalculator();
   final entries = await ledgerRepo.findByDebtId(debtId);
   return calculator.calculateBalance(entries);
 });

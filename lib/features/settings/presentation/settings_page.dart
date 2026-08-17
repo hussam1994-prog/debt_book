@@ -135,7 +135,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                           return Card(
                             margin: const EdgeInsets.symmetric(vertical: 4),
                             child: ListTile(
-                              leading: Icon(
+                              leading: const Icon(
                                 Icons.error_outline,
                                 color: Colors.red,
                               ),

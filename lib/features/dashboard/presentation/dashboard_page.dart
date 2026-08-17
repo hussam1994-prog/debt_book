@@ -56,11 +56,11 @@ class DashboardPage extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.lg),
-            Text('Payments (Last 7 Days)', style: AppTextStyles.headline2),
+            const Text('Payments (Last 7 Days)', style: AppTextStyles.headline2),
             const SizedBox(height: AppSpacing.sm),
             _BarChart(paymentsAsync: last7PaymentsAsync),
             const SizedBox(height: AppSpacing.lg),
-            Text('Overdue Debts', style: AppTextStyles.headline2),
+            const Text('Overdue Debts', style: AppTextStyles.headline2),
             const SizedBox(height: AppSpacing.sm),
             overdueAsync.when(
               data: (debts) {

@@ -221,6 +221,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
 
     final deleteDebt = ref.read(deleteDebtProvider);
     await deleteDebt(debt.id);
+    if (!mounted) return;
     ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
     ref.invalidate(paymentsForDebtProvider(widget.debtId));
     if (context.mounted) context.go('/');
@@ -245,6 +246,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
 
     final cancelDebt = ref.read(cancelDebtProvider);
     await cancelDebt(widget.debtId);
+    if (!mounted) return;
     ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
     ref.invalidate(paymentsForDebtProvider(widget.debtId));
     if (context.mounted) {
@@ -277,18 +279,16 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                 builder: (context, value, _) {
                   return Row(
                     children: [
-                      Radio<bool>(
-                        value: true,
-                        groupValue: isIncrease.value,
-                        onChanged: (v) => isIncrease.value = v!,
+                      SwitchListTile(
+                        title: const Text('Increase'),
+                        value: isIncrease.value,
+                        onChanged: (v) => isIncrease.value = v,
                       ),
-                      const Text('Increase'),
-                      Radio<bool>(
-                        value: false,
-                        groupValue: isIncrease.value,
-                        onChanged: (v) => isIncrease.value = v!,
+                      SwitchListTile(
+                        title: const Text('Decrease'),
+                        value: !isIncrease.value,
+                        onChanged: (v) => isIncrease.value = !v,
                       ),
-                      const Text('Decrease'),
                     ],
                   );
                 },
@@ -383,6 +383,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                       onPressed: () async {
                         final reversePayment = ref.read(reversePaymentProvider);
                         await reversePayment(payment.id);
+                        if (!mounted) return;
                         ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
                         ref.invalidate(paymentsForDebtProvider(widget.debtId));
                         if (context.mounted) {

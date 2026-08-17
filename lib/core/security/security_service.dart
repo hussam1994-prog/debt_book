@@ -74,7 +74,7 @@ class SecurityService {
   /// فك تشفير نص
   Future<String> decryptText(String cipherText) async {
     final parts = cipherText.split(':');
-    if (parts.length != 2) throw FormatException('Invalid cipherText');
+    if (parts.length != 2) throw const FormatException('Invalid cipherText');
     final iv = encrypt.IV.fromBase64(parts[0]);
     final encrypted = encrypt.Encrypted.fromBase64(parts[1]);
     final key = await _getOrCreateEncryptionKey();

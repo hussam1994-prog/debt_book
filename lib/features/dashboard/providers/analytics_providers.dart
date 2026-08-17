@@ -21,7 +21,7 @@ final allPaymentsProvider = FutureProvider<List<Payment>>((ref) async {
 final balancesByDebtProvider = FutureProvider<Map<DebtId, Money>>((ref) async {
   final debts = await ref.watch(allDebtsProvider.future);
   final ledgerRepo = ref.watch(ledgerRepositoryProvider);
-  final calculator = const BalanceCalculator();
+  const calculator = BalanceCalculator();
 
   final map = <DebtId, Money>{};
   for (final debt in debts) {

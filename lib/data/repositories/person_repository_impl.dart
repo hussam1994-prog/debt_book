@@ -63,10 +63,10 @@ class PersonRepositoryImpl implements PersonRepository {
     await (_db.update(_db.persons)
           ..where((t) => t.id.equals(id.value)))
         .write(PersonsCompanion(
-          isDeleted: Value(true),
+          isDeleted: const Value(true),
           deletedAt: Value(now),
           updatedAt: Value(now),
-          version: Value(1),
+          version: const Value(1),
         ));
   }
 }
