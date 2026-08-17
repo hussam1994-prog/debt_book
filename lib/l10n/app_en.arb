@@ -90,5 +90,6 @@
   "enterPin": "Enter PIN",
   "unlock": "Unlock",
   "notifications": "Notifications",
-  "notificationsSubtitle": "Enable debt due reminders"
+  "notificationsSubtitle": "Enable debt due reminders",
+  "whatsappMessage": "Hello, you owe {amount} IQD. Please settle your debt. Thank you"
 }

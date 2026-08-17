@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +10,7 @@ import 'core/providers.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
 import 'features/dashboard/providers/analytics_providers.dart';
+import 'features/splash/presentation/splash_screen.dart';
 import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
@@ -15,17 +18,36 @@ Future<void> main() async {
   runApp(const ProviderScope(child: DebtBookApp()));
 }
 
-class DebtBookApp extends ConsumerWidget {
+class DebtBookApp extends ConsumerStatefulWidget {
   const DebtBookApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DebtBookApp> createState() => _DebtBookAppState();
+}
+
+class _DebtBookAppState extends ConsumerState<DebtBookApp> {
+  bool _showSplash = true;
+
+  @override
+  void initState() {
+    super.initState();
+    Timer(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _showSplash = false;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final themeMode = ref.watch(themeModeProvider);
     final locale = ref.watch(localeProvider);
     final notificationsEnabled = ref.watch(notificationsEnabledProvider);
     final notificationService = ref.read(notificationServiceProvider);
 
-    // جدولة أو إلغاء الإشعارات حسب التفعيل
+    // جدولة/إلغاء الإشعارات حسب التفعيل
     Future.microtask(() async {
       if (notificationsEnabled) {
         try {
@@ -40,6 +62,16 @@ class DebtBookApp extends ConsumerWidget {
         await notificationService.cancelAllReminders();
       }
     });
+
+    if (_showSplash) {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        themeMode: themeMode,
+        home: const SplashScreen(),
+      );
+    }
 
     return MaterialApp.router(
       title: 'Debt Book',
