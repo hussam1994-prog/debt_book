@@ -11,10 +11,15 @@ import '../features/settings/presentation/settings_page.dart';
 import '../features/dashboard/presentation/dashboard_page.dart';
 import '../features/backup/presentation/backup_page.dart';
 import '../features/insights/presentation/insights_page.dart';
+import '../features/reports/presentation/reports_page.dart';
 
 final router = GoRouter(
   initialLocation: '/',
   routes: [
+    GoRoute(
+      path: '/reports',
+      builder: (context, state) => const ReportsPage(),
+    ),
     GoRoute(
       path: '/insights',
       builder: (context, state) => const InsightsPage(),

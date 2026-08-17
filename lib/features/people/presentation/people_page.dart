@@ -21,6 +21,11 @@ class PeoplePage extends ConsumerWidget {
         title: const Text('People'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.bar_chart),
+            tooltip: 'Reports',
+            onPressed: () => context.go('/reports'),
+          ),
+          IconButton(
             icon: const Icon(Icons.insights),
             tooltip: 'Insights',
             onPressed: () => context.go('/insights'),
