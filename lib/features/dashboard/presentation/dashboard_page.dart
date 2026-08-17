@@ -17,6 +17,7 @@ class DashboardPage extends ConsumerWidget {
     final paidAsync = ref.watch(totalPaidProvider);
     final peopleCountAsync = ref.watch(peopleWithDebtsCountProvider);
     final overdueAsync = ref.watch(overdueDebtsProvider);
+    final last7PaymentsAsync = ref.watch(last7DaysPaymentsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -54,6 +55,10 @@ class DashboardPage extends ConsumerWidget {
                 ),
               ],
             ),
+            const SizedBox(height: AppSpacing.lg),
+            Text('Payments (Last 7 Days)', style: AppTextStyles.headline2),
+            const SizedBox(height: AppSpacing.sm),
+            _BarChart(paymentsAsync: last7PaymentsAsync),
             const SizedBox(height: AppSpacing.lg),
             Text('Overdue Debts', style: AppTextStyles.headline2),
             const SizedBox(height: AppSpacing.sm),
@@ -124,6 +129,66 @@ class _StatCard extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _BarChart extends StatelessWidget {
+  final AsyncValue<List<Payment>> paymentsAsync;
+  const _BarChart({required this.paymentsAsync});
+
+  @override
+  Widget build(BuildContext context) {
+    return paymentsAsync.when(
+      data: (payments) {
+        if (payments.isEmpty) {
+          return const Text('No payments in last 7 days.');
+        }
+        final now = DateTime.now();
+        final days = List.generate(7, (i) =>
+            DateTime(now.year, now.month, now.day).subtract(Duration(days: 6 - i)));
+        final totals = days.map((day) {
+          final dayEnd = day.add(const Duration(days: 1));
+          return payments
+              .where((p) => p.paymentDate.isAfter(day) && p.paymentDate.isBefore(dayEnd))
+              .fold<int>(0, (sum, p) => sum + p.amount.amount);
+        }).toList();
+
+        final maxVal = totals.fold<int>(0, (max, v) => v > max ? v : max);
+
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: List.generate(days.length, (index) {
+                final dayLabel = '${days[index].day}/${days[index].month}';
+                final barHeight = maxVal == 0 ? 1.0 : (totals[index] / maxVal * 80);
+                return Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('${totals[index]}', style: const TextStyle(fontSize: 10)),
+                      const SizedBox(height: 4),
+                      Container(
+                        height: barHeight + 1,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(dayLabel, style: const TextStyle(fontSize: 10)),
+                    ],
+                  ),
+                );
+              }),
+            ),
+          ),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, st) => Center(child: Text('Error: $e')),
     );
   }
 }

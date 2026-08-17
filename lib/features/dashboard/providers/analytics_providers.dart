@@ -96,3 +96,10 @@ final insightsProvider = FutureProvider<List<Insight>>((ref) async {
     paymentsByDebt: paymentsByDebt,
   );
 });
+
+final last7DaysPaymentsProvider = FutureProvider<List<Payment>>((ref) async {
+  final payments = await ref.watch(allPaymentsProvider.future);
+  final now = DateTime.now();
+  final cutoff = now.subtract(const Duration(days: 7));
+  return payments.where((p) => p.paymentDate.isAfter(cutoff)).toList();
+});
