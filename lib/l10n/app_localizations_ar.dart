@@ -284,4 +284,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get notificationsSubtitle => 'تفعيل تذكيرات الديون المستحقة';
+
+  @override
+  String whatsappMessage(Object amount) {
+    return 'مرحباً، المطلوب منك تسديد مبلغ $amount دينار عراقي. شكراً';
+  }
 }

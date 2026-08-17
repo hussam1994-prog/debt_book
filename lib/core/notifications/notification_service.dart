@@ -1,21 +1,44 @@
-import 'package:domain/domain.dart';
+import 'dart:io' show Platform;
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-
-import '../../features/dashboard/providers/analytics_providers.dart';
+import 'package:domain/domain.dart';
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
+  bool _initialized = false;
+
+  /// هل المنصة الحالية تدعم الإشعارات المحلية؟
+  bool get _isSupported =>
+      !Platform.isWindows &&
+      !Platform.isLinux &&
+      !Platform.isMacOS &&
+      !kIsWeb;
 
   Future<void> initialize() async {
+    if (!_isSupported) {
+      _initialized = false;
+      return;
+    }
+    if (_initialized) return;
+
     tz.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation('Asia/Baghdad'));
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const initSettings = InitializationSettings(android: androidSettings);
-    await _plugin.initialize(initSettings);
+
+    try {
+      await _plugin.initialize(initSettings);
+      _initialized = true;
+    } catch (e) {
+      debugPrint('Notification init failed: $e');
+      _initialized = false;
+    }
   }
 
   Future<void> scheduleDebtReminder({
@@ -24,8 +47,14 @@ class NotificationService {
     required String body,
     required DateTime dueDate,
   }) async {
-    final tz.TZDateTime scheduledDate =
-        tz.TZDateTime.from(dueDate.subtract(const Duration(days: 2)), tz.local);
+    if (!_isSupported) return;
+    await initialize();
+    if (!_initialized) return;
+
+    final tz.TZDateTime scheduledDate = tz.TZDateTime.from(
+      dueDate.subtract(const Duration(days: 2)),
+      tz.local,
+    );
 
     const androidDetails = AndroidNotificationDetails(
       'debt_reminders',
@@ -36,22 +65,30 @@ class NotificationService {
     );
     const notificationDetails = NotificationDetails(android: androidDetails);
 
-    await _plugin.zonedSchedule(
-      id,
-      title,
-      body,
-      scheduledDate,
-      notificationDetails,
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-    );
+    try {
+      await _plugin.zonedSchedule(
+        id,
+        title,
+        body,
+        scheduledDate,
+        notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
+    } catch (e) {
+      debugPrint('Schedule failed: $e');
+    }
   }
 
   Future<void> scheduleUpcomingDebtReminders({
     required List<Debt> debts,
     required Map<DebtId, Money> balances,
   }) async {
+    if (!_isSupported) return;
+    await initialize();
+    if (!_initialized) return;
+
     await cancelAllReminders();
 
     final now = DateTime.now();
@@ -75,10 +112,26 @@ class NotificationService {
   }
 
   Future<void> cancelAllReminders() async {
-    await _plugin.cancelAll();
+    if (!_isSupported) return;
+    await initialize();
+    if (!_initialized) return;
+
+    try {
+      await _plugin.cancelAll();
+    } catch (e) {
+      debugPrint('Cancel all failed: $e');
+    }
   }
 
   Future<void> cancelReminder(int id) async {
-    await _plugin.cancel(id);
+    if (!_isSupported) return;
+    await initialize();
+    if (!_initialized) return;
+
+    try {
+      await _plugin.cancel(id);
+    } catch (e) {
+      debugPrint('Cancel failed: $e');
+    }
   }
 }

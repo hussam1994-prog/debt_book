@@ -643,6 +643,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enable debt due reminders'**
   String get notificationsSubtitle;
+
+  /// No description provided for @whatsappMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello, you owe {amount} IQD. Please settle your debt. Thank you'**
+  String whatsappMessage(Object amount);
 }
 
 class _AppLocalizationsDelegate

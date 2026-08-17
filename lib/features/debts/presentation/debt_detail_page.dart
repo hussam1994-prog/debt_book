@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/whatsapp/whatsapp_service.dart';
 import '../../../core/localization/l10n_extension.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../../core/whatsapp/whatsapp_service.dart';
 import '../../people/providers/people_providers.dart';
 
 class DebtDetailPage extends ConsumerStatefulWidget {
@@ -40,11 +40,11 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.chat),
-            tooltip: 'WhatsApp Reminder',
+            tooltip: 'تذكير واتساب',
             onPressed: () {
               if (_debt != null) _sendWhatsAppReminder(_debt!);
-           },
-         ),
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.edit),
             tooltip: l10n.edit,
@@ -155,6 +155,25 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
     );
   }
 
+  Future<void> _sendWhatsAppReminder(Debt debt) async {
+    try {
+      final person = await ref.read(personRepositoryProvider).findById(debt.personId);
+      if (person == null || person.phone == null || person.phone!.isEmpty) {
+        throw Exception('No phone number for this person');
+      }
+
+      final balance = await ref.read(getBalanceProvider).call(debt.id);
+      final message = 'مرحباً، المطلوب منك تسديد مبلغ ${balance.amount} دينار عراقي. شكراً';
+      await WhatsAppService.sendReminder(phone: person.phone!, message: message);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    }
+  }
+
   String _entryTypeLabel(LedgerEntryType type) {
     final l10n = context.l10n;
     switch (type) {
@@ -229,25 +248,6 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         ],
       ),
     );
-  }
-
-  Future<void> _sendWhatsAppReminder(Debt debt) async {
-    try {
-      final person = await ref.read(personRepositoryProvider).findById(debt.personId);
-      if (person == null || person.phone == null || person.phone!.isEmpty) {
-        throw Exception('No phone number for this person');
-      }
-
-      final balance = await ref.read(getBalanceProvider).call(debt.id);
-      final message = 'مرحباً، المطلوب منك تسديد مبلغ ${balance.amount} دينار عراقي. شكراً';
-      await WhatsAppService.sendReminder(phone: person.phone!, message: message);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
-    }
   }
 
   Future<void> _confirmDeleteDebt(Debt debt) async {

@@ -284,4 +284,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationsSubtitle => 'Enable debt due reminders';
+
+  @override
+  String whatsappMessage(Object amount) {
+    return 'Hello, you owe $amount IQD. Please settle your debt. Thank you';
+  }
 }
