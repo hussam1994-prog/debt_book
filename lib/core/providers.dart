@@ -7,6 +7,7 @@ import '../core/backup/backup_service.dart';
 import '../core/security/security_service.dart';
 import '../core/export/export_service.dart';
 import '../core/database/app_database.dart';
+import '../core/notifications/notification_service.dart';
 
 import '../data/repositories/person_repository_impl.dart';
 import '../data/repositories/debt_repository_impl.dart';
@@ -177,4 +178,8 @@ final deleteDebtProvider = Provider<DeleteDebt>((ref) {
 
 final exportServiceProvider = Provider<ExportService>((ref) {
   return ExportService();
+});
+
+final notificationServiceProvider = Provider<NotificationService>((ref) {
+  return NotificationService();
 });

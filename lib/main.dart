@@ -6,9 +6,9 @@ import 'app/router.dart';
 import 'core/providers.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
-import 'package:mobile/l10n/app_localizations.dart';
+import 'l10n/app_localizations.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const ProviderScope(child: DebtBookApp()));
 }
@@ -20,6 +20,10 @@ class DebtBookApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
     final locale = ref.watch(localeProvider);
+
+    // تهيئة الإشعارات
+    final notificationService = ref.read(notificationServiceProvider);
+    notificationService.initialize();
 
     return MaterialApp.router(
       title: 'Debt Book',
