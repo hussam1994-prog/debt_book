@@ -1,3 +1,4 @@
+import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,27 +9,31 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../providers/people_providers.dart';
 
-class PeoplePage extends ConsumerWidget {
+class PeoplePage extends ConsumerStatefulWidget {
   const PeoplePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PeoplePage> createState() => _PeoplePageState();
+}
+
+class _PeoplePageState extends ConsumerState<PeoplePage> {
+  final _searchController = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final peopleAsync = ref.watch(peopleProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('People'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.bar_chart),
-            tooltip: 'Reports',
-            onPressed: () => context.go('/reports'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.insights),
-            tooltip: 'Insights',
-            onPressed: () => context.go('/insights'),
-          ),
           IconButton(
             icon: const Icon(Icons.dashboard),
             tooltip: 'Dashboard',
@@ -41,66 +46,107 @@ class PeoplePage extends ConsumerWidget {
           ),
         ],
       ),
-      body: peopleAsync.when(
-        data: (people) {
-          if (people.isEmpty) {
-            return const EmptyState(
-              icon: Icons.people_outline,
-              title: 'No People',
-              subtitle: 'Add your first person to start tracking debts.',
-            );
-          }
-          return ListView.builder(
-            padding: const EdgeInsets.only(bottom: 80),
-            itemCount: people.length,
-            itemBuilder: (context, index) {
-              final person = people[index];
-              return AppCard(
-                onTap: () => context.go('/person/${person.id.value}'),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                      child: Text(
-                        person.name.substring(0, 1).toUpperCase(),
-                        style: const TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+                AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.sm),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search by name or phone...',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _query = value.trim().toLowerCase();
+                });
+              },
+            ),
+          ),
+          Expanded(
+            child: peopleAsync.when(
+              data: (people) {
+                final filtered = _query.isEmpty
+                    ? people
+                    : people.where((p) {
+                        final nameMatch =
+                            p.name.toLowerCase().contains(_query);
+                        final phoneMatch = p.phone != null &&
+                            p.phone!.toLowerCase().contains(_query);
+                        return nameMatch || phoneMatch;
+                      }).toList();
+
+                if (filtered.isEmpty) {
+                  return const EmptyState(
+                    icon: Icons.search,
+                    title: 'No results',
+                    subtitle: 'No people match your search.',
+                  );
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.only(bottom: 80),
+                  itemCount: filtered.length,
+                  itemBuilder: (context, index) {
+                    final person = filtered[index];
+                    return AppCard(
+                      onTap: () => context.go('/person/${person.id.value}'),
+                      child: Row(
                         children: [
-                          Text(person.name, style: AppTextStyles.bodyLarge),
-                          if (person.phone != null)
-                            Text(person.phone!, style: AppTextStyles.bodyMedium),
+                          CircleAvatar(
+                            backgroundColor:
+                                AppColors.primary.withValues(alpha: 0.1),
+                            child: Text(
+                              person.name.substring(0, 1).toUpperCase(),
+                              style: const TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.md),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(person.name,
+                                    style: AppTextStyles.bodyLarge),
+                                if (person.phone != null)
+                                  Text(person.phone!,
+                                      style: AppTextStyles.bodyMedium),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.chevron_right,
+                              color: AppColors.textSecondary),
                         ],
                       ),
-                    ),
-                    const Icon(Icons.chevron_right, color: AppColors.textSecondary),
-                  ],
-                ),
-              );
-            },
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, st) => Center(child: Text('Error: $e')),
+                    );
+                  },
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, st) => Center(child: Text('Error: $e')),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddPersonDialog(context, ref),
+        onPressed: () => _showAddPersonDialog(context),
         backgroundColor: AppColors.primary,
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  void _showAddPersonDialog(BuildContext context, WidgetRef ref) {
+  void _showAddPersonDialog(BuildContext context) {
     final nameController = TextEditingController();
     final phoneController = TextEditingController();
+
     showDialog(
       context: context,
       builder: (dialogContext) {
@@ -132,7 +178,9 @@ class PeoplePage extends ConsumerWidget {
                 final createPerson = ref.read(createPersonProvider);
                 await createPerson(
                   name: name,
-                  phone: phoneController.text.trim().isEmpty ? null : phoneController.text.trim(),
+                  phone: phoneController.text.trim().isEmpty
+                      ? null
+                      : phoneController.text.trim(),
                 );
                 ref.invalidate(peopleProvider);
                 if (dialogContext.mounted) Navigator.pop(dialogContext);
