@@ -86,5 +86,7 @@
   "debtCreation": "Debt Creation",
   "payment": "Payment",
   "reversal": "Reversal",
-  "adjustment": "Adjustment"
+  "adjustment": "Adjustment",
+  "enterPin": "Enter PIN",
+  "unlock": "Unlock"
 }

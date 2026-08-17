@@ -619,6 +619,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Adjustment'**
   String get adjustment;
+
+  /// No description provided for @enterPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter PIN'**
+  String get enterPin;
+
+  /// No description provided for @unlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock'**
+  String get unlock;
 }
 
 class _AppLocalizationsDelegate

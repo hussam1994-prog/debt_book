@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/localization/l10n_extension.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/empty_state.dart';
@@ -27,11 +28,12 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final debtsAsync = ref.watch(allDebtsWithPersonNameProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All Debts'),
+        title: Text(l10n.allDebts),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/'),
@@ -45,7 +47,7 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Search by description or person...',
+                hintText: l10n.searchHint,
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -70,10 +72,10 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
                       }).toList();
 
                 if (filtered.isEmpty) {
-                  return const EmptyState(
+                  return EmptyState(
                     icon: Icons.receipt_long,
-                    title: 'No debts',
-                    subtitle: 'Try adjusting your search.',
+                    title: l10n.noDebts,
+                    subtitle: l10n.noDebts,
                   );
                 }
 
@@ -90,7 +92,7 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            debt.description ?? 'Debt',
+                            debt.description ?? l10n.description,
                             style: AppTextStyles.bodyLarge,
                           ),
                           const SizedBox(height: 4),

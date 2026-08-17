@@ -272,4 +272,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get adjustment => 'تسوية';
+
+  @override
+  String get enterPin => 'أدخل PIN';
+
+  @override
+  String get unlock => 'فتح';
 }

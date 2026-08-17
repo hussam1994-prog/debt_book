@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/localization/l10n_extension.dart';
 import '../core/providers.dart';
 
 class LockScreen extends ConsumerStatefulWidget {
@@ -30,15 +31,16 @@ class _LockScreenState extends ConsumerState<LockScreen> {
       Navigator.of(context).pop(true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Wrong PIN')),
+        SnackBar(content: Text(context.l10n.wrongPin)),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: const Text('Locked')),
+      appBar: AppBar(title: Text(l10n.locked)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -49,12 +51,12 @@ class _LockScreenState extends ConsumerState<LockScreen> {
               keyboardType: TextInputType.number,
               obscureText: true,
               maxLength: 4,
-              decoration: const InputDecoration(labelText: 'Enter PIN'),
+              decoration: InputDecoration(labelText: l10n.enterPin),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _unlock,
-              child: const Text('Unlock'),
+              child: Text(l10n.unlock),
             ),
           ],
         ),

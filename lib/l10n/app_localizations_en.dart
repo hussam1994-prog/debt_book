@@ -272,4 +272,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adjustment => 'Adjustment';
+
+  @override
+  String get enterPin => 'Enter PIN';
+
+  @override
+  String get unlock => 'Unlock';
 }
