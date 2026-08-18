@@ -122,9 +122,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               title: Text(l10n.language),
               trailing: DropdownButton<Locale>(
                 value: locale,
-                items: const [
-                  DropdownMenuItem(value: Locale('en'), child: Text(l10n.english)),
-                  DropdownMenuItem(value: Locale('ar'), child: Text(l10n.arabic)),
+                items: [
+                  DropdownMenuItem(value: const Locale('en'), child: Text(l10n.english)),
+                  DropdownMenuItem(value: const Locale('ar'), child: Text(l10n.arabic)),
                 ],
                 onChanged: (value) async {
                   if (value != null) {
@@ -141,7 +141,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               value: notificationsEnabled,
               onChanged: (value) async {
                 await ref.read(notificationsEnabledProvider.notifier).set(value);
-                // هنا يمكنك حفظ الحالة ثم جدولة أو إلغاء
                 final notificationService = ref.read(notificationServiceProvider);
                 if (value) {
                   final debts = await ref.read(allDebtsProvider.future);

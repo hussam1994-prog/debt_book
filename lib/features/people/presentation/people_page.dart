@@ -154,7 +154,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                                 );
                               },
                             ),
-                          const Icon(Icons.chevron_right,
+                          Icon(Icons.chevron_right,
                               color: Theme.of(context).colorScheme.onSurfaceVariant),
                         ],
                       ),
