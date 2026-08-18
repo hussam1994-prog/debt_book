@@ -84,7 +84,13 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
                           children: [
                             Text(person.name, style: AppTextStyles.headline2),
                             if (person.phone != null)
-                              Text(person.phone!, style: AppTextStyles.bodyMedium),
+                              Text(
+                                person.phone!,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  fontSize: 14,
+                                ),
+                              ),
                             if (person.email != null)
                               Text(person.email!, style: AppTextStyles.bodyMedium),
                           ],
@@ -253,7 +259,7 @@ class _DebtCard extends ConsumerWidget {
           Text(
             debt.status.name,
             style: TextStyle(
-              color: _statusColor(debt.status),
+              color: _statusColor(context, debt.status),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -267,16 +273,17 @@ class _DebtCard extends ConsumerWidget {
     );
   }
 
-  Color _statusColor(DebtStatus status) {
+  Color _statusColor(BuildContext context, DebtStatus status) {
+    final colorScheme = Theme.of(context).colorScheme;
     switch (status) {
       case DebtStatus.paid:
         return Colors.green;
       case DebtStatus.overdue:
-        return AppColors.error;
+        return colorScheme.error;
       case DebtStatus.cancelled:
-        return AppColors.textSecondary;
+        return colorScheme.onSurfaceVariant;
       default:
-        return AppColors.primary;
+        return colorScheme.primary;
     }
   }
 

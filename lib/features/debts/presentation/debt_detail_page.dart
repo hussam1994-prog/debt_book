@@ -6,8 +6,8 @@ import 'package:go_router/go_router.dart';
 import '../../../core/localization/l10n_extension.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/widgets/empty_state.dart';
 import '../../../core/whatsapp/whatsapp_service.dart';
+import '../../../core/widgets/empty_state.dart';
 import '../../people/providers/people_providers.dart';
 
 class DebtDetailPage extends ConsumerStatefulWidget {
@@ -40,7 +40,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.chat),
-            tooltip: 'تذكير واتساب',
+            tooltip: l10n.whatsappTooltip,
             onPressed: () {
               if (_debt != null) _sendWhatsAppReminder(_debt!);
             },
@@ -103,7 +103,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
-                                  color: _balanceColor(balance),
+                                  color: _balanceColor(context, balance),
                                 ),
                               );
                             },
@@ -155,6 +155,20 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
     );
   }
 
+  String _entryTypeLabel(LedgerEntryType type) {
+    final l10n = context.l10n;
+    switch (type) {
+      case LedgerEntryType.debt_creation:
+        return l10n.debtCreation;
+      case LedgerEntryType.payment:
+        return l10n.payment;
+      case LedgerEntryType.reversal:
+        return l10n.reversal;
+      case LedgerEntryType.adjustment:
+        return l10n.adjustment;
+    }
+  }
+
   Future<void> _sendWhatsAppReminder(Debt debt) async {
     try {
       final person = await ref.read(personRepositoryProvider).findById(debt.personId);
@@ -171,20 +185,6 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
           SnackBar(content: Text('Error: $e')),
         );
       }
-    }
-  }
-
-  String _entryTypeLabel(LedgerEntryType type) {
-    final l10n = context.l10n;
-    switch (type) {
-      case LedgerEntryType.debt_creation:
-        return l10n.debtCreation;
-      case LedgerEntryType.payment:
-        return l10n.payment;
-      case LedgerEntryType.reversal:
-        return l10n.reversal;
-      case LedgerEntryType.adjustment:
-        return l10n.adjustment;
     }
   }
 
@@ -382,11 +382,12 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
     );
   }
 
-  Color _balanceColor(Money? balance) {
-    if (balance == null) return AppColors.textPrimary;
-    if (balance.amount > 0) return AppColors.error;
+  Color _balanceColor(BuildContext context, Money? balance) {
+    final colorScheme = Theme.of(context).colorScheme;
+    if (balance == null) return colorScheme.onSurface;
+    if (balance.amount > 0) return colorScheme.error;
     if (balance.amount < 0) return Colors.green;
-    return AppColors.textPrimary;
+    return colorScheme.onSurface;
   }
 
   Widget _buildLedgerList(AsyncValue<List<LedgerEntry>> entriesAsync) {
@@ -407,7 +408,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                     ? Icons.add_circle
                     : Icons.remove_circle,
                 color: entry.amount.amount >= 0
-                    ? AppColors.error
+                    ? Theme.of(context).colorScheme.error
                     : Colors.green,
               ),
               title: Text(_entryTypeLabel(entry.entryType)),
@@ -442,7 +443,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
               title: Text('${l10n.payments} ${payment.amount.amount} IQD'),
               subtitle: Text(payment.paymentDate.toString()),
               trailing: payment.isDeleted
-                  ? const Icon(Icons.block, color: AppColors.textSecondary)
+                  ? Icon(Icons.block, color: Theme.of(context).colorScheme.onSurfaceVariant)
                   : IconButton(
                       icon: const Icon(Icons.undo, color: AppColors.error),
                       onPressed: () async {

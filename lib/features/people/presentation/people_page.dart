@@ -129,8 +129,13 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                                 Text(person.name,
                                     style: AppTextStyles.bodyLarge),
                                 if (person.phone != null)
-                                  Text(person.phone!,
-                                      style: AppTextStyles.bodyMedium),
+                                  Text(
+                                    person.phone!,
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                      fontSize: 14,
+                                   ),
+                                 ),
                               ],
                             ),
                           ),
@@ -150,7 +155,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                               },
                             ),
                           const Icon(Icons.chevron_right,
-                              color: AppColors.textSecondary),
+                              color: Theme.of(context).colorScheme.onSurfaceVariant),
                         ],
                       ),
                     );

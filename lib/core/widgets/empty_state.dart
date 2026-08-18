@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../theme/app_theme.dart';
 
 class EmptyState extends StatelessWidget {
   final IconData icon;
@@ -15,16 +14,25 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 64, color: AppColors.textSecondary),
-          const SizedBox(height: AppSpacing.md),
-          Text(title, style: AppTextStyles.headline2),
+          Icon(icon, size: 64, color: colorScheme.onSurfaceVariant),
+          const SizedBox(height: 16),
+          Text(title, style: textTheme.titleLarge),
           if (subtitle != null) ...[
-            const SizedBox(height: AppSpacing.sm),
-            Text(subtitle!, style: AppTextStyles.bodyMedium, textAlign: TextAlign.center),
+            const SizedBox(height: 8),
+            Text(
+              subtitle!,
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ],
         ],
       ),
