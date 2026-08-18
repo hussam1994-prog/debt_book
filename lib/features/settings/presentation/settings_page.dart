@@ -123,8 +123,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               trailing: DropdownButton<Locale>(
                 value: locale,
                 items: const [
-                  DropdownMenuItem(value: Locale('en'), child: Text('English')),
-                  DropdownMenuItem(value: Locale('ar'), child: Text('العربية')),
+                  DropdownMenuItem(value: Locale('en'), child: Text(l10n.english)),
+                  DropdownMenuItem(value: Locale('ar'), child: Text(l10n.arabic)),
                 ],
                 onChanged: (value) async {
                   if (value != null) {

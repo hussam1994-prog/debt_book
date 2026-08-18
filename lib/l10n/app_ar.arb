@@ -95,5 +95,8 @@
   "whatsappTooltip": "إرسال رسالة واتساب",
   "whatsappGeneralMessage": "مرحباً، هذا تذكير من دفتر الديون.",
   "nameTooLong": "الاسم طويل جداً (الحد الأقصى 50 حرف)",
-  "invalidPhone": "رقم الهاتف غير صالح"
+  "invalidPhone": "رقم الهاتف غير صالح",
+  "exportCsv": "تصدير CSV",
+  "english": "الإنجليزية",
+  "arabic": "العربية"
 }

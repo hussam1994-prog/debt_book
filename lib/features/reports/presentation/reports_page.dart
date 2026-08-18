@@ -71,7 +71,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.file_download),
-            tooltip: 'Export CSV',
+            tooltip: l10n.exportCsv,
             onPressed: _exportToCsv,
           ),
         ],

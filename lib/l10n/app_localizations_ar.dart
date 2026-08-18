@@ -301,4 +301,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get invalidPhone => 'رقم الهاتف غير صالح';
+
+  @override
+  String get english => 'الإنجليزية';
+
+  @override
+  String get arabic => 'العربية';
 }
