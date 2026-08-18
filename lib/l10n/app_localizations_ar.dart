@@ -289,4 +289,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String whatsappMessage(Object amount) {
     return 'مرحباً، المطلوب منك تسديد مبلغ $amount دينار عراقي. شكراً';
   }
+
+  @override
+  String get whatsappTooltip => 'إرسال رسالة واتساب';
+
+  @override
+  String get whatsappGeneralMessage => 'مرحباً، هذا تذكير من دفتر الديون.';
+
+  @override
+  String get nameTooLong => 'الاسم طويل جداً (الحد الأقصى 50 حرف)';
+
+  @override
+  String get invalidPhone => 'رقم الهاتف غير صالح';
 }

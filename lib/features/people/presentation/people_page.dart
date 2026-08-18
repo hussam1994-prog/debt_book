@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/localization/l10n_extension.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/whatsapp/whatsapp_service.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../providers/people_providers.dart';
@@ -133,6 +134,21 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                               ],
                             ),
                           ),
+                          // زر واتساب
+                          if (person.phone != null &&
+                              person.phone!.isNotEmpty)
+                            IconButton(
+                              icon: const Icon(Icons.chat,
+                                  color: Colors.green),
+                              tooltip: l10n.whatsappTooltip,
+                              onPressed: () async {
+                                final message = l10n.whatsappGeneralMessage;
+                                await WhatsAppService.sendReminder(
+                                  phone: person.phone!,
+                                  message: message,
+                                );
+                              },
+                            ),
                           const Icon(Icons.chevron_right,
                               color: AppColors.textSecondary),
                         ],
@@ -170,11 +186,14 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
             children: [
               TextField(
                 controller: nameController,
+                maxLength: 50,
                 decoration: InputDecoration(labelText: l10n.name),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: phoneController,
+                maxLength: 15,
+                keyboardType: TextInputType.phone,
                 decoration: InputDecoration(labelText: l10n.phoneOptional),
               ),
             ],
@@ -188,12 +207,26 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
               onPressed: () async {
                 final name = nameController.text.trim();
                 if (name.isEmpty) return;
+
+                if (name.length > 50) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.nameTooLong)),
+                  );
+                  return;
+                }
+
+                final phone = phoneController.text.trim();
+                if (phone.isNotEmpty && phone.length < 10) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.invalidPhone)),
+                  );
+                  return;
+                }
+
                 final createPerson = ref.read(createPersonProvider);
                 await createPerson(
                   name: name,
-                  phone: phoneController.text.trim().isEmpty
-                      ? null
-                      : phoneController.text.trim(),
+                  phone: phone.isEmpty ? null : phone,
                 );
                 ref.invalidate(peopleProvider);
                 if (dialogContext.mounted) Navigator.pop(dialogContext);

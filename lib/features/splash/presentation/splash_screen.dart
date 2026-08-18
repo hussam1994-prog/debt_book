@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/localization/l10n_extension.dart';
+
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       backgroundColor: colorScheme.primary,
       body: Center(
@@ -19,7 +23,7 @@ class SplashScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              'Debt Book',
+              l10n.appTitle,
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,

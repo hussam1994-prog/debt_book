@@ -91,5 +91,9 @@
   "unlock": "Unlock",
   "notifications": "Notifications",
   "notificationsSubtitle": "Enable debt due reminders",
-  "whatsappMessage": "Hello, you owe {amount} IQD. Please settle your debt. Thank you"
+  "whatsappMessage": "Hello, you owe {amount} IQD. Please settle your debt. Thank you",
+  "whatsappTooltip": "Send WhatsApp message",
+  "whatsappGeneralMessage": "Hello, this is a reminder from Debt Book.",
+  "nameTooLong": "Name is too long (max 50 characters)",
+  "invalidPhone": "Invalid phone number"
 }

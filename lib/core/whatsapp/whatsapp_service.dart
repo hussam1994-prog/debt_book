@@ -8,13 +8,25 @@ class WhatsAppService {
     required String phone,
     required String message,
   }) async {
-    // تحويل الرقم إلى صيغة دولية. نفترض أن الرقم عراقي ونضيف 964
+    // تنظيف الرقم من أي رموز
     final cleanPhone = phone.replaceAll(RegExp(r'\D'), '');
-    final intlPhone = cleanPhone.startsWith('0')
-        ? '964${cleanPhone.substring(1)}'
-        : cleanPhone;
 
-    final uri = Uri.parse('https://wa.me/$intlPhone?text=${Uri.encodeComponent(message)}');
+    // تحويل الرقم العراقي إلى صيغة دولية
+    String intlPhone = cleanPhone;
+    if (cleanPhone.startsWith('0')) {
+      intlPhone = '964${cleanPhone.substring(1)}';
+    } else if (cleanPhone.startsWith('9640')) {
+      intlPhone = '964${cleanPhone.substring(4)}';
+    } else if (cleanPhone.startsWith('964')) {
+      intlPhone = cleanPhone;
+    } else {
+      intlPhone = '964$cleanPhone';
+    }
+
+    final uri = Uri.parse(
+      'https://wa.me/$intlPhone?text=${Uri.encodeComponent(message)}',
+    );
+
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {

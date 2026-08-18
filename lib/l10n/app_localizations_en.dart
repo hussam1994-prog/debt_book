@@ -289,4 +289,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String whatsappMessage(Object amount) {
     return 'Hello, you owe $amount IQD. Please settle your debt. Thank you';
   }
+
+  @override
+  String get whatsappTooltip => 'Send WhatsApp message';
+
+  @override
+  String get whatsappGeneralMessage =>
+      'Hello, this is a reminder from Debt Book.';
+
+  @override
+  String get nameTooLong => 'Name is too long (max 50 characters)';
+
+  @override
+  String get invalidPhone => 'Invalid phone number';
 }

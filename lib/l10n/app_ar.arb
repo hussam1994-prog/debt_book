@@ -91,5 +91,9 @@
   "adjustment": "تسوية",
   "notifications": "الإشعارات",
   "notificationsSubtitle": "تفعيل تذكيرات الديون المستحقة",
-  "whatsappMessage": "مرحباً، المطلوب منك تسديد مبلغ {amount} دينار عراقي. شكراً"
+  "whatsappMessage": "مرحباً، المطلوب منك تسديد مبلغ {amount} دينار عراقي. شكراً",
+  "whatsappTooltip": "إرسال رسالة واتساب",
+  "whatsappGeneralMessage": "مرحباً، هذا تذكير من دفتر الديون.",
+  "nameTooLong": "الاسم طويل جداً (الحد الأقصى 50 حرف)",
+  "invalidPhone": "رقم الهاتف غير صالح"
 }

@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.mobile"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -17,14 +17,13 @@ android {
     defaultConfig {
         applicationId = "com.example.mobile"
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 37
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
     buildTypes {
         release {
-            // توقيع مؤقت للتصحيح
             signingConfig = signingConfigs.getByName("debug")
         }
     }

@@ -649,6 +649,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hello, you owe {amount} IQD. Please settle your debt. Thank you'**
   String whatsappMessage(Object amount);
+
+  /// No description provided for @whatsappTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Send WhatsApp message'**
+  String get whatsappTooltip;
+
+  /// No description provided for @whatsappGeneralMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello, this is a reminder from Debt Book.'**
+  String get whatsappGeneralMessage;
+
+  /// No description provided for @nameTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Name is too long (max 50 characters)'**
+  String get nameTooLong;
+
+  /// No description provided for @invalidPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid phone number'**
+  String get invalidPhone;
 }
 
 class _AppLocalizationsDelegate
