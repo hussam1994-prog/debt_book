@@ -33,12 +33,22 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
   @override
   void initState() {
     super.initState();
+
     Timer(const Duration(seconds: 2), () {
       if (mounted) {
         setState(() {
           _showSplash = false;
         });
+
+        // فحص وجود PIN بعد السبلاش
         _refreshLockState();
+
+        // تشغيل النسخ الاحتياطي التلقائي في الخلفية
+        Future.microtask(() async {
+          try {
+            await ref.read(backupServiceProvider).autoBackupIfNeeded();
+          } catch (_) {}
+        });
       }
     });
   }
@@ -59,6 +69,7 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
     final notificationsEnabled = ref.watch(notificationsEnabledProvider);
     final notificationService = ref.read(notificationServiceProvider);
 
+    // جدولة أو إلغاء الإشعارات حسب التفضيل
     Future.microtask(() async {
       if (notificationsEnabled) {
         try {
@@ -74,6 +85,7 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
       }
     });
 
+    // 1) السبلاش
     if (_showSplash) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -84,12 +96,24 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
       );
     }
 
+    // 2) قفل PIN
     if (_isLocked) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         themeMode: themeMode,
+        locale: locale,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en'),
+          Locale('ar'),
+        ],
         home: LockScreen(
           onUnlocked: () {
             setState(() {
@@ -100,6 +124,7 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
       );
     }
 
+    // 3) التطبيق الرئيسي
     return MaterialApp.router(
       title: 'Debt Book',
       theme: AppTheme.light,

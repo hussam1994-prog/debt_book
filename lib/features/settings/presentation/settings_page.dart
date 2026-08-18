@@ -113,9 +113,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               title: Text(l10n.darkMode),
               secondary: const Icon(Icons.dark_mode),
               value: themeMode == ThemeMode.dark,
-              onChanged: (value) {
-                ref.read(themeModeProvider.notifier).state =
-                    value ? ThemeMode.dark : ThemeMode.light;
+              onChanged: (value) async {
+                await ref.read(themeModeProvider.notifier).setDark(value);
               },
             ),
             ListTile(
@@ -127,9 +126,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   DropdownMenuItem(value: Locale('en'), child: Text('English')),
                   DropdownMenuItem(value: Locale('ar'), child: Text('العربية')),
                 ],
-                onChanged: (value) {
+                onChanged: (value) async {
                   if (value != null) {
-                    ref.read(localeProvider.notifier).state = value;
+                    await ref.read(localeProvider.notifier).setLocale(value);
                   }
                 },
               ),
@@ -142,8 +141,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               value: notificationsEnabled,
               onChanged: (value) async {
                 await ref.read(notificationsEnabledProvider.notifier).set(value);
-                await saveNotificationsEnabled(value);
-
+                // هنا يمكنك حفظ الحالة ثم جدولة أو إلغاء
                 final notificationService = ref.read(notificationServiceProvider);
                 if (value) {
                   final debts = await ref.read(allDebtsProvider.future);

@@ -69,11 +69,13 @@ class _BackupPageState extends ConsumerState<BackupPage> {
         content: Text(l10n.confirmRestore),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false),
-              child: Text(l10n.cancel)),
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(l10n.cancel),
+          ),
           ElevatedButton(
-              onPressed: () => Navigator.pop(dialogContext, true),
-              child: Text(l10n.restore)),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(l10n.restore),
+          ),
         ],
       ),
     );
@@ -89,8 +91,59 @@ class _BackupPageState extends ConsumerState<BackupPage> {
           SnackBar(content: Text(l10n.backupRestored)),
         );
       }
+      await _loadBackups();
     } catch (e) {
       logger.error('Restore failed', error: e);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${l10n.restoreFailed}: $e')),
+        );
+      }
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _shareBackup(File file) async {
+    final backupService = ref.read(backupServiceProvider);
+    await backupService.shareBackup(file);
+  }
+
+  Future<void> _importBackup() async {
+    final l10n = context.l10n;
+    final backupService = ref.read(backupServiceProvider);
+    final picked = await backupService.pickBackupFile();
+    if (picked == null) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.restore),
+        content: Text(l10n.confirmRestore),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(l10n.restore),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    setState(() => _isLoading = true);
+    try {
+      await backupService.importBackup(picked);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.backupRestored)),
+        );
+      }
+      await _loadBackups();
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('${l10n.restoreFailed}: $e')),
@@ -118,10 +171,24 @@ class _BackupPageState extends ConsumerState<BackupPage> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(AppSpacing.md),
-                  child: ElevatedButton.icon(
-                    onPressed: _createBackup,
-                    icon: const Icon(Icons.backup),
-                    label: Text(l10n.createBackup),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: _createBackup,
+                          icon: const Icon(Icons.backup),
+                          label: Text(l10n.createBackup),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: _importBackup,
+                          icon: const Icon(Icons.file_download),
+                          label: Text(l10n.restore),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const Divider(),
@@ -138,14 +205,19 @@ class _BackupPageState extends ConsumerState<BackupPage> {
                             final file = _backups![index];
                             final date = file.lastModifiedSync();
                             return ListTile(
-                              leading:
-                                  const Icon(Icons.backup, color: AppColors.primary),
+                              leading: const Icon(Icons.backup,
+                                  color: AppColors.primary),
                               title: Text(file.path.split('/').last),
                               subtitle: Text(
-                                  '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute}'),
+                                '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute}',
+                              ),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.share),
+                                    onPressed: () => _shareBackup(file),
+                                  ),
                                   IconButton(
                                     icon: const Icon(Icons.restore),
                                     onPressed: () => _restoreBackup(file),
