@@ -9,6 +9,7 @@ environment:
 dependencies:
   url_launcher: ^6.3.0
   shared_preferences: ^2.2.2
+  sqlite3_flutter_libs: ^0.5.24
   flutter:
     sdk: flutter
   riverpod: ^2.5.1

@@ -5,7 +5,8 @@ import '../core/localization/l10n_extension.dart';
 import '../core/providers.dart';
 
 class LockScreen extends ConsumerStatefulWidget {
-  const LockScreen({super.key});
+  final VoidCallback? onUnlocked;
+  const LockScreen({super.key, this.onUnlocked});
 
   @override
   ConsumerState<LockScreen> createState() => _LockScreenState();
@@ -28,7 +29,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
     if (!mounted) return;
 
     if (verified) {
-      Navigator.of(context).pop(true);
+      widget.onUnlocked?.call();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.l10n.wrongPin)),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'app/lock_screen.dart';
 import 'app/router.dart';
 import 'core/notifications/notification_provider.dart';
 import 'core/providers.dart';
@@ -27,6 +28,7 @@ class DebtBookApp extends ConsumerStatefulWidget {
 
 class _DebtBookAppState extends ConsumerState<DebtBookApp> {
   bool _showSplash = true;
+  bool _isLocked = false;
 
   @override
   void initState() {
@@ -36,8 +38,18 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
         setState(() {
           _showSplash = false;
         });
+        _refreshLockState();
       }
     });
+  }
+
+  Future<void> _refreshLockState() async {
+    final hasPin = await ref.read(securityServiceProvider).hasPin();
+    if (mounted) {
+      setState(() {
+        _isLocked = hasPin;
+      });
+    }
   }
 
   @override
@@ -47,7 +59,6 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
     final notificationsEnabled = ref.watch(notificationsEnabledProvider);
     final notificationService = ref.read(notificationServiceProvider);
 
-    // جدولة/إلغاء الإشعارات حسب التفعيل
     Future.microtask(() async {
       if (notificationsEnabled) {
         try {
@@ -70,6 +81,22 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
         darkTheme: AppTheme.dark,
         themeMode: themeMode,
         home: const SplashScreen(),
+      );
+    }
+
+    if (_isLocked) {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        themeMode: themeMode,
+        home: LockScreen(
+          onUnlocked: () {
+            setState(() {
+              _isLocked = false;
+            });
+          },
+        ),
       );
     }
 
