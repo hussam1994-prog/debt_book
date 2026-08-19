@@ -100,5 +100,7 @@
   "english": "English",
   "arabic": "Arabic",
   "cloudSync": "Cloud Sync",
-  "cloudSyncSuccess": "Fetched persons from cloud:"
+  "cloudSyncSuccess": "Fetched persons from cloud:",
+  "cloudSyncResult": "Synced: {persons} persons, {debts} debts, {payments} payments, {ledger} ledger entries",
+  "cloudSyncFailed": "Sync failed: {error}"
 }

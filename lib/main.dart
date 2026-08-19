@@ -13,6 +13,7 @@ import 'core/providers.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
 import 'features/dashboard/providers/analytics_providers.dart';
+import 'features/people/providers/people_providers.dart';
 import 'features/splash/presentation/splash_screen.dart';
 import 'l10n/app_localizations.dart';
 
@@ -48,11 +49,22 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
         setState(() {
           _showSplash = false;
         });
+
+        // فحص قفل PIN
         _refreshLockState();
 
+        // ✅ مهام الخلفية بعد السبلاش
         Future.microtask(() async {
+          // 1) نسخ احتياطي تلقائي
           try {
             await ref.read(backupServiceProvider).autoBackupIfNeeded();
+          } catch (_) {}
+
+          // 2) مزامنة سحابية تلقائية
+          try {
+            await ref.read(cloudSyncServiceProvider).syncAll();
+            ref.invalidate(peopleProvider);
+            ref.invalidate(allDebtsProvider);
           } catch (_) {}
         });
       }
@@ -75,6 +87,7 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
     final notificationsEnabled = ref.watch(notificationsEnabledProvider);
     final notificationService = ref.read(notificationServiceProvider);
 
+    // جدولة أو إلغاء الإشعارات حسب التفضيل
     Future.microtask(() async {
       if (notificationsEnabled) {
         try {
@@ -90,6 +103,7 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
       }
     });
 
+    // 1) السبلاش
     if (_showSplash) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -100,6 +114,7 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
       );
     }
 
+    // 2) قفل PIN
     if (_isLocked) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -127,6 +142,7 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
       );
     }
 
+    // 3) التطبيق الرئيسي
     return MaterialApp.router(
       title: 'Debt Book',
       theme: AppTheme.light,

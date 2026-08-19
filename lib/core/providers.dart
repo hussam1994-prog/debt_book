@@ -186,5 +186,5 @@ final notificationServiceProvider = Provider<NotificationService>((ref) {
 });
 
 final cloudSyncServiceProvider = Provider<CloudSyncService>((ref) {
-  return CloudSyncService();
+  return CloudSyncService(ref.watch(appDatabaseProvider));
 });

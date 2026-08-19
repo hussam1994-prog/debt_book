@@ -314,4 +314,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cloudSyncSuccess => 'Fetched persons from cloud:';
+
+  @override
+  String cloudSyncResult(
+    Object debts,
+    Object ledger,
+    Object payments,
+    Object persons,
+  ) {
+    return 'Synced: $persons persons, $debts debts, $payments payments, $ledger ledger entries';
+  }
+
+  @override
+  String cloudSyncFailed(Object error) {
+    return 'Sync failed: $error';
+  }
 }

@@ -313,4 +313,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get cloudSyncSuccess => 'تم جلب الأشخاص من السحابة:';
+
+  @override
+  String cloudSyncResult(
+    Object debts,
+    Object ledger,
+    Object payments,
+    Object persons,
+  ) {
+    return 'تمت المزامنة: $persons أشخاص، $debts ديون، $payments دفعات، $ledger قيود';
+  }
+
+  @override
+  String cloudSyncFailed(Object error) {
+    return 'فشلت المزامنة: $error';
+  }
 }

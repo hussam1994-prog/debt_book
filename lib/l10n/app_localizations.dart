@@ -697,6 +697,23 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Fetched persons from cloud:'**
   String get cloudSyncSuccess;
+
+  /// No description provided for @cloudSyncResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Synced: {persons} persons, {debts} debts, {payments} payments, {ledger} ledger entries'**
+  String cloudSyncResult(
+    Object debts,
+    Object ledger,
+    Object payments,
+    Object persons,
+  );
+
+  /// No description provided for @cloudSyncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync failed: {error}'**
+  String cloudSyncFailed(Object error);
 }
 
 class _AppLocalizationsDelegate

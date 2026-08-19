@@ -100,5 +100,7 @@
   "english": "الإنجليزية",
   "arabic": "العربية",
   "cloudSync": "مزامنة سحابية",
-  "cloudSyncSuccess": "تم جلب الأشخاص من السحابة:"
+  "cloudSyncSuccess": "تم جلب الأشخاص من السحابة:",
+  "cloudSyncResult": "تمت المزامنة: {persons} أشخاص، {debts} ديون، {payments} دفعات، {ledger} قيود",
+  "cloudSyncFailed": "فشلت المزامنة: {error}"
 }

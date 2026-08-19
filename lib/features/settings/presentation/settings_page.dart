@@ -8,6 +8,7 @@ import '../../../core/notifications/notification_provider.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/theme_provider.dart';
 import '../../dashboard/providers/analytics_providers.dart';
+import '../../people/providers/people_providers.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -117,47 +118,19 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.cloud_sync),
-              title: Text(l10n.cloudSync),
-              onTap: () async {
-                final service = ref.read(cloudSyncServiceProvider);
-                final personRepo = ref.read(personRepositoryProvider);
-                final debtRepo = ref.read(debtRepositoryProvider);
-                final paymentRepo = ref.read(paymentRepositoryProvider);
-                final ledgerRepo = ref.read(ledgerRepositoryProvider);
-
-                // رفع محلي → سحابة
-                final persons = await personRepo.findAll();
-                final debts = await debtRepo.findAll();
-                final payments = await paymentRepo.findAll();
-                final ledgerEntries = await ledgerRepo.findAll();
-
-                await service.pushPersonsToCloud(persons);
-                await service.pushDebtsToCloud(debts);
-                await service.pushPaymentsToCloud(payments);
-                await service.pushLedgerEntriesToCloud(ledgerEntries);
-
-                // جلب سحابة → عرض
-                final cloudPersons = await service.fetchPersons();
-                final cloudDebts = await service.fetchDebts();
-                final cloudPayments = await service.fetchPayments();
-                final cloudLedger = await service.fetchLedgerEntries();
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${l10n.cloudSyncSuccess} ${cloudPersons.length}')),
-                  );
-                }
-              },
-            ),
-            const Divider(),
-            ListTile(
               leading: const Icon(Icons.language),
               title: Text(l10n.language),
               trailing: DropdownButton<Locale>(
                 value: locale,
                 items: [
-                  DropdownMenuItem(value: const Locale('en'), child: Text(l10n.english)),
-                  DropdownMenuItem(value: const Locale('ar'), child: Text(l10n.arabic)),
+                  DropdownMenuItem(
+                    value: const Locale('en'),
+                    child: Text(l10n.english),
+                  ),
+                  DropdownMenuItem(
+                    value: const Locale('ar'),
+                    child: Text(l10n.arabic),
+                  ),
                 ],
                 onChanged: (value) async {
                   if (value != null) {
@@ -173,8 +146,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               secondary: const Icon(Icons.notifications),
               value: notificationsEnabled,
               onChanged: (value) async {
-                await ref.read(notificationsEnabledProvider.notifier).set(value);
-                final notificationService = ref.read(notificationServiceProvider);
+                await ref
+                    .read(notificationsEnabledProvider.notifier)
+                    .set(value);
+                final notificationService =
+                    ref.read(notificationServiceProvider);
                 if (value) {
                   final debts = await ref.read(allDebtsProvider.future);
                   final balances = await ref.read(balancesByDebtProvider.future);
@@ -184,6 +160,45 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   );
                 } else {
                   await notificationService.cancelAllReminders();
+                }
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.cloud_sync),
+              title: Text(l10n.cloudSync),
+              onTap: () async {
+                final service = ref.read(cloudSyncServiceProvider);
+                try {
+                  final result = await service.syncAll();
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          l10n.cloudSyncResult(
+                            result['persons'] ?? 0,
+                            result['debts'] ?? 0,
+                            result['payments'] ?? 0,
+                            result['ledger'] ?? 0,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                  ref.invalidate(peopleProvider);
+                  ref.invalidate(allDebtsProvider);
+                  ref.invalidate(allPaymentsProvider);
+                  ref.invalidate(balancesByDebtProvider);
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          l10n.cloudSyncFailed(e.toString()),
+                        ),
+                      ),
+                    );
+                  }
                 }
               },
             ),
@@ -220,8 +235,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 ...(_violations!.map(
                   (v) => Card(
                     child: ListTile(
-                      leading:
-                          const Icon(Icons.error_outline, color: Colors.red),
+                      leading: const Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                      ),
                       title: Text(v.type.name),
                       subtitle: Text(v.message),
                     ),
