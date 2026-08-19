@@ -24,8 +24,11 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final personAsync = ref.watch(personRepositoryProvider).findById(widget.personId);
+    final personAsync =
+        ref.watch(personRepositoryProvider).findById(widget.personId);
     final debtsAsync = ref.watch(debtsForPersonProvider(widget.personId));
+    final balancesAsync =
+        ref.watch(balancesForDebtsProvider(debtsAsync.value ?? []));
 
     return Scaffold(
       appBar: AppBar(
@@ -67,13 +70,14 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
                     children: [
                       CircleAvatar(
                         radius: 32,
-                        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                        backgroundColor:
+                            AppColors.primary.withValues(alpha: 0.1),
                         child: Text(
                           person.name.substring(0, 1).toUpperCase(),
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.md),
@@ -81,11 +85,18 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(person.name, style: Theme.of(context).textTheme.titleLarge),
+                            Text(person.name,
+                                style: Theme.of(context).textTheme.titleLarge),
                             if (person.phone != null)
-                              Text(person.phone!, style: Theme.of(context).textTheme.bodyMedium),
+                              Text(person.phone!,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium),
                             if (person.email != null)
-                              Text(person.email!, style: Theme.of(context).textTheme.bodyMedium),
+                              Text(person.email!,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium),
                           ],
                         ),
                       ),
@@ -107,9 +118,12 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
                       itemCount: debts.length,
                       itemBuilder: (context, index) {
                         final debt = debts[index];
+                        final balance = balancesAsync.value?[debt.id];
                         return _DebtCard(
                           debt: debt,
-                          onTap: () => context.go('/debt/${debt.id.value}'),
+                          balance: balance,
+                          onTap: () =>
+                              context.go('/debt/${debt.id.value}'),
                         );
                       },
                     );
@@ -146,28 +160,23 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
-              controller: nameController,
-              decoration: InputDecoration(labelText: l10n.name),
-            ),
+                controller: nameController,
+                decoration: InputDecoration(labelText: l10n.name)),
             TextField(
-              controller: phoneController,
-              decoration: InputDecoration(labelText: l10n.phone),
-            ),
+                controller: phoneController,
+                decoration: InputDecoration(labelText: l10n.phone)),
             TextField(
-              controller: emailController,
-              decoration: InputDecoration(labelText: l10n.email),
-            ),
+                controller: emailController,
+                decoration: InputDecoration(labelText: l10n.email)),
             TextField(
-              controller: notesController,
-              decoration: InputDecoration(labelText: l10n.notes),
-            ),
+                controller: notesController,
+                decoration: InputDecoration(labelText: l10n.notes)),
           ],
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(l10n.cancel),
-          ),
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(l10n.cancel)),
           ElevatedButton(
             onPressed: () async {
               final updatedPerson = Person(
@@ -209,9 +218,8 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
         content: Text(l10n.confirmDeletePerson),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text(l10n.cancel),
-          ),
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(l10n.cancel)),
           ElevatedButton(
             onPressed: () => Navigator.pop(dialogContext, true),
             child: Text(l10n.delete),
@@ -231,31 +239,27 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
 
 class _DebtCard extends ConsumerWidget {
   final Debt debt;
+  final Money? balance;
   final VoidCallback onTap;
-  const _DebtCard({required this.debt, required this.onTap});
+  const _DebtCard({
+    required this.debt,
+    required this.balance,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final balanceAsync = ref.watch(balanceForDebtProvider(debt.id));
+    final textTheme = Theme.of(context).textTheme;
 
     return AppCard(
       onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          balanceAsync.when(
-            data: (balance) {
-              return Text(
-                '${balance.amount} IQD',
-                style: Theme.of(context).textTheme.titleLarge,
-              );
-            },
-            loading: () => const Text('...'),
-            error: (e, st) => Text(
-              '${debt.amount.amount} IQD',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+          Text(
+            '${balance?.amount ?? debt.amount.amount} IQD',
+            style: textTheme.titleLarge,
           ),
           const SizedBox(height: 4),
           Text(
@@ -268,7 +272,7 @@ class _DebtCard extends ConsumerWidget {
           if (debt.dueDate != null)
             Text(
               '${l10n.dueDate}: ${_formatDate(debt.dueDate!)}',
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: textTheme.bodyMedium,
             ),
         ],
       ),

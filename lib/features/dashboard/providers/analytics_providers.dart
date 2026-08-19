@@ -3,36 +3,47 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers.dart';
 
-/// جميع الديون (غير المحذوفة).
 final allDebtsProvider = FutureProvider<List<Debt>>((ref) async {
   final repo = ref.watch(debtRepositoryProvider);
   final debts = await repo.findAll();
   return debts.where((d) => !d.isDeleted).toList();
 });
 
-/// جميع الدفعات (غير المحذوفة).
 final allPaymentsProvider = FutureProvider<List<Payment>>((ref) async {
   final repo = ref.watch(paymentRepositoryProvider);
   final payments = await repo.findAll();
   return payments.where((p) => !p.isDeleted).toList();
 });
 
-/// الرصيد الحالي لكل دين.
+/// ✅ إضافة المزود المفقود: يجمع كل الديون مع اسم الشخص
+final allDebtsWithPersonNameProvider =
+    FutureProvider<List<(Debt, String)>>((ref) async {
+  final debts = await ref.watch(allDebtsProvider.future);
+  final personRepo = ref.watch(personRepositoryProvider);
+
+  final result = <(Debt, String)>[];
+  for (final debt in debts) {
+    final person = await personRepo.findById(debt.personId);
+    result.add((debt, person?.name ?? 'Unknown'));
+  }
+  return result;
+});
+
+/// ✅ تحسين: جلب جميع القيود مرة واحدة بدلاً من استعلام لكل دين
 final balancesByDebtProvider = FutureProvider<Map<DebtId, Money>>((ref) async {
   final debts = await ref.watch(allDebtsProvider.future);
   final ledgerRepo = ref.watch(ledgerRepositoryProvider);
-  const calculator = BalanceCalculator();
+  final allEntries = await ledgerRepo.findAll();
 
-  final map = <DebtId, Money>{};
+  final calculator = const BalanceCalculator();
+  final balances = <DebtId, Money>{};
   for (final debt in debts) {
-    final entries = await ledgerRepo.findByDebtId(debt.id);
-    final balance = calculator.calculateBalance(entries);
-    map[debt.id] = balance;
+    final entries = allEntries.where((e) => e.debtId == debt.id).toList();
+    balances[debt.id] = calculator.calculateBalance(entries);
   }
-  return map;
+  return balances;
 });
 
-/// إجمالي المستحق (مجموع الأرصدة الموجبة).
 final totalOutstandingProvider = FutureProvider<Money>((ref) async {
   final balances = await ref.watch(balancesByDebtProvider.future);
   var total = 0;
@@ -42,7 +53,6 @@ final totalOutstandingProvider = FutureProvider<Money>((ref) async {
   return Money(amount: total);
 });
 
-/// إجمالي المدفوع.
 final totalPaidProvider = FutureProvider<Money>((ref) async {
   final payments = await ref.watch(allPaymentsProvider.future);
   var total = 0;
@@ -52,7 +62,6 @@ final totalPaidProvider = FutureProvider<Money>((ref) async {
   return Money(amount: total);
 });
 
-/// عدد الأشخاص الذين لديهم ديون نشطة.
 final peopleWithDebtsCountProvider = FutureProvider<int>((ref) async {
   final debts = await ref.watch(allDebtsProvider.future);
   final balances = await ref.watch(balancesByDebtProvider.future);
@@ -66,7 +75,6 @@ final peopleWithDebtsCountProvider = FutureProvider<int>((ref) async {
   return activePersonIds.length;
 });
 
-/// الديون المتأخرة.
 final overdueDebtsProvider = FutureProvider<List<Debt>>((ref) async {
   final debts = await ref.watch(allDebtsProvider.future);
   final balances = await ref.watch(balancesByDebtProvider.future);
@@ -77,6 +85,13 @@ final overdueDebtsProvider = FutureProvider<List<Debt>>((ref) async {
     if (debt.dueDate == null) return false;
     return debt.dueDate!.isBefore(now);
   }).toList();
+});
+
+final last7DaysPaymentsProvider = FutureProvider<List<Payment>>((ref) async {
+  final payments = await ref.watch(allPaymentsProvider.future);
+  final now = DateTime.now();
+  final cutoff = now.subtract(const Duration(days: 7));
+  return payments.where((p) => p.paymentDate.isAfter(cutoff)).toList();
 });
 
 final insightsProvider = FutureProvider<List<Insight>>((ref) async {
@@ -95,24 +110,4 @@ final insightsProvider = FutureProvider<List<Insight>>((ref) async {
     balances: balances,
     paymentsByDebt: paymentsByDebt,
   );
-});
-
-final last7DaysPaymentsProvider = FutureProvider<List<Payment>>((ref) async {
-  final payments = await ref.watch(allPaymentsProvider.future);
-  final now = DateTime.now();
-  final cutoff = now.subtract(const Duration(days: 7));
-  return payments.where((p) => p.paymentDate.isAfter(cutoff)).toList();
-});
-
-final allDebtsWithPersonNameProvider = FutureProvider<List<(Debt, String)>>((ref) async {
-  final debts = await ref.watch(allDebtsProvider.future);
-  final personRepo = ref.watch(personRepositoryProvider);
-  final result = <(Debt, String)>[];
-
-  for (final debt in debts) {
-    final person = await personRepo.findById(debt.personId);
-    final personName = person?.name ?? 'Unknown';
-    result.add((debt, personName));
-  }
-  return result;
 });

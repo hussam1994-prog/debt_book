@@ -37,15 +37,29 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.memory() : super(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) async {
           await m.createAll();
+          await _createIndexes();
         },
-        onUpgrade: (m, from, to) async {},
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await _createIndexes();
+          }
+        },
       );
+
+  Future<void> _createIndexes() async {
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_debts_person_id ON debts(person_id);');
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_payments_debt_id ON payments(debt_id);');
+    await customStatement(
+        'CREATE INDEX IF NOT EXISTS idx_ledger_debt_id ON ledger_entries(debt_id);');
+  }
 
   static QueryExecutor _openConnection() {
     if (!kIsWeb &&
