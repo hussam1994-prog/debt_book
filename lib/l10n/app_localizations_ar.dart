@@ -328,4 +328,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String cloudSyncFailed(Object error) {
     return 'فشلت المزامنة: $error';
   }
+
+  @override
+  String get login => 'تسجيل الدخول';
+
+  @override
+  String get register => 'إنشاء حساب';
+
+  @override
+  String get password => 'كلمة المرور';
+
+  @override
+  String get logoutConfirm => 'هل أنت متأكد من تسجيل الخروج؟';
+
+  @override
+  String get pleaseFillFields => 'يرجى إدخال البريد وكلمة المرور';
+
+  @override
+  String get passwordTooShort => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+
+  @override
+  String get checkEmailToConfirm => 'تم إنشاء الحساب. تحقق من بريدك للتأكيد.';
+
+  @override
+  String get forgotPassword => 'نسيت كلمة المرور؟';
+
+  @override
+  String get send => 'إرسال';
+
+  @override
+  String get resetEmailSent => 'تم إرسال رابط إعادة التعيين. تحقق من بريدك.';
 }

@@ -14,11 +14,16 @@ class CloudSyncService {
 
   CloudSyncService(this._db);
 
+  String? get _userId => _client.auth.currentUser?.id;
+
   // ========== Persons ==========
   Future<void> pushPersonsToCloud(List<Person> persons) async {
+    final userId = _userId;
+    if (userId == null) return;
     for (final person in persons) {
       await _client.from('persons').upsert({
         'id': person.id.value,
+        'user_id': userId,
         'name': person.name,
         'phone': person.phone,
         'email': person.email,
@@ -30,9 +35,12 @@ class CloudSyncService {
   }
 
   Future<List<Map<String, dynamic>>> fetchPersons() async {
+    final userId = _userId;
+    if (userId == null) return [];
     final data = await _client
         .from('persons')
         .select()
+        .eq('user_id', userId)
         .eq('is_deleted', false);
     return data;
   }
@@ -69,9 +77,12 @@ class CloudSyncService {
 
   // ========== Debts ==========
   Future<void> pushDebtsToCloud(List<Debt> debts) async {
+    final userId = _userId;
+    if (userId == null) return;
     for (final debt in debts) {
       await _client.from('debts').upsert({
         'id': debt.id.value,
+        'user_id': userId,
         'person_id': debt.personId.value,
         'description': debt.description,
         'amount': debt.amount.amount,
@@ -87,9 +98,12 @@ class CloudSyncService {
   }
 
   Future<List<Map<String, dynamic>>> fetchDebts() async {
+    final userId = _userId;
+    if (userId == null) return [];
     final data = await _client
         .from('debts')
         .select()
+        .eq('user_id', userId)
         .eq('is_deleted', false);
     return data;
   }
@@ -133,9 +147,12 @@ class CloudSyncService {
 
   // ========== Payments ==========
   Future<void> pushPaymentsToCloud(List<Payment> payments) async {
+    final userId = _userId;
+    if (userId == null) return;
     for (final payment in payments) {
       await _client.from('payments').upsert({
         'id': payment.id.value,
+        'user_id': userId,
         'debt_id': payment.debtId.value,
         'amount': payment.amount.amount,
         'currency': payment.amount.currency,
@@ -151,9 +168,12 @@ class CloudSyncService {
   }
 
   Future<List<Map<String, dynamic>>> fetchPayments() async {
+    final userId = _userId;
+    if (userId == null) return [];
     final data = await _client
         .from('payments')
         .select()
+        .eq('user_id', userId)
         .eq('is_deleted', false);
     return data;
   }
@@ -194,9 +214,12 @@ class CloudSyncService {
 
   // ========== Ledger ==========
   Future<void> pushLedgerEntriesToCloud(List<LedgerEntry> entries) async {
+    final userId = _userId;
+    if (userId == null) return;
     for (final entry in entries) {
       await _client.from('ledger_entries').upsert({
         'id': entry.id.value,
+        'user_id': userId,
         'debt_id': entry.debtId.value,
         'entry_type': entry.entryType.name,
         'amount': entry.amount.amount,
@@ -211,7 +234,12 @@ class CloudSyncService {
   }
 
   Future<List<Map<String, dynamic>>> fetchLedgerEntries() async {
-    final data = await _client.from('ledger_entries').select();
+    final userId = _userId;
+    if (userId == null) return [];
+    final data = await _client
+        .from('ledger_entries')
+        .select()
+        .eq('user_id', userId);
     return data;
   }
 
@@ -253,7 +281,6 @@ class CloudSyncService {
     final paymentRepo = PaymentRepositoryImpl(_db);
     final ledgerRepo = LedgerRepositoryImpl(_db);
 
-    // رفع
     final persons = await personRepo.findAll();
     final debts = await debtRepo.findAll();
     final payments = await paymentRepo.findAll();
@@ -264,13 +291,11 @@ class CloudSyncService {
     await pushPaymentsToCloud(payments);
     await pushLedgerEntriesToCloud(ledger);
 
-    // جلب
     await syncPersonsFromCloud();
     await syncDebtsFromCloud();
     await syncPaymentsFromCloud();
     await syncLedgerEntriesFromCloud();
 
-    // ✅ إرجاع إجمالي الصفوف في السحابة
     final cloudPersons = await fetchPersons();
     final cloudDebts = await fetchDebts();
     final cloudPayments = await fetchPayments();

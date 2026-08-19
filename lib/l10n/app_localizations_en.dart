@@ -329,4 +329,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String cloudSyncFailed(Object error) {
     return 'Sync failed: $error';
   }
+
+  @override
+  String get login => 'Login';
+
+  @override
+  String get register => 'Register';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get logoutConfirm => 'Are you sure you want to logout?';
+
+  @override
+  String get pleaseFillFields => 'Please enter email and password';
+
+  @override
+  String get passwordTooShort => 'Password must be at least 6 characters';
+
+  @override
+  String get checkEmailToConfirm =>
+      'Account created. Check your email to confirm.';
+
+  @override
+  String get forgotPassword => 'Forgot Password?';
+
+  @override
+  String get send => 'Send';
+
+  @override
+  String get resetEmailSent => 'Reset email sent. Check your inbox.';
 }

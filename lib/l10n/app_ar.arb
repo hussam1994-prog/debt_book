@@ -102,5 +102,16 @@
   "cloudSync": "مزامنة سحابية",
   "cloudSyncSuccess": "تم جلب الأشخاص من السحابة:",
   "cloudSyncResult": "تمت المزامنة: {persons} أشخاص، {debts} ديون، {payments} دفعات، {ledger} قيود",
-  "cloudSyncFailed": "فشلت المزامنة: {error}"
+  "cloudSyncFailed": "فشلت المزامنة: {error}",
+  "login": "تسجيل الدخول",
+  "register": "إنشاء حساب",
+  "password": "كلمة المرور",
+  "logout": "تسجيل الخروج",
+  "logoutConfirm": "هل أنت متأكد من تسجيل الخروج؟",
+  "pleaseFillFields": "يرجى إدخال البريد وكلمة المرور",
+  "passwordTooShort": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+  "checkEmailToConfirm": "تم إنشاء الحساب. تحقق من بريدك للتأكيد.",
+  "forgotPassword": "نسيت كلمة المرور؟",
+  "send": "إرسال",
+  "resetEmailSent": "تم إرسال رابط إعادة التعيين. تحقق من بريدك."
 }

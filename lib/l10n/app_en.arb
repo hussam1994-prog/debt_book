@@ -102,5 +102,16 @@
   "cloudSync": "Cloud Sync",
   "cloudSyncSuccess": "Fetched persons from cloud:",
   "cloudSyncResult": "Synced: {persons} persons, {debts} debts, {payments} payments, {ledger} ledger entries",
-  "cloudSyncFailed": "Sync failed: {error}"
+  "cloudSyncFailed": "Sync failed: {error}",
+  "login": "Login",
+  "register": "Register",
+  "password": "Password",
+  "logout": "Logout",
+  "logoutConfirm": "Are you sure you want to logout?",
+  "pleaseFillFields": "Please enter email and password",
+  "passwordTooShort": "Password must be at least 6 characters",
+  "checkEmailToConfirm": "Account created. Check your email to confirm.",
+  "forgotPassword": "Forgot Password?",
+  "send": "Send",
+  "resetEmailSent": "Reset email sent. Check your inbox."
 }
