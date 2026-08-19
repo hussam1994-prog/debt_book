@@ -1,4 +1,3 @@
-import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,6 +14,7 @@ class InsightsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
     final insightsAsync = ref.watch(insightsProvider);
 
     return Scaffold(
@@ -47,7 +47,7 @@ class InsightsPage extends ConsumerWidget {
                     Expanded(
                       child: Text(
                         insight.message,
-                        style: AppTextStyles.bodyLarge,
+                        style: textTheme.bodyLarge,
                       ),
                     ),
                     if (insight.debtId != null)

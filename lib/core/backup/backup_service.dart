@@ -74,26 +74,23 @@ class BackupService {
   }
 
   Future<void> shareBackup(File backupFile) async {
-    await Share.shareXFiles(
-      [XFile(backupFile.path)],
-      subject: 'Debt Book Backup',
-      text: 'نسخة احتياطية من تطبيق دفتر الديون',
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile(backupFile.path)],
+        subject: 'Debt Book Backup',
+        text: 'نسخة احتياطية من تطبيق دفتر الديون',
+      ),
     );
   }
 
   Future<File?> pickBackupFile() async {
-    final result = await FilePicker.pickFiles(
-      type: FileType.any,
-      allowMultiple: false,
-    );
+    final result = await FilePicker.pickFiles(type: FileType.any);
 
-    if (result != null && result.isNotEmpty) {
-      final firstFile = result.first;
-      if (firstFile.path != null) {
-        return File(firstFile.path!);
-      }
-    }
-    return null;
+    if (result.isEmpty) return null;
+
+    final path = result.first.path;
+    if (path == null) return null;
+    return File(path);
   }
 
   Future<void> importBackup(File sourceFile) async {

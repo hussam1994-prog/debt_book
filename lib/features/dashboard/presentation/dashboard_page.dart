@@ -15,6 +15,7 @@ class DashboardPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
     final outstandingAsync = ref.watch(totalOutstandingProvider);
     final paidAsync = ref.watch(totalPaidProvider);
     final peopleCountAsync = ref.watch(peopleWithDebtsCountProvider);
@@ -58,11 +59,11 @@ class DashboardPage extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.lg),
-            Text(l10n.paymentsLast7Days, style: AppTextStyles.headline2),
+            Text(l10n.paymentsLast7Days, style: textTheme.titleLarge),
             const SizedBox(height: AppSpacing.sm),
             _BarChart(paymentsAsync: last7PaymentsAsync),
             const SizedBox(height: AppSpacing.lg),
-            Text(l10n.noOverdue, style: AppTextStyles.headline2),
+            Text(l10n.noOverdue, style: textTheme.titleLarge),
             const SizedBox(height: AppSpacing.sm),
             overdueAsync.when(
               data: (debts) {
@@ -103,6 +104,7 @@ class _StatCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final textTheme = Theme.of(context).textTheme;
     return Expanded(
       child: AppCard(
         padding: const EdgeInsets.all(AppSpacing.sm),
@@ -110,7 +112,7 @@ class _StatCard extends ConsumerWidget {
           children: [
             Icon(icon, color: color, size: 28),
             const SizedBox(height: 4),
-            Text(label, style: AppTextStyles.bodyMedium),
+            Text(label, style: textTheme.bodyMedium),
             const SizedBox(height: 4),
             valueAsync.when(
               data: (value) {
@@ -119,7 +121,7 @@ class _StatCard extends ConsumerWidget {
                     : '$value';
                 return Text(
                   display,
-                  style: AppTextStyles.headline2.copyWith(fontSize: 14),
+                  style: textTheme.titleMedium?.copyWith(fontSize: 14),
                   textAlign: TextAlign.center,
                 );
               },

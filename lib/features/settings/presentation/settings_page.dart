@@ -21,7 +21,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   bool _isLoading = false;
 
   Future<void> _runIntegrityCheck() async {
-    final l10n = context.l10n;
     final logger = ref.read(loggingServiceProvider);
     logger.info('Starting ledger integrity check');
 

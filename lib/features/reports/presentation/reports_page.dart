@@ -57,6 +57,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
     final allDebtsAsync = ref.watch(allDebtsProvider);
     final balancesAsync = ref.watch(balancesByDebtProvider);
     final overdueAsync = ref.watch(overdueDebtsProvider);
@@ -81,14 +82,14 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.overview, style: AppTextStyles.headline2),
+            Text(l10n.overview, style: textTheme.titleLarge),
             const SizedBox(height: AppSpacing.sm),
             _SummarySection(
               allDebtsAsync: allDebtsAsync,
               balancesAsync: balancesAsync,
             ),
             const SizedBox(height: AppSpacing.lg),
-            Text(l10n.noOverdue, style: AppTextStyles.headline2),
+            Text(l10n.noOverdue, style: textTheme.titleLarge),
             const SizedBox(height: AppSpacing.sm),
             overdueAsync.when(
               data: (debts) {
@@ -124,7 +125,6 @@ class _SummarySection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-
     return Row(
       children: [
         _StatBox(
@@ -176,6 +176,7 @@ class _StatBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Expanded(
       child: Card(
         child: Padding(
@@ -184,7 +185,7 @@ class _StatBox extends StatelessWidget {
             children: [
               Icon(icon, color: color, size: 28),
               const SizedBox(height: 8),
-              Text(label, style: AppTextStyles.bodyMedium),
+              Text(label, style: textTheme.bodyMedium),
               const SizedBox(height: 4),
               valueAsync.when(
                 data: (value) {
@@ -193,7 +194,7 @@ class _StatBox extends StatelessWidget {
                       : '$value';
                   return Text(
                     display,
-                    style: AppTextStyles.headline2.copyWith(fontSize: 14),
+                    style: textTheme.titleMedium?.copyWith(fontSize: 14),
                   );
                 },
                 loading: () => const SizedBox(

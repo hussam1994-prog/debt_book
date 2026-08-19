@@ -28,6 +28,7 @@ class _BackupPageState extends ConsumerState<BackupPage> {
   Future<void> _loadBackups() async {
     final backupService = ref.read(backupServiceProvider);
     final backups = await backupService.listBackups();
+    if (!mounted) return;
     setState(() => _backups = backups);
   }
 
@@ -40,21 +41,19 @@ class _BackupPageState extends ConsumerState<BackupPage> {
       final backupService = ref.read(backupServiceProvider);
       final file = await backupService.createBackup();
       logger.info('Backup created');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${l10n.backupCreated}: ${file.path.split('/').last}')),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${l10n.backupCreated}: ${file.path.split('/').last}')),
+      );
       await _loadBackups();
     } catch (e) {
       logger.error('Backup failed', error: e);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${l10n.backupFailed}: $e')),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${l10n.backupFailed}: $e')),
+      );
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -86,27 +85,26 @@ class _BackupPageState extends ConsumerState<BackupPage> {
       final backupService = ref.read(backupServiceProvider);
       await backupService.restoreBackup(file);
       logger.info('Backup restored');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.backupRestored)),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.backupRestored)),
+      );
       await _loadBackups();
     } catch (e) {
       logger.error('Restore failed', error: e);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${l10n.restoreFailed}: $e')),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${l10n.restoreFailed}: $e')),
+      );
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _shareBackup(File file) async {
     final backupService = ref.read(backupServiceProvider);
     await backupService.shareBackup(file);
+    // لا حاجة لاستخدام context هنا
   }
 
   Future<void> _importBackup() async {
@@ -115,6 +113,7 @@ class _BackupPageState extends ConsumerState<BackupPage> {
     final picked = await backupService.pickBackupFile();
     if (picked == null) return;
 
+    if (!mounted) return;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -137,20 +136,18 @@ class _BackupPageState extends ConsumerState<BackupPage> {
     setState(() => _isLoading = true);
     try {
       await backupService.importBackup(picked);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.backupRestored)),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.backupRestored)),
+      );
       await _loadBackups();
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${l10n.restoreFailed}: $e')),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${l10n.restoreFailed}: $e')),
+      );
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -228,6 +225,7 @@ class _BackupPageState extends ConsumerState<BackupPage> {
                                       final backupService =
                                           ref.read(backupServiceProvider);
                                       await backupService.deleteBackup(file);
+                                      if (!mounted) return;
                                       await _loadBackups();
                                     },
                                   ),

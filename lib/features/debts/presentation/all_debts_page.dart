@@ -1,4 +1,3 @@
-import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -29,6 +28,7 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
     final debtsAsync = ref.watch(allDebtsWithPersonNameProvider);
 
     return Scaffold(
@@ -93,20 +93,16 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
                         children: [
                           Text(
                             debt.description ?? l10n.description,
-                            style: AppTextStyles.bodyLarge,
+                            style: textTheme.bodyLarge,
                           ),
                           const SizedBox(height: 4),
                           Text(
                             personName,
-                            style: AppTextStyles.bodyMedium,
+                            style: textTheme.bodyMedium,
                           ),
                           Text(
                             '${debt.amount.amount} IQD',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
+                            style: textTheme.titleMedium,
                           ),
                         ],
                       ),
