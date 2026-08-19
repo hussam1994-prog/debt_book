@@ -122,13 +122,26 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               onTap: () async {
                 final service = ref.read(cloudSyncServiceProvider);
                 final personRepo = ref.read(personRepositoryProvider);
+                final debtRepo = ref.read(debtRepositoryProvider);
+                final paymentRepo = ref.read(paymentRepositoryProvider);
+                final ledgerRepo = ref.read(ledgerRepositoryProvider);
 
-                // 1) رفع المحليين إلى السحابة
-                final localPersons = await personRepo.findAll();
-                await service.pushPersonsToCloud(localPersons);
+                // رفع محلي → سحابة
+                final persons = await personRepo.findAll();
+                final debts = await debtRepo.findAll();
+                final payments = await paymentRepo.findAll();
+                final ledgerEntries = await ledgerRepo.findAll();
 
-                // 2) جلب العدد من السحابة
+                await service.pushPersonsToCloud(persons);
+                await service.pushDebtsToCloud(debts);
+                await service.pushPaymentsToCloud(payments);
+                await service.pushLedgerEntriesToCloud(ledgerEntries);
+
+                // جلب سحابة → عرض
                 final cloudPersons = await service.fetchPersons();
+                final cloudDebts = await service.fetchDebts();
+                final cloudPayments = await service.fetchPayments();
+                final cloudLedger = await service.fetchLedgerEntries();
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('${l10n.cloudSyncSuccess} ${cloudPersons.length}')),
