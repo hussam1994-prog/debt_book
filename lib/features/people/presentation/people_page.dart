@@ -32,6 +32,8 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
   Widget build(BuildContext context) {
     final peopleAsync = ref.watch(peopleProvider);
     final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -115,7 +117,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                                 AppColors.primary.withValues(alpha: 0.1),
                             child: Text(
                               person.name.substring(0, 1).toUpperCase(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -126,16 +128,18 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(person.name,
-                                    style: AppTextStyles.bodyLarge),
+                                // ✅ اسم الشخص: واضح في الوضعين
+                                Text(
+                                  person.name,
+                                  style: textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                                 if (person.phone != null)
                                   Text(
                                     person.phone!,
-                                    style: TextStyle(
-                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                      fontSize: 14,
-                                   ),
-                                 ),
+                                    style: textTheme.bodyMedium,
+                                  ),
                               ],
                             ),
                           ),
@@ -154,8 +158,10 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                                 );
                               },
                             ),
-                          Icon(Icons.chevron_right,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant),
+                          Icon(
+                            Icons.chevron_right,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
                         ],
                       ),
                     );

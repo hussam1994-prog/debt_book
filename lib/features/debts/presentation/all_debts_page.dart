@@ -102,7 +102,11 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
                           ),
                           Text(
                             '${debt.amount.amount} IQD',
-                            style: AppTextStyles.headline2.copyWith(fontSize: 16),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                           ),
                         ],
                       ),

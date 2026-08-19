@@ -70,11 +70,10 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
                         backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                         child: Text(
                           person.name.substring(0, 1).toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 24,
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.md),
@@ -82,17 +81,11 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(person.name, style: AppTextStyles.headline2),
+                            Text(person.name, style: Theme.of(context).textTheme.titleLarge),
                             if (person.phone != null)
-                              Text(
-                                person.phone!,
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                  fontSize: 14,
-                                ),
-                              ),
+                              Text(person.phone!, style: Theme.of(context).textTheme.bodyMedium),
                             if (person.email != null)
-                              Text(person.email!, style: AppTextStyles.bodyMedium),
+                              Text(person.email!, style: Theme.of(context).textTheme.bodyMedium),
                           ],
                         ),
                       ),
@@ -153,23 +146,28 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
-                controller: nameController,
-                decoration: InputDecoration(labelText: l10n.name)),
+              controller: nameController,
+              decoration: InputDecoration(labelText: l10n.name),
+            ),
             TextField(
-                controller: phoneController,
-                decoration: InputDecoration(labelText: l10n.phone)),
+              controller: phoneController,
+              decoration: InputDecoration(labelText: l10n.phone),
+            ),
             TextField(
-                controller: emailController,
-                decoration: InputDecoration(labelText: l10n.email)),
+              controller: emailController,
+              decoration: InputDecoration(labelText: l10n.email),
+            ),
             TextField(
-                controller: notesController,
-                decoration: InputDecoration(labelText: l10n.notes)),
+              controller: notesController,
+              decoration: InputDecoration(labelText: l10n.notes),
+            ),
           ],
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(l10n.cancel)),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(l10n.cancel),
+          ),
           ElevatedButton(
             onPressed: () async {
               final updatedPerson = Person(
@@ -211,8 +209,9 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
         content: Text(l10n.confirmDeletePerson),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false),
-              child: Text(l10n.cancel)),
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(l10n.cancel),
+          ),
           ElevatedButton(
             onPressed: () => Navigator.pop(dialogContext, true),
             child: Text(l10n.delete),
@@ -249,11 +248,14 @@ class _DebtCard extends ConsumerWidget {
             data: (balance) {
               return Text(
                 '${balance.amount} IQD',
-                style: AppTextStyles.headline2,
+                style: Theme.of(context).textTheme.titleLarge,
               );
             },
             loading: () => const Text('...'),
-            error: (e, st) => Text('${debt.amount.amount} IQD'),
+            error: (e, st) => Text(
+              '${debt.amount.amount} IQD',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
@@ -266,7 +268,7 @@ class _DebtCard extends ConsumerWidget {
           if (debt.dueDate != null)
             Text(
               '${l10n.dueDate}: ${_formatDate(debt.dueDate!)}',
-              style: AppTextStyles.bodyMedium,
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
         ],
       ),

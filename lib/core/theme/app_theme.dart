@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color primary = Color(0xFF006A4E); // أخضر عراقي عميق
+  static const Color primary = Color(0xFF006A4E);
   static const Color primaryDark = Color(0xFF004D39);
-  static const Color accent = Color(0xFFF5A623); // ذهبي
+  static const Color accent = Color(0xFFF5A623);
   static const Color background = Color(0xFFF8F9FA);
   static const Color surface = Colors.white;
   static const Color error = Color(0xFFD32F2F);
-  static const Color textPrimary = Color(0xFF1C1C1E);
-  static const Color textSecondary = Color(0xFF6C757D);
+  // لاحظ: حذفنا textPrimary و textSecondary من هنا نهائيًا
   static const Color divider = Color(0xFFE0E0E0);
 }
 
@@ -20,30 +19,8 @@ class AppSpacing {
   static const double xl = 32;
 }
 
-class AppTextStyles {
-  static const TextStyle headline1 = TextStyle(
-    fontSize: 28,
-    fontWeight: FontWeight.bold,
-    color: AppColors.textPrimary,
-  );
-  static const TextStyle headline2 = TextStyle(
-    fontSize: 22,
-    fontWeight: FontWeight.w600,
-    color: AppColors.textPrimary,
-  );
-  static const TextStyle bodyLarge = TextStyle(
-    fontSize: 16,
-    color: AppColors.textPrimary,
-  );
-  static const TextStyle bodyMedium = TextStyle(
-    fontSize: 14,
-    color: AppColors.textSecondary,
-  );
-  static const TextStyle button = TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.w600,
-  );
-}
+// ❌ حذفنا كلاس AppTextStyles بالكامل لأنه كان يستخدم ألوانًا ثابتة
+// بدلاً منه نستخدم Theme.of(context).textTheme في الشاشات
 
 class AppTheme {
   static ThemeData get light {
@@ -59,7 +36,7 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.background,
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
+        foregroundColor: AppColors.primaryDark,
         elevation: 0,
         centerTitle: true,
       ),

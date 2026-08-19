@@ -91,7 +91,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                         children: [
                           Text(
                             debt.description ?? l10n.description,
-                            style: AppTextStyles.headline2,
+                            style: Theme.of(context).textTheme.titleLarge,
                           ),
                           const SizedBox(height: 8),
                           FutureBuilder<Money>(
@@ -111,7 +111,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                           if (debt.dueDate != null)
                             Text(
                               '${l10n.dueDate}: ${_formatDate(debt.dueDate!)}',
-                              style: AppTextStyles.bodyMedium,
+                              style: Theme.of(context).textTheme.bodyMedium,
                             ),
                         ],
                       ),
@@ -214,8 +214,9 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(l10n.cancel)),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(l10n.cancel),
+          ),
           ElevatedButton(
             onPressed: () async {
               final now = DateTime.now();
@@ -259,8 +260,9 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         content: Text(l10n.confirmDeleteDebt),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false),
-              child: Text(l10n.cancel)),
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(l10n.cancel),
+          ),
           ElevatedButton(
             onPressed: () => Navigator.pop(dialogContext, true),
             child: Text(l10n.delete),
@@ -287,8 +289,9 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         content: Text(l10n.confirmCancelDebt),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false),
-              child: Text(l10n.cancel)),
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(l10n.cancel),
+          ),
           ElevatedButton(
             onPressed: () => Navigator.pop(dialogContext, true),
             child: Text(l10n.save),
@@ -352,8 +355,9 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
               ),
               actions: [
                 TextButton(
-                    onPressed: () => Navigator.pop(dialogContext),
-                    child: Text(l10n.cancel)),
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: Text(l10n.cancel),
+                ),
                 ElevatedButton(
                   onPressed: () async {
                     final amount = int.tryParse(amountController.text);
@@ -396,7 +400,9 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
       data: (entries) {
         if (entries.isEmpty) {
           return EmptyState(
-              icon: Icons.list_alt, title: l10n.noLedgerEntries);
+            icon: Icons.list_alt,
+            title: l10n.noLedgerEntries,
+          );
         }
         return ListView.builder(
           itemCount: entries.length,
@@ -443,7 +449,10 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
               title: Text('${l10n.payments} ${payment.amount.amount} IQD'),
               subtitle: Text(payment.paymentDate.toString()),
               trailing: payment.isDeleted
-                  ? Icon(Icons.block, color: Theme.of(context).colorScheme.onSurfaceVariant)
+                  ? Icon(
+                      Icons.block,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    )
                   : IconButton(
                       icon: const Icon(Icons.undo, color: AppColors.error),
                       onPressed: () async {
