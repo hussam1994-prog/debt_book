@@ -98,5 +98,7 @@
   "invalidPhone": "رقم الهاتف غير صالح",
   "exportCsv": "تصدير CSV",
   "english": "الإنجليزية",
-  "arabic": "العربية"
+  "arabic": "العربية",
+  "cloudSync": "مزامنة سحابية",
+  "cloudSyncSuccess": "تم جلب الأشخاص من السحابة:"
 }

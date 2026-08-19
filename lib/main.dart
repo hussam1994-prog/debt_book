@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app/lock_screen.dart';
 import 'app/router.dart';
+import 'core/cloud/supabase_config.dart';
 import 'core/notifications/notification_provider.dart';
 import 'core/providers.dart';
 import 'core/theme/app_theme.dart';
@@ -16,6 +18,13 @@ import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ✅ تهيئة Supabase
+  await Supabase.initialize(
+    url: SupabaseConfig.url,
+    anonKey: SupabaseConfig.anonKey,
+  );
+
   runApp(const ProviderScope(child: DebtBookApp()));
 }
 
@@ -39,11 +48,8 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
         setState(() {
           _showSplash = false;
         });
-
-        // فحص وجود PIN بعد السبلاش
         _refreshLockState();
 
-        // تشغيل النسخ الاحتياطي التلقائي في الخلفية
         Future.microtask(() async {
           try {
             await ref.read(backupServiceProvider).autoBackupIfNeeded();
@@ -69,7 +75,6 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
     final notificationsEnabled = ref.watch(notificationsEnabledProvider);
     final notificationService = ref.read(notificationServiceProvider);
 
-    // جدولة أو إلغاء الإشعارات حسب التفضيل
     Future.microtask(() async {
       if (notificationsEnabled) {
         try {
@@ -85,7 +90,6 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
       }
     });
 
-    // 1) السبلاش
     if (_showSplash) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -96,7 +100,6 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
       );
     }
 
-    // 2) قفل PIN
     if (_isLocked) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -124,7 +127,6 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
       );
     }
 
-    // 3) التطبيق الرئيسي
     return MaterialApp.router(
       title: 'Debt Book',
       theme: AppTheme.light,

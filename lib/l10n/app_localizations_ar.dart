@@ -307,4 +307,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get arabic => 'العربية';
+
+  @override
+  String get cloudSync => 'مزامنة سحابية';
+
+  @override
+  String get cloudSyncSuccess => 'تم جلب الأشخاص من السحابة:';
 }

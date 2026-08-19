@@ -8,6 +8,7 @@ import '../core/security/security_service.dart';
 import '../core/export/export_service.dart';
 import '../core/database/app_database.dart';
 import '../core/notifications/notification_service.dart';
+import '../core/cloud/cloud_sync_service.dart';
 
 import '../data/repositories/person_repository_impl.dart';
 import '../data/repositories/debt_repository_impl.dart';
@@ -182,4 +183,8 @@ final exportServiceProvider = Provider<ExportService>((ref) {
 
 final notificationServiceProvider = Provider<NotificationService>((ref) {
   return NotificationService();
+});
+
+final cloudSyncServiceProvider = Provider<CloudSyncService>((ref) {
+  return CloudSyncService();
 });

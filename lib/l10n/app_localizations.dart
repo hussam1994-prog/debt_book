@@ -685,6 +685,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Arabic'**
   String get arabic;
+
+  /// No description provided for @cloudSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Sync'**
+  String get cloudSync;
+
+  /// No description provided for @cloudSyncSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetched persons from cloud:'**
+  String get cloudSyncSuccess;
 }
 
 class _AppLocalizationsDelegate

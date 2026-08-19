@@ -98,5 +98,7 @@
   "invalidPhone": "Invalid phone number",
   "exportCsv": "Export CSV",
   "english": "English",
-  "arabic": "Arabic"
+  "arabic": "Arabic",
+  "cloudSync": "Cloud Sync",
+  "cloudSyncSuccess": "Fetched persons from cloud:"
 }

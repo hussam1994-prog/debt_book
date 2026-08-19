@@ -117,6 +117,27 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               },
             ),
             ListTile(
+              leading: const Icon(Icons.cloud_sync),
+              title: Text(l10n.cloudSync),
+              onTap: () async {
+                final service = ref.read(cloudSyncServiceProvider);
+                final personRepo = ref.read(personRepositoryProvider);
+
+                // 1) رفع المحليين إلى السحابة
+                final localPersons = await personRepo.findAll();
+                await service.pushPersonsToCloud(localPersons);
+
+                // 2) جلب العدد من السحابة
+                final cloudPersons = await service.fetchPersons();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${l10n.cloudSyncSuccess} ${cloudPersons.length}')),
+                  );
+                }
+              },
+            ),
+            const Divider(),
+            ListTile(
               leading: const Icon(Icons.language),
               title: Text(l10n.language),
               trailing: DropdownButton<Locale>(
