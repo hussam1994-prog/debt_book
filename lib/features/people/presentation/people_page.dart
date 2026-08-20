@@ -2,6 +2,7 @@ import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/localization/l10n_extension.dart';
 import '../../../core/providers.dart';
@@ -10,6 +11,7 @@ import '../../../core/whatsapp/whatsapp_service.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/sync_status_banner.dart';
+import '../../dashboard/providers/analytics_providers.dart';
 import '../providers/people_providers.dart';
 
 class PeoplePage extends ConsumerStatefulWidget {
@@ -60,6 +62,47 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
     );
   }
 
+  Future<void> _refresh() async {
+    final l10n = context.l10n;
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.pleaseLoginFirst)),
+      );
+      return;
+    }
+
+    final service = ref.read(cloudSyncServiceProvider);
+    try {
+      final result = await service.syncAll();
+      ref.invalidate(peopleProvider);
+      ref.invalidate(allDebtsProvider);
+      ref.invalidate(allPaymentsProvider);
+      ref.invalidate(balancesByDebtProvider);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              l10n.cloudSyncResult(
+                result['persons'] ?? 0,
+                result['debts'] ?? 0,
+                result['payments'] ?? 0,
+                result['ledger'] ?? 0,
+              ),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.cloudSyncFailed(e.toString()))),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final peopleAsync = ref.watch(peopleProvider);
@@ -71,6 +114,11 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
       appBar: AppBar(
         title: Text(l10n.people),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: l10n.refresh,
+            onPressed: _refresh,
+          ),
           IconButton(
             icon: const Icon(Icons.receipt_long),
             tooltip: l10n.allDebts,
@@ -175,7 +223,6 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                               ],
                             ),
                           ),
-                          // زر واتساب
                           if (person.phone != null &&
                               person.phone!.isNotEmpty)
                             IconButton(
@@ -190,7 +237,6 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                                 );
                               },
                             ),
-                          // زر حذف
                           IconButton(
                             icon: const Icon(Icons.delete_outline,
                                 color: Colors.red),

@@ -138,5 +138,7 @@
   "dueSoonNotificationBody": "Your debt is due soon",
   "personDeleted": "Person deleted successfully",
   "delete": "Delete",
-  "confirmDeletePerson": "Are you sure? This will hide the person and all related data."
+  "confirmDeletePerson": "Are you sure? This will hide the person and all related data.",
+  "refresh": "Refresh",
+  "personDeleted": "Person deleted successfully"
 }
