@@ -135,5 +135,8 @@
   "newDebtNotificationTitle": "دين جديد",
   "newDebtNotificationBody": "تمت إضافة دين بقيمة {amount} دينار",
   "dueSoonNotificationTitle": "تذكير",
-  "dueSoonNotificationBody": "دينك يستحق قريبًا"
+  "dueSoonNotificationBody": "دينك يستحق قريبًا",
+  "personDeleted": "تم حذف الشخص بنجاح",
+  "delete": "حذف",
+  "confirmDeletePerson": "هل أنت متأكد؟ سيتم إخفاء الشخص وجميع البيانات المرتبطة."
 }

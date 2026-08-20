@@ -906,6 +906,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your debt is due soon'**
   String get dueSoonNotificationBody;
+
+  /// No description provided for @personDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Person deleted successfully'**
+  String get personDeleted;
 }
 
 class _AppLocalizationsDelegate

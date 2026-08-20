@@ -429,4 +429,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dueSoonNotificationBody => 'Your debt is due soon';
+
+  @override
+  String get personDeleted => 'Person deleted successfully';
 }

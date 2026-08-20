@@ -29,6 +29,37 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
     super.dispose();
   }
 
+  Future<void> _confirmDeletePerson(Person person) async {
+    final l10n = context.l10n;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.delete),
+        content: Text(l10n.confirmDeletePerson),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(l10n.delete),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    final deletePerson = ref.read(deletePersonProvider);
+    await deletePerson(person.id);
+    if (!mounted) return;
+    ref.invalidate(peopleProvider);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(l10n.personDeleted)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final peopleAsync = ref.watch(peopleProvider);
@@ -64,7 +95,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
       ),
       body: Column(
         children: [
-          const SyncStatusBanner(), // ✅ مؤشر حالة المزامنة
+          const SyncStatusBanner(),
           Padding(
             padding: const EdgeInsets.fromLTRB(
                 AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.sm),
@@ -144,6 +175,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                               ],
                             ),
                           ),
+                          // زر واتساب
                           if (person.phone != null &&
                               person.phone!.isNotEmpty)
                             IconButton(
@@ -158,6 +190,13 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                                 );
                               },
                             ),
+                          // زر حذف
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline,
+                                color: Colors.red),
+                            tooltip: l10n.delete,
+                            onPressed: () => _confirmDeletePerson(person),
+                          ),
                           Icon(
                             Icons.chevron_right,
                             color: colorScheme.onSurfaceVariant,

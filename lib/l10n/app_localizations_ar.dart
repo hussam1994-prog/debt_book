@@ -427,4 +427,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get dueSoonNotificationBody => 'دينك يستحق قريبًا';
+
+  @override
+  String get personDeleted => 'تم حذف الشخص بنجاح';
 }

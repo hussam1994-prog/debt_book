@@ -135,5 +135,8 @@
   "newDebtNotificationTitle": "New Debt",
   "newDebtNotificationBody": "A debt of {amount} IQD was added",
   "dueSoonNotificationTitle": "Reminder",
-  "dueSoonNotificationBody": "Your debt is due soon"
+  "dueSoonNotificationBody": "Your debt is due soon",
+  "personDeleted": "Person deleted successfully",
+  "delete": "Delete",
+  "confirmDeletePerson": "Are you sure? This will hide the person and all related data."
 }
