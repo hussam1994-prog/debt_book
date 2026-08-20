@@ -14,6 +14,7 @@ class LockScreen extends ConsumerStatefulWidget {
 
 class _LockScreenState extends ConsumerState<LockScreen> {
   final _pinController = TextEditingController();
+  bool _obscurePin = true;
 
   @override
   void dispose() {
@@ -40,26 +41,69 @@ class _LockScreenState extends ConsumerState<LockScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.locked)),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _pinController,
-              keyboardType: TextInputType.number,
-              obscureText: true,
-              maxLength: 4,
-              decoration: InputDecoration(labelText: l10n.enterPin),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.lock,
+                  size: 80,
+                  color: colorScheme.primary,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.locked,
+                  style: textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                TextField(
+                  controller: _pinController,
+                  keyboardType: TextInputType.number,
+                  obscureText: _obscurePin,
+                  maxLength: 4,
+                  textAlign: TextAlign.center,
+                  style: textTheme.headlineSmall?.copyWith(
+                    letterSpacing: 12,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: l10n.enterPin,
+                    counterText: '',
+                    prefixIcon: const Icon(Icons.pin),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePin ? Icons.visibility_off : Icons.visibility,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePin = !_obscurePin;
+                        });
+                      },
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _unlock,
+                    child: Text(l10n.unlock),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _unlock,
-              child: Text(l10n.unlock),
-            ),
-          ],
+          ),
         ),
       ),
     );
