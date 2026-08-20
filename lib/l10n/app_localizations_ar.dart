@@ -430,4 +430,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get personDeleted => 'تم حذف الشخص بنجاح';
+
+  @override
+  String get refresh => 'تحديث';
 }

@@ -37,7 +37,10 @@ class PersonRepositoryImpl implements PersonRepository {
 
   @override
   Future<List<Person>> findAll() async {
-    final rows = await _db.select(_db.persons).get();
+    // ✅ إصلاح: إرجاع الأشخاص غير المحذوفين فقط
+    final rows = await (_db.select(_db.persons)
+          ..where((t) => t.isDeleted.equals(false)))
+        .get();
     return rows.map(PersonMapper.fromRow).toList();
   }
 
@@ -63,10 +66,10 @@ class PersonRepositoryImpl implements PersonRepository {
     await (_db.update(_db.persons)
           ..where((t) => t.id.equals(id.value)))
         .write(PersonsCompanion(
-          isDeleted: const Value(true),
+          isDeleted: Value(true),
           deletedAt: Value(now),
           updatedAt: Value(now),
-          version: const Value(1),
+          version: Value(1),
         ));
   }
 }

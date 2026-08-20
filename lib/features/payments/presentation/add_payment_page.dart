@@ -25,9 +25,17 @@ class _AddPaymentPageState extends ConsumerState<AddPaymentPage> {
     super.dispose();
   }
 
+  /// ✅ تحديث محلي بعد إضافة الدفعة
+  void _refreshLocal() {
+    ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
+    ref.invalidate(paymentsForDebtProvider(widget.debtId));
+    ref.invalidate(balanceForDebtProvider(widget.debtId));
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.addPayment),
@@ -43,7 +51,7 @@ class _AddPaymentPageState extends ConsumerState<AddPaymentPage> {
             TextField(
               controller: amountController,
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: l10n.amount),
+              decoration: InputDecoration(labelText: l10n.adjustmentAmount),
             ),
             const SizedBox(height: 16),
             DropdownButton<OverpaymentPolicy>(
@@ -73,6 +81,7 @@ class _AddPaymentPageState extends ConsumerState<AddPaymentPage> {
               onPressed: () async {
                 final amount = int.tryParse(amountController.text);
                 if (amount == null || amount <= 0) return;
+
                 final addPayment = ref.read(addPaymentProvider);
                 try {
                   await addPayment(
@@ -80,9 +89,10 @@ class _AddPaymentPageState extends ConsumerState<AddPaymentPage> {
                     amount: Money(amount: amount),
                     policy: policy,
                   );
-                  ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
-                  ref.invalidate(paymentsForDebtProvider(widget.debtId));
-                  ref.invalidate(balanceForDebtProvider(widget.debtId));
+
+                  // ✅ تحديث محلي
+                  _refreshLocal();
+
                   if (context.mounted) context.pop();
                 } catch (e) {
                   if (context.mounted) {

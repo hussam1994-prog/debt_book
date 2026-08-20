@@ -912,6 +912,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Person deleted successfully'**
   String get personDeleted;
+
+  /// No description provided for @refresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get refresh;
 }
 
 class _AppLocalizationsDelegate

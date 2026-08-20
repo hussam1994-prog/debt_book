@@ -21,138 +21,17 @@ class DebtDetailPage extends ConsumerStatefulWidget {
 class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
   Debt? _debt;
 
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final debtAsync = ref.watch(debtRepositoryProvider).findById(widget.debtId);
-    final entriesAsync = ref.watch(ledgerEntriesForDebtProvider(widget.debtId));
-    final paymentsAsync = ref.watch(paymentsForDebtProvider(widget.debtId));
-    final getBalance = ref.read(getBalanceProvider);
-    final balanceAsync = getBalance(widget.debtId);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.debtDetails),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/'),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.chat),
-            tooltip: l10n.whatsappTooltip,
-            onPressed: () {
-              if (_debt != null) _sendWhatsAppReminder(_debt!);
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.edit),
-            tooltip: l10n.edit,
-            onPressed: () {
-              if (_debt != null) _showEditDebtDialog(_debt!);
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete),
-            tooltip: l10n.deleteDebt,
-            onPressed: () {
-              if (_debt != null) _confirmDeleteDebt(_debt!);
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.tune),
-            tooltip: l10n.addAdjustment,
-            onPressed: () => _showAdjustmentDialog(context, ref),
-          ),
-          IconButton(
-            icon: const Icon(Icons.cancel_outlined),
-            tooltip: l10n.cancelDebt,
-            onPressed: () => _confirmCancelDebt(),
-          ),
-        ],
-      ),
-      body: FutureBuilder<Debt?>(
-        future: debtAsync,
-        builder: (context, debtSnapshot) {
-          final debt = debtSnapshot.data;
-          if (debt != null) {
-            _debt = debt;
-          }
-          return Column(
-            children: [
-              if (debt != null)
-                Padding(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            debt.description ?? l10n.description,
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          const SizedBox(height: 8),
-                          FutureBuilder<Money>(
-                            future: balanceAsync,
-                            builder: (context, balanceSnapshot) {
-                              final balance = balanceSnapshot.data;
-                              return Text(
-                                '${l10n.balance}: ${balance != null ? balance.amount : "---"} IQD',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: _balanceColor(context, balance),
-                                ),
-                              );
-                            },
-                          ),
-                          if (debt.dueDate != null)
-                            Text(
-                              '${l10n.dueDate}: ${_formatDate(debt.dueDate!)}',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              const Divider(),
-              Expanded(
-                child: DefaultTabController(
-                  length: 2,
-                  child: Column(
-                    children: [
-                      TabBar(
-                        tabs: [
-                          Tab(text: l10n.ledger),
-                          Tab(text: l10n.payments),
-                        ],
-                      ),
-                      Expanded(
-                        child: TabBarView(
-                          children: [
-                            _buildLedgerList(entriesAsync),
-                            _buildPaymentsList(context, paymentsAsync, ref),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go('/debt/${widget.debtId.value}/add-payment'),
-        backgroundColor: AppColors.primary,
-        icon: const Icon(Icons.add),
-        label: Text(l10n.addPayment),
-      ),
-    );
+  /// ✅ تحديث محلي فقط: إعادة قراءة بيانات الدين والقيود والدفعات
+  void _refreshLocal() {
+    ref.invalidate(debtRepositoryProvider);
+    ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
+    ref.invalidate(paymentsForDebtProvider(widget.debtId));
+    ref.invalidate(balanceForDebtProvider(widget.debtId));
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تم تحديث التفاصيل محليًا')),
+      );
+    }
   }
 
   String _entryTypeLabel(LedgerEntryType type) {
@@ -171,13 +50,15 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
 
   Future<void> _sendWhatsAppReminder(Debt debt) async {
     try {
-      final person = await ref.read(personRepositoryProvider).findById(debt.personId);
+      final person =
+          await ref.read(personRepositoryProvider).findById(debt.personId);
       if (person == null || person.phone == null || person.phone!.isEmpty) {
         throw Exception('No phone number for this person');
       }
 
       final balance = await ref.read(getBalanceProvider).call(debt.id);
-      final message = 'مرحباً، المطلوب منك تسديد مبلغ ${balance.amount} دينار عراقي. شكراً';
+      final message =
+          'مرحباً، المطلوب منك تسديد مبلغ ${balance.amount} دينار عراقي. شكراً';
       await WhatsAppService.sendReminder(phone: person.phone!, message: message);
     } catch (e) {
       if (mounted) {
@@ -214,9 +95,8 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(l10n.cancel),
-          ),
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(l10n.cancel)),
           ElevatedButton(
             onPressed: () async {
               final now = DateTime.now();
@@ -260,9 +140,8 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         content: Text(l10n.confirmDeleteDebt),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text(l10n.cancel),
-          ),
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(l10n.cancel)),
           ElevatedButton(
             onPressed: () => Navigator.pop(dialogContext, true),
             child: Text(l10n.delete),
@@ -289,9 +168,8 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         content: Text(l10n.confirmCancelDebt),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: Text(l10n.cancel),
-          ),
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(l10n.cancel)),
           ElevatedButton(
             onPressed: () => Navigator.pop(dialogContext, true),
             child: Text(l10n.save),
@@ -355,9 +233,8 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(dialogContext),
-                  child: Text(l10n.cancel),
-                ),
+                    onPressed: () => Navigator.pop(dialogContext),
+                    child: Text(l10n.cancel)),
                 ElevatedButton(
                   onPressed: () async {
                     final amount = int.tryParse(amountController.text);
@@ -400,11 +277,10 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
       data: (entries) {
         if (entries.isEmpty) {
           return EmptyState(
-            icon: Icons.list_alt,
-            title: l10n.noLedgerEntries,
-          );
+              icon: Icons.list_alt, title: l10n.noLedgerEntries);
         }
         return ListView.builder(
+          physics: const AlwaysScrollableScrollPhysics(),
           itemCount: entries.length,
           itemBuilder: (context, index) {
             final entry = entries[index];
@@ -441,6 +317,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
           return EmptyState(icon: Icons.payment, title: l10n.noPayments);
         }
         return ListView.builder(
+          physics: const AlwaysScrollableScrollPhysics(),
           itemCount: payments.length,
           itemBuilder: (context, index) {
             final payment = payments[index];
@@ -481,4 +358,146 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
 
   String _formatDate(DateTime date) =>
       '${date.day}/${date.month}/${date.year}';
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final debtAsync = ref.watch(debtRepositoryProvider).findById(widget.debtId);
+    final entriesAsync = ref.watch(ledgerEntriesForDebtProvider(widget.debtId));
+    final paymentsAsync = ref.watch(paymentsForDebtProvider(widget.debtId));
+    final getBalance = ref.read(getBalanceProvider);
+    final balanceAsync = getBalance(widget.debtId);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.debtDetails),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/'),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: l10n.refresh,
+            onPressed: _refreshLocal, // ✅ زر تحديث محلي
+          ),
+          IconButton(
+            icon: const Icon(Icons.chat),
+            tooltip: l10n.whatsappTooltip,
+            onPressed: () {
+              if (_debt != null) _sendWhatsAppReminder(_debt!);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.edit),
+            tooltip: l10n.edit,
+            onPressed: () {
+              if (_debt != null) _showEditDebtDialog(_debt!);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete),
+            tooltip: l10n.deleteDebt,
+            onPressed: () {
+              if (_debt != null) _confirmDeleteDebt(_debt!);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.tune),
+            tooltip: l10n.addAdjustment,
+            onPressed: () => _showAdjustmentDialog(context, ref),
+          ),
+          IconButton(
+            icon: const Icon(Icons.cancel_outlined),
+            tooltip: l10n.cancelDebt,
+            onPressed: () => _confirmCancelDebt(),
+          ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: () async => _refreshLocal(), // ✅ سحب للتحديث
+        child: FutureBuilder<Debt?>(
+          future: debtAsync,
+          builder: (context, debtSnapshot) {
+            final debt = debtSnapshot.data;
+            if (debt != null) {
+              _debt = debt;
+            }
+            return Column(
+              children: [
+                if (debt != null)
+                  Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              debt.description ?? l10n.description,
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            const SizedBox(height: 8),
+                            FutureBuilder<Money>(
+                              future: balanceAsync,
+                              builder: (context, balanceSnapshot) {
+                                final balance = balanceSnapshot.data;
+                                return Text(
+                                  '${l10n.balance}: ${balance != null ? balance.amount : "---"} IQD',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: _balanceColor(context, balance),
+                                  ),
+                                );
+                              },
+                            ),
+                            if (debt.dueDate != null)
+                              Text(
+                                '${l10n.dueDate}: ${_formatDate(debt.dueDate!)}',
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                const Divider(),
+                Expanded(
+                  child: DefaultTabController(
+                    length: 2,
+                    child: Column(
+                      children: [
+                        TabBar(
+                          tabs: [
+                            Tab(text: l10n.ledger),
+                            Tab(text: l10n.payments),
+                          ],
+                        ),
+                        Expanded(
+                          child: TabBarView(
+                            children: [
+                              _buildLedgerList(entriesAsync),
+                              _buildPaymentsList(context, paymentsAsync, ref),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.go('/debt/${widget.debtId.value}/add-payment'),
+        backgroundColor: AppColors.primary,
+        icon: const Icon(Icons.add),
+        label: Text(l10n.addPayment),
+      ),
+    );
+  }
 }

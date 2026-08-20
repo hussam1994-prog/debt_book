@@ -39,6 +39,7 @@ class DebtBookApp extends ConsumerStatefulWidget {
 class _DebtBookAppState extends ConsumerState<DebtBookApp> {
   bool _showSplash = true;
   bool _isLocked = false;
+  bool _autoSyncDone = false; // ✅ يمنع التكرار
 
   @override
   void initState() {
@@ -51,13 +52,16 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
         });
         _refreshLockState();
 
+        // ✅ نسخ احتياطي تلقائي مرة واحدة فقط
         Future.microtask(() async {
           try {
             await ref.read(backupServiceProvider).autoBackupIfNeeded();
           } catch (_) {}
 
-          // مزامنة تلقائية بعد تسجيل الدخول
-          if (Supabase.instance.client.auth.currentUser != null) {
+          // ✅ مزامنة تلقائية مرة واحدة فقط
+          if (!_autoSyncDone &&
+              Supabase.instance.client.auth.currentUser != null) {
+            _autoSyncDone = true;
             try {
               await ref.read(cloudSyncServiceProvider).syncAll();
               ref.invalidate(peopleProvider);
@@ -85,6 +89,7 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
     final notificationsEnabled = ref.watch(notificationsEnabledProvider);
     final notificationService = ref.read(notificationServiceProvider);
 
+    // ✅ جدولة الإشعارات فقط عند الحاجة (بدون تكرار)
     Future.microtask(() async {
       if (notificationsEnabled) {
         try {
@@ -127,7 +132,7 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
           );
         }
 
-        // ✅ بدء Realtime بعد تسجيل الدخول
+        // ✅ بدء Realtime مرة واحدة فقط
         Future.microtask(() {
           try {
             ref.read(realtimeServiceProvider).start();

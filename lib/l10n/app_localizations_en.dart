@@ -432,4 +432,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get personDeleted => 'Person deleted successfully';
+
+  @override
+  String get refresh => 'Refresh';
 }

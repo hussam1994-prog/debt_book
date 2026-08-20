@@ -2,7 +2,6 @@ import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/localization/l10n_extension.dart';
 import '../../../core/providers.dart';
@@ -11,7 +10,6 @@ import '../../../core/whatsapp/whatsapp_service.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/sync_status_banner.dart';
-import '../../dashboard/providers/analytics_providers.dart';
 import '../providers/people_providers.dart';
 
 class PeoplePage extends ConsumerStatefulWidget {
@@ -29,6 +27,16 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  /// ✅ تحديث محلي فقط: إعادة قراءة البيانات من SQLite
+  void _refreshLocal() {
+    ref.invalidate(peopleProvider);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تم تحديث القائمة محليًا')),
+      );
+    }
   }
 
   Future<void> _confirmDeletePerson(Person person) async {
@@ -62,47 +70,6 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
     );
   }
 
-  Future<void> _refresh() async {
-    final l10n = context.l10n;
-    final userId = Supabase.instance.client.auth.currentUser?.id;
-    if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.pleaseLoginFirst)),
-      );
-      return;
-    }
-
-    final service = ref.read(cloudSyncServiceProvider);
-    try {
-      final result = await service.syncAll();
-      ref.invalidate(peopleProvider);
-      ref.invalidate(allDebtsProvider);
-      ref.invalidate(allPaymentsProvider);
-      ref.invalidate(balancesByDebtProvider);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              l10n.cloudSyncResult(
-                result['persons'] ?? 0,
-                result['debts'] ?? 0,
-                result['payments'] ?? 0,
-                result['ledger'] ?? 0,
-              ),
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.cloudSyncFailed(e.toString()))),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final peopleAsync = ref.watch(peopleProvider);
@@ -117,7 +84,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: l10n.refresh,
-            onPressed: _refresh,
+            onPressed: _refreshLocal, // ✅ تحديث محلي
           ),
           IconButton(
             icon: const Icon(Icons.receipt_long),
@@ -164,97 +131,101 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
             ),
           ),
           Expanded(
-            child: peopleAsync.when(
-              data: (people) {
-                final filtered = _query.isEmpty
-                    ? people
-                    : people.where((p) {
-                        final nameMatch =
-                            p.name.toLowerCase().contains(_query);
-                        final phoneMatch = p.phone != null &&
-                            p.phone!.toLowerCase().contains(_query);
-                        return nameMatch || phoneMatch;
-                      }).toList();
+            child: RefreshIndicator(
+              onRefresh: () async => _refreshLocal(), // ✅ سحب للتحديث
+              child: peopleAsync.when(
+                data: (people) {
+                  final filtered = _query.isEmpty
+                      ? people
+                      : people.where((p) {
+                          final nameMatch =
+                              p.name.toLowerCase().contains(_query);
+                          final phoneMatch = p.phone != null &&
+                              p.phone!.toLowerCase().contains(_query);
+                          return nameMatch || phoneMatch;
+                        }).toList();
 
-                if (filtered.isEmpty) {
-                  return EmptyState(
-                    icon: Icons.search,
-                    title: l10n.noPeople,
-                    subtitle: l10n.noPeople,
-                  );
-                }
+                  if (filtered.isEmpty) {
+                    return EmptyState(
+                      icon: Icons.search,
+                      title: l10n.noPeople,
+                      subtitle: l10n.noPeople,
+                    );
+                  }
 
-                return ListView.builder(
-                  padding: const EdgeInsets.only(bottom: 80),
-                  itemCount: filtered.length,
-                  itemBuilder: (context, index) {
-                    final person = filtered[index];
-                    return AppCard(
-                      onTap: () => context.go('/person/${person.id.value}'),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundColor:
-                                AppColors.primary.withValues(alpha: 0.1),
-                            child: Text(
-                              person.name.substring(0, 1).toUpperCase(),
-                              style: TextStyle(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.bold,
+                  return ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.only(bottom: 80),
+                    itemCount: filtered.length,
+                    itemBuilder: (context, index) {
+                      final person = filtered[index];
+                      return AppCard(
+                        onTap: () => context.go('/person/${person.id.value}'),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              backgroundColor:
+                                  AppColors.primary.withValues(alpha: 0.1),
+                              child: Text(
+                                person.name.substring(0, 1).toUpperCase(),
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: AppSpacing.md),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  person.name,
-                                  style: textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                if (person.phone != null)
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
                                   Text(
-                                    person.phone!,
-                                    style: textTheme.bodyMedium,
+                                    person.name,
+                                    style: textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                              ],
+                                  if (person.phone != null)
+                                    Text(
+                                      person.phone!,
+                                      style: textTheme.bodyMedium,
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                          if (person.phone != null &&
-                              person.phone!.isNotEmpty)
+                            if (person.phone != null &&
+                                person.phone!.isNotEmpty)
+                              IconButton(
+                                icon: const Icon(Icons.chat,
+                                    color: Colors.green),
+                                tooltip: l10n.whatsappTooltip,
+                                onPressed: () async {
+                                  final message = l10n.whatsappGeneralMessage;
+                                  await WhatsAppService.sendReminder(
+                                    phone: person.phone!,
+                                    message: message,
+                                  );
+                                },
+                              ),
                             IconButton(
-                              icon: const Icon(Icons.chat,
-                                  color: Colors.green),
-                              tooltip: l10n.whatsappTooltip,
-                              onPressed: () async {
-                                final message = l10n.whatsappGeneralMessage;
-                                await WhatsAppService.sendReminder(
-                                  phone: person.phone!,
-                                  message: message,
-                                );
-                              },
+                              icon: const Icon(Icons.delete_outline,
+                                  color: Colors.red),
+                              tooltip: l10n.delete,
+                              onPressed: () => _confirmDeletePerson(person),
                             ),
-                          IconButton(
-                            icon: const Icon(Icons.delete_outline,
-                                color: Colors.red),
-                            tooltip: l10n.delete,
-                            onPressed: () => _confirmDeletePerson(person),
-                          ),
-                          Icon(
-                            Icons.chevron_right,
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, st) => Center(child: Text('Error: $e')),
+                            Icon(
+                              Icons.chevron_right,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, st) => Center(child: Text('Error: $e')),
+              ),
             ),
           ),
         ],
