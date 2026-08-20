@@ -90,8 +90,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
     setState(() => _isLoading = true);
     try {
-      // ملاحظة: حذف المستخدم من Supabase Auth قد يتطلب Edge Function.
-      // هنا نكتفي بتسجيل الخروج، وسيتغير onAuthStateChange تلقائيًا.
       await Supabase.instance.client.auth.signOut();
     } catch (e) {
       if (mounted) {
@@ -115,7 +113,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         title: Text(l10n.profile),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(), // ✅ إصلاح مشكلة pop
+          onPressed: () => context.pop(),
         ),
       ),
       body: Padding(
@@ -124,31 +122,43 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             CircleAvatar(
-              radius: 40,
+              radius: 48,
               backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
-              child: Icon(Icons.person, size: 48, color: colorScheme.primary),
+              child: Icon(
+                Icons.person,
+                size: 56,
+                color: colorScheme.primary,
+              ),
             ),
             const SizedBox(height: 16),
             Text(
               _userEmail ?? '---',
-              style: textTheme.titleMedium,
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
+            // بطاقة تغيير كلمة المرور
             OutlinedButton.icon(
               onPressed: _isLoading
                   ? null
                   : () => _showChangePasswordDialog(context),
               icon: const Icon(Icons.lock_reset),
               label: Text(l10n.changePassword),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
             ),
             const SizedBox(height: 12),
+            // بطاقة حذف الحساب
             OutlinedButton.icon(
               onPressed: _isLoading ? null : _deleteAccount,
               icon: Icon(Icons.delete_forever, color: colorScheme.error),
               label: Text(l10n.deleteAccount),
               style: OutlinedButton.styleFrom(
                 foregroundColor: colorScheme.error,
+                padding: const EdgeInsets.symmetric(vertical: 12),
               ),
             ),
           ],
