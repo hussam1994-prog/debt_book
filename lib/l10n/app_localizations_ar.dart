@@ -364,4 +364,32 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get pleaseLoginFirst => 'يرجى تسجيل الدخول أولاً';
+
+  @override
+  String get profile => 'الملف الشخصي';
+
+  @override
+  String get changePassword => 'تغيير كلمة المرور';
+
+  @override
+  String get deleteAccount => 'حذف الحساب';
+
+  @override
+  String get deleteAccountConfirm =>
+      'هل أنت متأكد من حذف حسابك؟ لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get newPassword => 'كلمة المرور الجديدة';
+
+  @override
+  String get confirmPassword => 'تأكيد كلمة المرور';
+
+  @override
+  String get passwordsDoNotMatch => 'كلمتا المرور غير متطابقتين';
+
+  @override
+  String get passwordChanged => 'تم تغيير كلمة المرور بنجاح';
+
+  @override
+  String get accountDeleted => 'تم حذف الحساب';
 }

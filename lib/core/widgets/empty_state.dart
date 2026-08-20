@@ -18,23 +18,39 @@ class EmptyState extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 64, color: colorScheme.onSurfaceVariant),
-          const SizedBox(height: 16),
-          Text(title, style: textTheme.titleLarge),
-          if (subtitle != null) ...[
-            const SizedBox(height: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: colorScheme.primary.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 64, color: colorScheme.primary),
+            ),
+            const SizedBox(height: 24),
             Text(
-              subtitle!,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+              title,
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w600,
               ),
               textAlign: TextAlign.center,
             ),
+            if (subtitle != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                subtitle!,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

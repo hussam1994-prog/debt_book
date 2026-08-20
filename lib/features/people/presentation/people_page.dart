@@ -1,3 +1,4 @@
+import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +9,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/whatsapp/whatsapp_service.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/sync_status_banner.dart';
 import '../providers/people_providers.dart';
 
 class PeoplePage extends ConsumerStatefulWidget {
@@ -62,6 +64,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
       ),
       body: Column(
         children: [
+          const SyncStatusBanner(), // ✅ مؤشر حالة المزامنة
           Padding(
             padding: const EdgeInsets.fromLTRB(
                 AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.sm),
@@ -116,7 +119,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                                 AppColors.primary.withValues(alpha: 0.1),
                             child: Text(
                               person.name.substring(0, 1).toUpperCase(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -127,7 +130,6 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // ✅ اسم الشخص: واضح في الوضعين
                                 Text(
                                   person.name,
                                   style: textTheme.titleMedium?.copyWith(
@@ -142,7 +144,6 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                               ],
                             ),
                           ),
-                          // زر واتساب
                           if (person.phone != null &&
                               person.phone!.isNotEmpty)
                             IconButton(

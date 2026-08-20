@@ -366,4 +366,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pleaseLoginFirst => 'Please login first';
+
+  @override
+  String get profile => 'Profile';
+
+  @override
+  String get changePassword => 'Change Password';
+
+  @override
+  String get deleteAccount => 'Delete Account';
+
+  @override
+  String get deleteAccountConfirm =>
+      'Are you sure you want to delete your account? This action cannot be undone.';
+
+  @override
+  String get newPassword => 'New Password';
+
+  @override
+  String get confirmPassword => 'Confirm Password';
+
+  @override
+  String get passwordsDoNotMatch => 'Passwords do not match';
+
+  @override
+  String get passwordChanged => 'Password changed successfully';
+
+  @override
+  String get accountDeleted => 'Account deleted';
 }

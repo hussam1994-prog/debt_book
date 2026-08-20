@@ -8,6 +8,7 @@ import '../../../core/localization/l10n_extension.dart';
 import '../../../core/notifications/notification_provider.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/theme_provider.dart';
+import '../../../core/widgets/sync_status_banner.dart';
 import '../../dashboard/providers/analytics_providers.dart';
 import '../../people/providers/people_providers.dart';
 
@@ -113,7 +114,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     if (confirmed != true) return;
 
     await Supabase.instance.client.auth.signOut();
-    // سيتغير onAuthStateChange تلقائيًا في main.dart ويعيدك لشاشة الدخول
   }
 
   @override
@@ -131,184 +131,202 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           onPressed: () => context.go('/'),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            SwitchListTile(
-              title: Text(l10n.darkMode),
-              secondary: const Icon(Icons.dark_mode),
-              value: themeMode == ThemeMode.dark,
-              onChanged: (value) async {
-                await ref.read(themeModeProvider.notifier).setDark(value);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.language),
-              title: Text(l10n.language),
-              trailing: DropdownButton<Locale>(
-                value: locale,
-                items: [
-                  DropdownMenuItem(
-                    value: const Locale('en'),
-                    child: Text(l10n.english),
+      body: Column(
+        children: [
+          const SyncStatusBanner(),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ListView(
+                children: [
+                  SwitchListTile(
+                    title: Text(l10n.darkMode),
+                    secondary: const Icon(Icons.dark_mode),
+                    value: themeMode == ThemeMode.dark,
+                    onChanged: (value) async {
+                      await ref.read(themeModeProvider.notifier).setDark(value);
+                    },
                   ),
-                  DropdownMenuItem(
-                    value: const Locale('ar'),
-                    child: Text(l10n.arabic),
-                  ),
-                ],
-                onChanged: (value) async {
-                  if (value != null) {
-                    await ref.read(localeProvider.notifier).setLocale(value);
-                  }
-                },
-              ),
-            ),
-            const Divider(),
-            SwitchListTile(
-              title: Text(l10n.notifications),
-              subtitle: Text(l10n.notificationsSubtitle),
-              secondary: const Icon(Icons.notifications),
-              value: notificationsEnabled,
-              onChanged: (value) async {
-                await ref
-                    .read(notificationsEnabledProvider.notifier)
-                    .set(value);
-                final notificationService =
-                    ref.read(notificationServiceProvider);
-                if (value) {
-                  final debts = await ref.read(allDebtsProvider.future);
-                  final balances = await ref.read(balancesByDebtProvider.future);
-                  await notificationService.scheduleUpcomingDebtReminders(
-                    debts: debts,
-                    balances: balances,
-                  );
-                } else {
-                  await notificationService.cancelAllReminders();
-                }
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.cloud_sync),
-              title: Text(l10n.cloudSync),
-              onTap: () async {
-                // ✅ فحص تسجيل الدخول قبل المزامنة
-                final userId =
-                    Supabase.instance.client.auth.currentUser?.id;
-                if (userId == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.pleaseLoginFirst)),
-                  );
-                  return;
-                }
-
-                final service = ref.read(cloudSyncServiceProvider);
-                try {
-                  final result = await service.syncAll();
-
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          l10n.cloudSyncResult(
-                            result['persons'] ?? 0,
-                            result['debts'] ?? 0,
-                            result['payments'] ?? 0,
-                            result['ledger'] ?? 0,
-                          ),
+                  ListTile(
+                    leading: const Icon(Icons.language),
+                    title: Text(l10n.language),
+                    trailing: DropdownButton<Locale>(
+                      value: locale,
+                      items: [
+                        DropdownMenuItem(
+                          value: const Locale('en'),
+                          child: Text(l10n.english),
                         ),
-                      ),
-                    );
-                  }
-
-                  ref.invalidate(peopleProvider);
-                  ref.invalidate(allDebtsProvider);
-                  ref.invalidate(allPaymentsProvider);
-                  ref.invalidate(balancesByDebtProvider);
-                } catch (e, st) {
-                  // ✅ عرض الخطأ كاملاً في نافذة للتشخيص
-                  if (mounted) {
-                    showDialog<void>(
-                      context: context,
-                      builder: (dialogContext) => AlertDialog(
-                        title: Text(l10n.cloudSyncFailed(e.toString())),
-                        content: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('$e'),
-                              const SizedBox(height: 12),
-                              Text(
-                                '$st',
-                                style: const TextStyle(fontSize: 10),
-                              ),
-                            ],
-                          ),
+                        DropdownMenuItem(
+                          value: const Locale('ar'),
+                          child: Text(l10n.arabic),
                         ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(dialogContext),
-                            child: Text(l10n.cancel),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                }
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.lock),
-              title: Text(l10n.setPin),
-              onTap: () => _showSetPinDialog(context),
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.backup),
-              title: Text(l10n.backupRestore),
-              onTap: () => context.go('/backup'),
-            ),
-            const Divider(),
-            ElevatedButton.icon(
-              onPressed: _isLoading ? null : _runIntegrityCheck,
-              icon: const Icon(Icons.fact_check),
-              label: Text(l10n.runIntegrity),
-            ),
-            const SizedBox(height: 24),
-            if (_isLoading)
-              const Center(child: CircularProgressIndicator())
-            else if (_violations != null)
-              if (_violations!.isEmpty)
-                Center(
-                  child: Text(
-                    l10n.allGood,
-                    style: const TextStyle(fontSize: 16, color: Colors.green),
-                  ),
-                )
-              else
-                ...(_violations!.map(
-                  (v) => Card(
-                    child: ListTile(
-                      leading: const Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                      ),
-                      title: Text(v.type.name),
-                      subtitle: Text(v.message),
+                      ],
+                      onChanged: (value) async {
+                        if (value != null) {
+                          await ref
+                              .read(localeProvider.notifier)
+                              .setLocale(value);
+                        }
+                      },
                     ),
                   ),
-                )),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: Text(l10n.logout),
-              onTap: _confirmLogout,
+                  const Divider(),
+                  SwitchListTile(
+                    title: Text(l10n.notifications),
+                    subtitle: Text(l10n.notificationsSubtitle),
+                    secondary: const Icon(Icons.notifications),
+                    value: notificationsEnabled,
+                    onChanged: (value) async {
+                      await ref
+                          .read(notificationsEnabledProvider.notifier)
+                          .set(value);
+                      final notificationService =
+                          ref.read(notificationServiceProvider);
+                      if (value) {
+                        final debts =
+                            await ref.read(allDebtsProvider.future);
+                        final balances =
+                            await ref.read(balancesByDebtProvider.future);
+                        await notificationService
+                            .scheduleUpcomingDebtReminders(
+                          debts: debts,
+                          balances: balances,
+                        );
+                      } else {
+                        await notificationService.cancelAllReminders();
+                      }
+                    },
+                  ),
+                  const Divider(),
+                  ListTile(
+                    leading: const Icon(Icons.cloud_sync),
+                    title: Text(l10n.cloudSync),
+                    onTap: () async {
+                      final userId =
+                          Supabase.instance.client.auth.currentUser?.id;
+                      if (userId == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(l10n.pleaseLoginFirst)),
+                        );
+                        return;
+                      }
+
+                      final service = ref.read(cloudSyncServiceProvider);
+                      try {
+                        final result = await service.syncAll();
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                l10n.cloudSyncResult(
+                                  result['persons'] ?? 0,
+                                  result['debts'] ?? 0,
+                                  result['payments'] ?? 0,
+                                  result['ledger'] ?? 0,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                        ref.invalidate(peopleProvider);
+                        ref.invalidate(allDebtsProvider);
+                        ref.invalidate(allPaymentsProvider);
+                        ref.invalidate(balancesByDebtProvider);
+                      } catch (e, st) {
+                        if (mounted) {
+                          showDialog<void>(
+                            context: context,
+                            builder: (dialogContext) => AlertDialog(
+                              title: Text(
+                                l10n.cloudSyncFailed(e.toString()),
+                              ),
+                              content: SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('$e'),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      '$st',
+                                      style: const TextStyle(fontSize: 10),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(dialogContext),
+                                  child: Text(l10n.cancel),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      }
+                    },
+                  ),
+                  const Divider(),
+                  ListTile(
+                    leading: const Icon(Icons.person),
+                    title: Text(l10n.profile),
+                    onTap: () => context.go('/profile'),
+                  ),
+                  const Divider(),
+                  ListTile(
+                    leading: const Icon(Icons.lock),
+                    title: Text(l10n.setPin),
+                    onTap: () => _showSetPinDialog(context),
+                  ),
+                  const Divider(),
+                  ListTile(
+                    leading: const Icon(Icons.backup),
+                    title: Text(l10n.backupRestore),
+                    onTap: () => context.go('/backup'),
+                  ),
+                  const Divider(),
+                  ElevatedButton.icon(
+                    onPressed: _isLoading ? null : _runIntegrityCheck,
+                    icon: const Icon(Icons.fact_check),
+                    label: Text(l10n.runIntegrity),
+                  ),
+                  const SizedBox(height: 24),
+                  if (_isLoading)
+                    const Center(child: CircularProgressIndicator())
+                  else if (_violations != null)
+                    if (_violations!.isEmpty)
+                      Center(
+                        child: Text(
+                          l10n.allGood,
+                          style: const TextStyle(
+                              fontSize: 16, color: Colors.green),
+                        ),
+                      )
+                    else
+                      ...(_violations!.map(
+                        (v) => Card(
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.error_outline,
+                              color: Colors.red,
+                            ),
+                            title: Text(v.type.name),
+                            subtitle: Text(v.message),
+                          ),
+                        ),
+                      )),
+                  const Divider(),
+                  ListTile(
+                    leading: const Icon(Icons.logout),
+                    title: Text(l10n.logout),
+                    onTap: _confirmLogout,
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

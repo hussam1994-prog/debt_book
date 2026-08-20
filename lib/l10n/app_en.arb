@@ -115,5 +115,14 @@
   "send": "Send",
   "resetEmailSent": "Reset email sent. Check your inbox.",
   "invalidEmail": "Invalid email address",
-  "pleaseLoginFirst": "Please login first"
+  "pleaseLoginFirst": "Please login first",
+  "profile": "Profile",
+  "changePassword": "Change Password",
+  "deleteAccount": "Delete Account",
+  "deleteAccountConfirm": "Are you sure you want to delete your account? This action cannot be undone.",
+  "newPassword": "New Password",
+  "confirmPassword": "Confirm Password",
+  "passwordsDoNotMatch": "Passwords do not match",
+  "passwordChanged": "Password changed successfully",
+  "accountDeleted": "Account deleted"
 }

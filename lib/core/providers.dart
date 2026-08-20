@@ -10,6 +10,7 @@ import '../core/database/app_database.dart';
 import '../core/notifications/notification_service.dart';
 import '../core/cloud/cloud_sync_service.dart';
 import '../core/cloud/realtime_service.dart';
+import '../core/sync/sync_status_provider.dart';
 
 import '../data/repositories/person_repository_impl.dart';
 import '../data/repositories/debt_repository_impl.dart';
@@ -186,8 +187,12 @@ final notificationServiceProvider = Provider<NotificationService>((ref) {
   return NotificationService();
 });
 
+// ✅ الإصلاح: تعريف واحد لـ cloudSyncServiceProvider
 final cloudSyncServiceProvider = Provider<CloudSyncService>((ref) {
-  return CloudSyncService(ref.watch(appDatabaseProvider));
+  return CloudSyncService(
+    ref.watch(appDatabaseProvider),
+    ref.read(syncStatusProvider.notifier),
+  );
 });
 
 final realtimeServiceProvider = Provider<RealtimeService>((ref) {
