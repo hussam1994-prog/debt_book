@@ -19,7 +19,10 @@ class CloudSyncService {
   // ========== Persons ==========
   Future<void> pushPersonsToCloud(List<Person> persons) async {
     final userId = _userId;
-    if (userId == null) return;
+    if (userId == null) {
+      throw Exception('User ID is null. Please login.');
+    }
+
     for (final person in persons) {
       await _client.from('persons').upsert({
         'id': person.id.value,
@@ -37,6 +40,7 @@ class CloudSyncService {
   Future<List<Map<String, dynamic>>> fetchPersons() async {
     final userId = _userId;
     if (userId == null) return [];
+
     final data = await _client
         .from('persons')
         .select()
@@ -79,6 +83,7 @@ class CloudSyncService {
   Future<void> pushDebtsToCloud(List<Debt> debts) async {
     final userId = _userId;
     if (userId == null) return;
+
     for (final debt in debts) {
       await _client.from('debts').upsert({
         'id': debt.id.value,
@@ -100,6 +105,7 @@ class CloudSyncService {
   Future<List<Map<String, dynamic>>> fetchDebts() async {
     final userId = _userId;
     if (userId == null) return [];
+
     final data = await _client
         .from('debts')
         .select()
@@ -149,6 +155,7 @@ class CloudSyncService {
   Future<void> pushPaymentsToCloud(List<Payment> payments) async {
     final userId = _userId;
     if (userId == null) return;
+
     for (final payment in payments) {
       await _client.from('payments').upsert({
         'id': payment.id.value,
@@ -170,6 +177,7 @@ class CloudSyncService {
   Future<List<Map<String, dynamic>>> fetchPayments() async {
     final userId = _userId;
     if (userId == null) return [];
+
     final data = await _client
         .from('payments')
         .select()
@@ -216,6 +224,7 @@ class CloudSyncService {
   Future<void> pushLedgerEntriesToCloud(List<LedgerEntry> entries) async {
     final userId = _userId;
     if (userId == null) return;
+
     for (final entry in entries) {
       await _client.from('ledger_entries').upsert({
         'id': entry.id.value,
@@ -236,6 +245,7 @@ class CloudSyncService {
   Future<List<Map<String, dynamic>>> fetchLedgerEntries() async {
     final userId = _userId;
     if (userId == null) return [];
+
     final data = await _client
         .from('ledger_entries')
         .select()

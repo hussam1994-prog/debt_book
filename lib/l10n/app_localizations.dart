@@ -774,6 +774,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reset email sent. Check your inbox.'**
   String get resetEmailSent;
+
+  /// No description provided for @invalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email address'**
+  String get invalidEmail;
+
+  /// No description provided for @pleaseLoginFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Please login first'**
+  String get pleaseLoginFirst;
 }
 
 class _AppLocalizationsDelegate

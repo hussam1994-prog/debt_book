@@ -113,5 +113,7 @@
   "checkEmailToConfirm": "Account created. Check your email to confirm.",
   "forgotPassword": "Forgot Password?",
   "send": "Send",
-  "resetEmailSent": "Reset email sent. Check your inbox."
+  "resetEmailSent": "Reset email sent. Check your inbox.",
+  "invalidEmail": "Invalid email address",
+  "pleaseLoginFirst": "Please login first"
 }

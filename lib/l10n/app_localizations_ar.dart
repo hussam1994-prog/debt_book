@@ -358,4 +358,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get resetEmailSent => 'تم إرسال رابط إعادة التعيين. تحقق من بريدك.';
+
+  @override
+  String get invalidEmail => 'البريد الإلكتروني غير صالح';
+
+  @override
+  String get pleaseLoginFirst => 'يرجى تسجيل الدخول أولاً';
 }

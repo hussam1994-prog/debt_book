@@ -360,4 +360,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get resetEmailSent => 'Reset email sent. Check your inbox.';
+
+  @override
+  String get invalidEmail => 'Invalid email address';
+
+  @override
+  String get pleaseLoginFirst => 'Please login first';
 }

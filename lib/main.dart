@@ -26,6 +26,13 @@ Future<void> main() async {
     anonKey: SupabaseConfig.anonKey,
   );
 
+  // ✅ التقاط أي خطأ غير معالج وعرضه في الطرفية
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    debugPrint('❌ GlobalError: ${details.exception}');
+    debugPrint('Stack: ${details.stack}');
+  };
+
   runApp(const ProviderScope(child: DebtBookApp()));
 }
 
@@ -49,7 +56,6 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
         setState(() {
           _showSplash = false;
         });
-
         _refreshLockState();
 
         Future.microtask(() async {
@@ -57,7 +63,6 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
             await ref.read(backupServiceProvider).autoBackupIfNeeded();
           } catch (_) {}
 
-          // مزامنة تلقائية بعد التحقق من تسجيل الدخول
           if (Supabase.instance.client.auth.currentUser != null) {
             try {
               await ref.read(cloudSyncServiceProvider).syncAll();
@@ -104,8 +109,7 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
     return StreamBuilder<AuthState>(
       stream: Supabase.instance.client.auth.onAuthStateChange,
       builder: (context, snapshot) {
-        final isLoggedIn =
-            Supabase.instance.client.auth.currentUser != null;
+        final isLoggedIn = Supabase.instance.client.auth.currentUser != null;
 
         if (!isLoggedIn) {
           return MaterialApp(
@@ -125,8 +129,37 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
               Locale('ar'),
             ],
             home: const AuthPage(),
+            builder: (context, child) {
+              ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
+                return Material(
+                  child: Container(
+                    color: Colors.red.shade50,
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error, color: Colors.red, size: 48),
+                        const SizedBox(height: 12),
+                        Text('حدث خطأ: ${errorDetails.exception}',
+                            textAlign: TextAlign.center),
+                        const SizedBox(height: 8),
+                        Text('${errorDetails.stack}',
+                            style: const TextStyle(fontSize: 10)),
+                      ],
+                    ),
+                  ),
+                );
+              };
+              return child ?? const SizedBox.shrink();
+            },
           );
         }
+
+        Future.microtask(() {
+          try {
+            ref.read(realtimeServiceProvider).start();
+          } catch (_) {}
+        });
 
         if (_showSplash) {
           return MaterialApp(
@@ -162,6 +195,29 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
                 });
               },
             ),
+            builder: (context, child) {
+              ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
+                return Material(
+                  child: Container(
+                    color: Colors.red.shade50,
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error, color: Colors.red, size: 48),
+                        const SizedBox(height: 12),
+                        Text('حدث خطأ: ${errorDetails.exception}',
+                            textAlign: TextAlign.center),
+                        const SizedBox(height: 8),
+                        Text('${errorDetails.stack}',
+                            style: const TextStyle(fontSize: 10)),
+                      ],
+                    ),
+                  ),
+                );
+              };
+              return child ?? const SizedBox.shrink();
+            },
           );
         }
 
@@ -183,6 +239,29 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
           ],
           routerConfig: router,
           debugShowCheckedModeBanner: false,
+          builder: (context, child) {
+            ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
+              return Material(
+                child: Container(
+                  color: Colors.red.shade50,
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error, color: Colors.red, size: 48),
+                      const SizedBox(height: 12),
+                      Text('حدث خطأ: ${errorDetails.exception}',
+                          textAlign: TextAlign.center),
+                      const SizedBox(height: 8),
+                      Text('${errorDetails.stack}',
+                          style: const TextStyle(fontSize: 10)),
+                    ],
+                  ),
+                ),
+              );
+            };
+            return child ?? const SizedBox.shrink();
+          },
         );
       },
     );

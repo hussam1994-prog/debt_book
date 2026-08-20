@@ -194,9 +194,20 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               leading: const Icon(Icons.cloud_sync),
               title: Text(l10n.cloudSync),
               onTap: () async {
+                // ✅ فحص تسجيل الدخول قبل المزامنة
+                final userId =
+                    Supabase.instance.client.auth.currentUser?.id;
+                if (userId == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.pleaseLoginFirst)),
+                  );
+                  return;
+                }
+
                 final service = ref.read(cloudSyncServiceProvider);
                 try {
                   final result = await service.syncAll();
+
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -211,17 +222,37 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       ),
                     );
                   }
+
                   ref.invalidate(peopleProvider);
                   ref.invalidate(allDebtsProvider);
                   ref.invalidate(allPaymentsProvider);
                   ref.invalidate(balancesByDebtProvider);
-                } catch (e) {
+                } catch (e, st) {
+                  // ✅ عرض الخطأ كاملاً في نافذة للتشخيص
                   if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          l10n.cloudSyncFailed(e.toString()),
+                    showDialog<void>(
+                      context: context,
+                      builder: (dialogContext) => AlertDialog(
+                        title: Text(l10n.cloudSyncFailed(e.toString())),
+                        content: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('$e'),
+                              const SizedBox(height: 12),
+                              Text(
+                                '$st',
+                                style: const TextStyle(fontSize: 10),
+                              ),
+                            ],
+                          ),
                         ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(dialogContext),
+                            child: Text(l10n.cancel),
+                          ),
+                        ],
                       ),
                     );
                   }

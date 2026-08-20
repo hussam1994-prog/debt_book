@@ -9,6 +9,7 @@ import '../core/export/export_service.dart';
 import '../core/database/app_database.dart';
 import '../core/notifications/notification_service.dart';
 import '../core/cloud/cloud_sync_service.dart';
+import '../core/cloud/realtime_service.dart';
 
 import '../data/repositories/person_repository_impl.dart';
 import '../data/repositories/debt_repository_impl.dart';
@@ -187,4 +188,8 @@ final notificationServiceProvider = Provider<NotificationService>((ref) {
 
 final cloudSyncServiceProvider = Provider<CloudSyncService>((ref) {
   return CloudSyncService(ref.watch(appDatabaseProvider));
+});
+
+final realtimeServiceProvider = Provider<RealtimeService>((ref) {
+  return RealtimeService(ref);
 });
