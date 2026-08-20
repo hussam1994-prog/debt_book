@@ -113,7 +113,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         title: Text(l10n.profile),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: () => context.go('/settings'), // ✅ التصحيح
         ),
       ),
       body: Padding(
@@ -139,7 +139,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
-            // بطاقة تغيير كلمة المرور
             OutlinedButton.icon(
               onPressed: _isLoading
                   ? null
@@ -151,7 +150,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
             ),
             const SizedBox(height: 12),
-            // بطاقة حذف الحساب
             OutlinedButton.icon(
               onPressed: _isLoading ? null : _deleteAccount,
               icon: Icon(Icons.delete_forever, color: colorScheme.error),

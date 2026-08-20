@@ -840,6 +840,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Account deleted'**
   String get accountDeleted;
+
+  /// No description provided for @pdfReportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Debt Book Report'**
+  String get pdfReportTitle;
+
+  /// No description provided for @pdfPerson.
+  ///
+  /// In en, this message translates to:
+  /// **'Person'**
+  String get pdfPerson;
+
+  /// No description provided for @pdfDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get pdfDescription;
+
+  /// No description provided for @pdfOriginalAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Original Amount'**
+  String get pdfOriginalAmount;
+
+  /// No description provided for @pdfBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance'**
+  String get pdfBalance;
+
+  /// No description provided for @pdfStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get pdfStatus;
+
+  /// No description provided for @pdfDueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Due Date'**
+  String get pdfDueDate;
+
+  /// No description provided for @newDebtNotificationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Debt'**
+  String get newDebtNotificationTitle;
+
+  /// No description provided for @newDebtNotificationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A debt of {amount} IQD was added'**
+  String newDebtNotificationBody(Object amount);
+
+  /// No description provided for @dueSoonNotificationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder'**
+  String get dueSoonNotificationTitle;
+
+  /// No description provided for @dueSoonNotificationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your debt is due soon'**
+  String get dueSoonNotificationBody;
 }
 
 class _AppLocalizationsDelegate

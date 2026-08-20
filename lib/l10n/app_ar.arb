@@ -124,5 +124,16 @@
   "confirmPassword": "تأكيد كلمة المرور",
   "passwordsDoNotMatch": "كلمتا المرور غير متطابقتين",
   "passwordChanged": "تم تغيير كلمة المرور بنجاح",
-  "accountDeleted": "تم حذف الحساب"
+  "accountDeleted": "تم حذف الحساب",
+  "pdfReportTitle": "تقرير دفتر الديون",
+  "pdfPerson": "الشخص",
+  "pdfDescription": "الوصف",
+  "pdfOriginalAmount": "المبلغ الأصلي",
+  "pdfBalance": "الرصيد",
+  "pdfStatus": "الحالة",
+  "pdfDueDate": "تاريخ الاستحقاق",
+  "newDebtNotificationTitle": "دين جديد",
+  "newDebtNotificationBody": "تمت إضافة دين بقيمة {amount} دينار",
+  "dueSoonNotificationTitle": "تذكير",
+  "dueSoonNotificationBody": "دينك يستحق قريبًا"
 }

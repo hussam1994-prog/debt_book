@@ -1,4 +1,4 @@
-import 'dart:io' show Platform;
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -11,7 +11,6 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
   bool _initialized = false;
 
-  /// هل المنصة الحالية تدعم الإشعارات المحلية؟
   bool get _isSupported =>
       !Platform.isWindows &&
       !Platform.isLinux &&
@@ -34,6 +33,10 @@ class NotificationService {
 
     try {
       await _plugin.initialize(initSettings);
+
+      // ✅ طلب صلاحية الإشعارات على أندرويد 13+
+      await _requestPermissions();
+
       _initialized = true;
     } catch (e) {
       debugPrint('Notification init failed: $e');
@@ -41,25 +44,71 @@ class NotificationService {
     }
   }
 
-  Future<void> scheduleDebtReminder({
+  Future<void> _requestPermissions() async {
+    try {
+      final androidImpl = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      await androidImpl?.requestNotificationsPermission();
+    } catch (_) {}
+  }
+
+  Future<void> _ensureInitialized() async {
+    if (!_initialized) {
+      await initialize();
+    }
+  }
+
+  /// إشعار فوري عند إضافة دين
+  Future<void> showNewDebtNotification({
+    required int id,
+    required String title,
+    required String body,
+  }) async {
+    if (!_isSupported) return;
+    await _ensureInitialized();
+    if (!_initialized) return;
+
+    const androidDetails = AndroidNotificationDetails(
+      'debt_notifications',
+      'Debt Notifications',
+      channelDescription: 'Notifications for debts',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+    const notificationDetails = NotificationDetails(android: androidDetails);
+
+    try {
+      await _plugin.show(
+        id,
+        title,
+        body,
+        notificationDetails,
+      );
+    } catch (e) {
+      debugPrint('Show new debt notification failed: $e');
+    }
+  }
+
+  /// جدولة إشعار قبل يوم من الاستحقاق
+  Future<void> scheduleDueSoonNotification({
     required int id,
     required String title,
     required String body,
     required DateTime dueDate,
   }) async {
     if (!_isSupported) return;
-    await initialize();
+    await _ensureInitialized();
     if (!_initialized) return;
 
     final tz.TZDateTime scheduledDate = tz.TZDateTime.from(
-      dueDate.subtract(const Duration(days: 2)),
+      dueDate.subtract(const Duration(days: 1)),
       tz.local,
     );
 
     const androidDetails = AndroidNotificationDetails(
-      'debt_reminders',
-      'Debt Reminders',
-      channelDescription: 'Reminders for upcoming debt due dates',
+      'due_soon',
+      'Due Soon Reminders',
+      channelDescription: 'Reminders for upcoming debts',
       importance: Importance.high,
       priority: Priority.high,
     );
@@ -77,16 +126,17 @@ class NotificationService {
             UILocalNotificationDateInterpretation.absoluteTime,
       );
     } catch (e) {
-      debugPrint('Schedule failed: $e');
+      debugPrint('Schedule due soon notification failed: $e');
     }
   }
 
+  /// جدولة تذكير للديون القادمة خلال 7 أيام
   Future<void> scheduleUpcomingDebtReminders({
     required List<Debt> debts,
     required Map<DebtId, Money> balances,
   }) async {
     if (!_isSupported) return;
-    await initialize();
+    await _ensureInitialized();
     if (!_initialized) return;
 
     await cancelAllReminders();
@@ -102,7 +152,7 @@ class NotificationService {
 
     for (var i = 0; i < upcoming.length; i++) {
       final debt = upcoming[i];
-      await scheduleDebtReminder(
+      await scheduleDueSoonNotification(
         id: debt.hashCode,
         title: 'Debt Due Soon',
         body: debt.description ?? 'Debt #${debt.id.value.substring(0, 8)}',
@@ -113,25 +163,25 @@ class NotificationService {
 
   Future<void> cancelAllReminders() async {
     if (!_isSupported) return;
-    await initialize();
+    await _ensureInitialized();
     if (!_initialized) return;
 
     try {
       await _plugin.cancelAll();
     } catch (e) {
-      debugPrint('Cancel all failed: $e');
+      debugPrint('Cancel all reminders failed: $e');
     }
   }
 
   Future<void> cancelReminder(int id) async {
     if (!_isSupported) return;
-    await initialize();
+    await _ensureInitialized();
     if (!_initialized) return;
 
     try {
       await _plugin.cancel(id);
     } catch (e) {
-      debugPrint('Cancel failed: $e');
+      debugPrint('Cancel reminder failed: $e');
     }
   }
 }

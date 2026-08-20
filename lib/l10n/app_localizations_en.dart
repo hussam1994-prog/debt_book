@@ -394,4 +394,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountDeleted => 'Account deleted';
+
+  @override
+  String get pdfReportTitle => 'Debt Book Report';
+
+  @override
+  String get pdfPerson => 'Person';
+
+  @override
+  String get pdfDescription => 'Description';
+
+  @override
+  String get pdfOriginalAmount => 'Original Amount';
+
+  @override
+  String get pdfBalance => 'Balance';
+
+  @override
+  String get pdfStatus => 'Status';
+
+  @override
+  String get pdfDueDate => 'Due Date';
+
+  @override
+  String get newDebtNotificationTitle => 'New Debt';
+
+  @override
+  String newDebtNotificationBody(Object amount) {
+    return 'A debt of $amount IQD was added';
+  }
+
+  @override
+  String get dueSoonNotificationTitle => 'Reminder';
+
+  @override
+  String get dueSoonNotificationBody => 'Your debt is due soon';
 }

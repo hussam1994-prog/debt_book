@@ -124,5 +124,16 @@
   "confirmPassword": "Confirm Password",
   "passwordsDoNotMatch": "Passwords do not match",
   "passwordChanged": "Password changed successfully",
-  "accountDeleted": "Account deleted"
+  "accountDeleted": "Account deleted",
+  "pdfReportTitle": "Debt Book Report",
+  "pdfPerson": "Person",
+  "pdfDescription": "Description",
+  "pdfOriginalAmount": "Original Amount",
+  "pdfBalance": "Balance",
+  "pdfStatus": "Status",
+  "pdfDueDate": "Due Date",
+  "newDebtNotificationTitle": "New Debt",
+  "newDebtNotificationBody": "A debt of {amount} IQD was added",
+  "dueSoonNotificationTitle": "Reminder",
+  "dueSoonNotificationBody": "Your debt is due soon"
 }

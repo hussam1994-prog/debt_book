@@ -17,6 +17,54 @@ class ReportsPage extends ConsumerStatefulWidget {
 }
 
 class _ReportsPageState extends ConsumerState<ReportsPage> {
+  Future<void> _exportToPdf() async {
+    try {
+      final allDebts = await ref.read(allDebtsProvider.future);
+      final balances = await ref.read(balancesByDebtProvider.future);
+      final personRepo = ref.read(personRepositoryProvider);
+
+      final rows = <Map<String, String>>[];
+      for (final debt in allDebts) {
+        final person = await personRepo.findById(debt.personId);
+        final balance = balances[debt.id] ?? Money.zero;
+        rows.add({
+          'person': person?.name ?? 'Unknown',
+          'description': debt.description ?? '',
+          'originalAmount': '${debt.amount.amount}',
+          'balance': '${balance.amount}',
+          'status': debt.status.name,
+          'dueDate': debt.dueDate?.toIso8601String() ?? '',
+        });
+      }
+
+      final l10n = context.l10n;
+      final labels = <String, String>{
+        'pdfReportTitle': l10n.pdfReportTitle,
+        'pdfPerson': l10n.pdfPerson,
+        'pdfDescription': l10n.pdfDescription,
+        'pdfOriginalAmount': l10n.pdfOriginalAmount,
+        'pdfBalance': l10n.pdfBalance,
+        'pdfStatus': l10n.pdfStatus,
+        'pdfDueDate': l10n.pdfDueDate,
+      };
+
+      final pdfService = ref.read(pdfExportServiceProvider);
+      final file = await pdfService.exportDebtsToPdf(rows: rows, labels: labels);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('PDF exported to: ${file.path}')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Export failed: $e')),
+        );
+      }
+    }
+  }
+
   Future<void> _exportToCsv() async {
     try {
       final allDebts = await ref.read(allDebtsProvider.future);
@@ -70,6 +118,11 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
           onPressed: () => context.go('/'),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf),
+            tooltip: 'Export PDF',
+            onPressed: _exportToPdf,
+          ),
           IconButton(
             icon: const Icon(Icons.file_download),
             tooltip: l10n.exportCsv,

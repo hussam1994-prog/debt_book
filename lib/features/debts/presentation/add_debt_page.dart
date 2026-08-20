@@ -29,6 +29,7 @@ class _AddDebtPageState extends ConsumerState<AddDebtPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.addDebt),
@@ -49,23 +50,38 @@ class _AddDebtPageState extends ConsumerState<AddDebtPage> {
             TextField(
               controller: amountController,
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: l10n.amount),
+              decoration: InputDecoration(labelText: l10n.adjustmentAmount),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () async {
                 final amount = int.tryParse(amountController.text);
                 if (amount == null || amount <= 0) return;
+
+                final description = descriptionController.text.trim();
                 final createDebt = ref.read(createDebtProvider);
+
                 try {
                   await createDebt(
                     personId: widget.personId,
                     amount: Money(amount: amount),
-                    description: descriptionController.text.trim().isEmpty
-                        ? null
-                        : descriptionController.text.trim(),
+                    description: description.isEmpty ? null : description,
                   );
+
+                  // ✅ إشعار فوري مترجم
+                  final notificationService =
+                      ref.read(notificationServiceProvider);
+                  final uniqueId =
+                      DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+                  await notificationService.showNewDebtNotification(
+                    id: uniqueId,
+                    title: l10n.newDebtNotificationTitle,
+                    body: l10n.newDebtNotificationBody(amount),
+                  );
+
                   ref.invalidate(debtsForPersonProvider(widget.personId));
+
                   if (context.mounted) context.pop();
                 } catch (e) {
                   if (context.mounted) {

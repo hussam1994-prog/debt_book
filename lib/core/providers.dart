@@ -11,6 +11,7 @@ import '../core/notifications/notification_service.dart';
 import '../core/cloud/cloud_sync_service.dart';
 import '../core/cloud/realtime_service.dart';
 import '../core/sync/sync_status_provider.dart';
+import '../core/export/pdf_export_service.dart';
 
 import '../data/repositories/person_repository_impl.dart';
 import '../data/repositories/debt_repository_impl.dart';
@@ -197,4 +198,8 @@ final cloudSyncServiceProvider = Provider<CloudSyncService>((ref) {
 
 final realtimeServiceProvider = Provider<RealtimeService>((ref) {
   return RealtimeService(ref);
+});
+
+final pdfExportServiceProvider = Provider<PdfExportService>((ref) {
+  return PdfExportService();
 });

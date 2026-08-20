@@ -392,4 +392,39 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get accountDeleted => 'تم حذف الحساب';
+
+  @override
+  String get pdfReportTitle => 'تقرير دفتر الديون';
+
+  @override
+  String get pdfPerson => 'الشخص';
+
+  @override
+  String get pdfDescription => 'الوصف';
+
+  @override
+  String get pdfOriginalAmount => 'المبلغ الأصلي';
+
+  @override
+  String get pdfBalance => 'الرصيد';
+
+  @override
+  String get pdfStatus => 'الحالة';
+
+  @override
+  String get pdfDueDate => 'تاريخ الاستحقاق';
+
+  @override
+  String get newDebtNotificationTitle => 'دين جديد';
+
+  @override
+  String newDebtNotificationBody(Object amount) {
+    return 'تمت إضافة دين بقيمة $amount دينار';
+  }
+
+  @override
+  String get dueSoonNotificationTitle => 'تذكير';
+
+  @override
+  String get dueSoonNotificationBody => 'دينك يستحق قريبًا';
 }
