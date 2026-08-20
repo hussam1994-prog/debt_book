@@ -14,6 +14,7 @@ class RealtimeService {
   void start() {
     if (_client.auth.currentUser == null) return;
 
+    // persons
     _client
         .channel('public:persons')
         .onPostgresChanges(
@@ -24,6 +25,7 @@ class RealtimeService {
         )
         .subscribe();
 
+    // debts
     _client
         .channel('public:debts')
         .onPostgresChanges(
@@ -34,6 +36,7 @@ class RealtimeService {
         )
         .subscribe();
 
+    // payments
     _client
         .channel('public:payments')
         .onPostgresChanges(
@@ -44,6 +47,7 @@ class RealtimeService {
         )
         .subscribe();
 
+    // ledger_entries
     _client
         .channel('public:ledger_entries')
         .onPostgresChanges(
