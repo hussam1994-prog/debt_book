@@ -2,6 +2,7 @@ import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../core/localization/l10n_extension.dart';
 import '../../../core/providers.dart';
@@ -17,6 +18,53 @@ class ReportsPage extends ConsumerStatefulWidget {
 }
 
 class _ReportsPageState extends ConsumerState<ReportsPage> {
+  /// ✅ تحديث محلي فقط: إعادة تحميل بيانات التقارير
+  void _refreshLocal() {
+    ref.invalidate(allDebtsProvider);
+    ref.invalidate(balancesByDebtProvider);
+    ref.invalidate(overdueDebtsProvider);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تم تحديث التقارير محليًا')),
+      );
+    }
+  }
+
+  Future<void> _exportToCsv() async {
+    try {
+      final allDebts = await ref.read(allDebtsProvider.future);
+      final balances = await ref.read(balancesByDebtProvider.future);
+      final personRepo = ref.read(personRepositoryProvider);
+
+      final rows = <Map<String, String>>[];
+      for (final debt in allDebts) {
+        final person = await personRepo.findById(debt.personId);
+        final balance = balances[debt.id] ?? Money.zero;
+        rows.add({
+          'person': person?.name ?? 'Unknown',
+          'description': debt.description ?? '',
+          'originalAmount': '${debt.amount.amount}',
+          'balance': '${balance.amount}',
+          'status': debt.status.name,
+          'dueDate': debt.dueDate?.toIso8601String() ?? '',
+        });
+      }
+
+      final exportService = ref.read(exportServiceProvider);
+      final file = await exportService.exportDebtsToCsv(rows: rows);
+
+      if (mounted) {
+        _showShareDialog(file.path);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Export failed: $e')),
+        );
+      }
+    }
+  }
+
   Future<void> _exportToPdf() async {
     try {
       final allDebts = await ref.read(allDebtsProvider.future);
@@ -52,9 +100,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
       final file = await pdfService.exportDebtsToPdf(rows: rows, labels: labels);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('PDF exported to: ${file.path}')),
-        );
+        _showShareDialog(file.path);
       }
     } catch (e) {
       if (mounted) {
@@ -65,41 +111,30 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
     }
   }
 
-  Future<void> _exportToCsv() async {
-    try {
-      final allDebts = await ref.read(allDebtsProvider.future);
-      final balances = await ref.read(balancesByDebtProvider.future);
-      final personRepo = ref.read(personRepositoryProvider);
-
-      final rows = <Map<String, String>>[];
-      for (final debt in allDebts) {
-        final person = await personRepo.findById(debt.personId);
-        final balance = balances[debt.id] ?? Money.zero;
-        rows.add({
-          'person': person?.name ?? 'Unknown',
-          'description': debt.description ?? '',
-          'originalAmount': '${debt.amount.amount}',
-          'balance': '${balance.amount}',
-          'status': debt.status.name,
-          'dueDate': debt.dueDate?.toIso8601String() ?? '',
-        });
-      }
-
-      final exportService = ref.read(exportServiceProvider);
-      final file = await exportService.exportDebtsToCsv(rows: rows);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('CSV exported to: ${file.path}')),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Export failed: $e')),
-        );
-      }
-    }
+  void _showShareDialog(String filePath) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('تم التصدير'),
+        content: const Text('هل تريد مشاركة الملف؟'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('إغلاق'),
+          ),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.share),
+            label: const Text('مشاركة'),
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              await SharePlus.instance.share(
+                ShareParams(files: [XFile(filePath)]),
+              );
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -119,6 +154,11 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: l10n.refresh,
+            onPressed: _refreshLocal, // ✅ زر تحديث محلي
+          ),
+          IconButton(
             icon: const Icon(Icons.picture_as_pdf),
             tooltip: 'Export PDF',
             onPressed: _exportToPdf,
@@ -130,36 +170,40 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.overview, style: textTheme.titleLarge),
-            const SizedBox(height: AppSpacing.sm),
-            _SummarySection(
-              allDebtsAsync: allDebtsAsync,
-              balancesAsync: balancesAsync,
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Text(l10n.noOverdue, style: textTheme.titleLarge),
-            const SizedBox(height: AppSpacing.sm),
-            overdueAsync.when(
-              data: (debts) {
-                if (debts.isEmpty) {
-                  return EmptyState(
-                    icon: Icons.check_circle_outline,
-                    title: l10n.noOverdue,
+      body: RefreshIndicator(
+        onRefresh: () async => _refreshLocal(), // ✅ سحب للتحديث
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.overview, style: textTheme.titleLarge),
+              const SizedBox(height: AppSpacing.sm),
+              _SummarySection(
+                allDebtsAsync: allDebtsAsync,
+                balancesAsync: balancesAsync,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Text(l10n.noOverdue, style: textTheme.titleLarge),
+              const SizedBox(height: AppSpacing.sm),
+              overdueAsync.when(
+                data: (debts) {
+                  if (debts.isEmpty) {
+                    return EmptyState(
+                      icon: Icons.check_circle_outline,
+                      title: l10n.noOverdue,
+                    );
+                  }
+                  return Column(
+                    children: debts.map((debt) => _DebtTile(debt: debt)).toList(),
                   );
-                }
-                return Column(
-                  children: debts.map((debt) => _DebtTile(debt: debt)).toList(),
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, st) => Center(child: Text('Error: $e')),
-            ),
-          ],
+                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, st) => Center(child: Text('Error: $e')),
+              ),
+            ],
+          ),
         ),
       ),
     );

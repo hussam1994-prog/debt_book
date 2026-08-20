@@ -21,6 +21,19 @@ class PersonDetailPage extends ConsumerStatefulWidget {
 class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
   Person? _person;
 
+  /// ✅ تحديث محلي فقط: إعادة قراءة بيانات الشخص والديون من قاعدة البيانات
+  void _refreshLocal() {
+    ref.invalidate(personRepositoryProvider);
+    ref.invalidate(debtsForPersonProvider(widget.personId));
+    final debts = ref.read(debtsForPersonProvider(widget.personId)).value ?? [];
+    ref.invalidate(balancesForDebtsProvider(debts));
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تم تحديث البيانات محليًا')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -39,6 +52,11 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: l10n.refresh,
+            onPressed: _refreshLocal, // ✅ زر تحديث محلي
+          ),
+          IconButton(
             icon: const Icon(Icons.edit),
             tooltip: l10n.edit,
             onPressed: () {
@@ -54,90 +72,100 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
           ),
         ],
       ),
-      body: FutureBuilder<Person?>(
-        future: personAsync,
-        builder: (context, personSnapshot) {
-          final person = personSnapshot.data;
-          if (person != null) {
-            _person = person;
-          }
-          return Column(
-            children: [
-              if (person != null)
-                Padding(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 32,
-                        backgroundColor:
-                            AppColors.primary.withValues(alpha: 0.1),
-                        child: Text(
-                          person.name.substring(0, 1).toUpperCase(),
-                          style: TextStyle(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold,
+      body: RefreshIndicator(
+        onRefresh: () async => _refreshLocal(), // ✅ سحب للتحديث
+        child: FutureBuilder<Person?>(
+          future: personAsync,
+          builder: (context, personSnapshot) {
+            final person = personSnapshot.data;
+            if (person != null) {
+              _person = person;
+            }
+            return Column(
+              children: [
+                if (person != null)
+                  Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 32,
+                          backgroundColor:
+                              AppColors.primary.withValues(alpha: 0.1),
+                          child: Text(
+                            person.name.substring(0, 1).toUpperCase(),
+                            style: const TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: AppSpacing.md),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(person.name,
-                                style: Theme.of(context).textTheme.titleLarge),
-                            if (person.phone != null)
-                              Text(person.phone!,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium),
-                            if (person.email != null)
-                              Text(person.email!,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium),
-                          ],
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                person.name,
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                              if (person.phone != null)
+                                Text(
+                                  person.phone!,
+                                  style:
+                                      Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              if (person.email != null)
+                                Text(
+                                  person.email!,
+                                  style:
+                                      Theme.of(context).textTheme.bodyMedium,
+                                ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
+                  ),
+                const Divider(),
+                Expanded(
+                  child: debtsAsync.when(
+                    data: (debts) {
+                      if (debts.isEmpty) {
+                        return EmptyState(
+                          icon: Icons.receipt_long,
+                          title: l10n.noDebts,
+                          subtitle: l10n.noDebts,
+                        );
+                      }
+                      return ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        itemCount: debts.length,
+                        itemBuilder: (context, index) {
+                          final debt = debts[index];
+                          final balance = balancesAsync.value?[debt.id];
+                          return _DebtCard(
+                            debt: debt,
+                            balance: balance,
+                            onTap: () =>
+                                context.go('/debt/${debt.id.value}'),
+                          );
+                        },
+                      );
+                    },
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (e, st) => Center(child: Text('Error: $e')),
                   ),
                 ),
-              const Divider(),
-              Expanded(
-                child: debtsAsync.when(
-                  data: (debts) {
-                    if (debts.isEmpty) {
-                      return EmptyState(
-                        icon: Icons.receipt_long,
-                        title: l10n.noDebts,
-                        subtitle: l10n.noDebts,
-                      );
-                    }
-                    return ListView.builder(
-                      itemCount: debts.length,
-                      itemBuilder: (context, index) {
-                        final debt = debts[index];
-                        final balance = balancesAsync.value?[debt.id];
-                        return _DebtCard(
-                          debt: debt,
-                          balance: balance,
-                          onTap: () =>
-                              context.go('/debt/${debt.id.value}'),
-                        );
-                      },
-                    );
-                  },
-                  loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (e, st) => Center(child: Text('Error: $e')),
-                ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go('/person/${widget.personId.value}/add-debt'),
+        onPressed: () =>
+            context.go('/person/${widget.personId.value}/add-debt'),
         backgroundColor: AppColors.primary,
         icon: const Icon(Icons.add),
         label: Text(l10n.addDebt),
@@ -293,7 +321,6 @@ class _DebtCard extends ConsumerWidget {
     }
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
-  }
+  String _formatDate(DateTime date) =>
+      '${date.day}/${date.month}/${date.year}';
 }

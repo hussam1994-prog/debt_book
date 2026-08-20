@@ -1,3 +1,4 @@
+import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +8,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../dashboard/providers/analytics_providers.dart';
+import '../../people/providers/people_providers.dart';
 
 class AllDebtsPage extends ConsumerStatefulWidget {
   const AllDebtsPage({super.key});
@@ -25,6 +27,18 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
     super.dispose();
   }
 
+  /// ✅ تحديث محلي فقط: إعادة قراءة بيانات الديون من قاعدة البيانات المحلية
+  void _refreshLocal() {
+    ref.invalidate(allDebtsProvider);
+    ref.invalidate(allDebtsWithPersonNameProvider);
+    ref.invalidate(balancesByDebtProvider);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تم تحديث الديون محليًا')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -38,6 +52,13 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/'),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: l10n.refresh,
+            onPressed: _refreshLocal, // ✅ زر تحديث محلي
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -61,57 +82,64 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
             ),
           ),
           Expanded(
-            child: debtsAsync.when(
-              data: (debts) {
-                final filtered = _query.isEmpty
-                    ? debts
-                    : debts.where((entry) {
-                        final desc = entry.$1.description?.toLowerCase() ?? '';
-                        final person = entry.$2.toLowerCase();
-                        return desc.contains(_query) || person.contains(_query);
-                      }).toList();
+            child: RefreshIndicator(
+              onRefresh: () async => _refreshLocal(), // ✅ سحب للتحديث
+              child: debtsAsync.when(
+                data: (debts) {
+                  final filtered = _query.isEmpty
+                      ? debts
+                      : debts.where((entry) {
+                          final desc =
+                              entry.$1.description?.toLowerCase() ?? '';
+                          final person = entry.$2.toLowerCase();
+                          return desc.contains(_query) ||
+                              person.contains(_query);
+                        }).toList();
 
-                if (filtered.isEmpty) {
-                  return EmptyState(
-                    icon: Icons.receipt_long,
-                    title: l10n.noDebts,
-                    subtitle: l10n.noDebts,
-                  );
-                }
-
-                return ListView.builder(
-                  padding: const EdgeInsets.only(bottom: 80),
-                  itemCount: filtered.length,
-                  itemBuilder: (context, index) {
-                    final entry = filtered[index];
-                    final debt = entry.$1;
-                    final personName = entry.$2;
-                    return AppCard(
-                      onTap: () => context.go('/debt/${debt.id.value}'),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            debt.description ?? l10n.description,
-                            style: textTheme.bodyLarge,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            personName,
-                            style: textTheme.bodyMedium,
-                          ),
-                          Text(
-                            '${debt.amount.amount} IQD',
-                            style: textTheme.titleMedium,
-                          ),
-                        ],
-                      ),
+                  if (filtered.isEmpty) {
+                    return EmptyState(
+                      icon: Icons.receipt_long,
+                      title: l10n.noDebts,
+                      subtitle: l10n.noDebts,
                     );
-                  },
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, st) => Center(child: Text('Error: $e')),
+                  }
+
+                  return ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.only(bottom: 80),
+                    itemCount: filtered.length,
+                    itemBuilder: (context, index) {
+                      final entry = filtered[index];
+                      final debt = entry.$1;
+                      final personName = entry.$2;
+                      return AppCard(
+                        onTap: () => context.go('/debt/${debt.id.value}'),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              debt.description ?? l10n.description,
+                              style: textTheme.bodyLarge,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              personName,
+                              style: textTheme.bodyMedium,
+                            ),
+                            Text(
+                              '${debt.amount.amount} IQD',
+                              style: textTheme.titleMedium,
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+                loading: () =>
+                    const Center(child: CircularProgressIndicator()),
+                error: (e, st) => Center(child: Text('Error: $e')),
+              ),
             ),
           ),
         ],

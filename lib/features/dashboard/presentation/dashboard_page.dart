@@ -7,10 +7,21 @@ import '../../../core/localization/l10n_extension.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/sync_status_banner.dart';
 import '../providers/analytics_providers.dart';
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
+
+  /// ✅ تحديث محلي فقط: إعادة تحميل بيانات لوحة المعلومات
+  void _refreshLocal(WidgetRef ref) {
+    ref.invalidate(totalOutstandingProvider);
+    ref.invalidate(totalPaidProvider);
+    ref.invalidate(peopleWithDebtsCountProvider);
+    ref.invalidate(overdueDebtsProvider);
+    ref.invalidate(last7DaysPaymentsProvider);
+    ref.invalidate(balancesByDebtProvider);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,59 +40,80 @@ class DashboardPage extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/'),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: l10n.refresh,
+            onPressed: () => _refreshLocal(ref), // ✅ تحديث محلي
+          ),
+        ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                _StatCard(
-                  label: l10n.balance,
-                  valueAsync: outstandingAsync,
-                  icon: Icons.receipt_long,
-                  color: AppColors.error,
+      body: Column(
+        children: [
+          const SyncStatusBanner(),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () async => _refreshLocal(ref), // ✅ سحب للتحديث
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        _StatCard(
+                          label: l10n.balance,
+                          valueAsync: outstandingAsync,
+                          icon: Icons.receipt_long,
+                          color: AppColors.error,
+                        ),
+                        _StatCard(
+                          label: l10n.paid,
+                          valueAsync: paidAsync,
+                          icon: Icons.payments,
+                          color: Colors.green,
+                        ),
+                        _StatCard(
+                          label: l10n.people,
+                          valueAsync: peopleCountAsync,
+                          icon: Icons.people,
+                          color: AppColors.primary,
+                          isMoney: false,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(l10n.paymentsLast7Days, style: textTheme.titleLarge),
+                    const SizedBox(height: AppSpacing.sm),
+                    _BarChart(paymentsAsync: last7PaymentsAsync),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(l10n.noOverdue, style: textTheme.titleLarge),
+                    const SizedBox(height: AppSpacing.sm),
+                    overdueAsync.when(
+                      data: (debts) {
+                        if (debts.isEmpty) {
+                          return EmptyState(
+                            icon: Icons.check_circle_outline,
+                            title: l10n.noOverdue,
+                          );
+                        }
+                        return Column(
+                          children: debts
+                              .map((debt) => _DebtCard(debt: debt))
+                              .toList(),
+                        );
+                      },
+                      loading: () =>
+                          const Center(child: CircularProgressIndicator()),
+                      error: (e, st) => Center(child: Text('Error: $e')),
+                    ),
+                  ],
                 ),
-                _StatCard(
-                  label: l10n.paid,
-                  valueAsync: paidAsync,
-                  icon: Icons.payments,
-                  color: Colors.green,
-                ),
-                _StatCard(
-                  label: l10n.people,
-                  valueAsync: peopleCountAsync,
-                  icon: Icons.people,
-                  color: AppColors.primary,
-                  isMoney: false,
-                ),
-              ],
+              ),
             ),
-            const SizedBox(height: AppSpacing.lg),
-            Text(l10n.paymentsLast7Days, style: textTheme.titleLarge),
-            const SizedBox(height: AppSpacing.sm),
-            _BarChart(paymentsAsync: last7PaymentsAsync),
-            const SizedBox(height: AppSpacing.lg),
-            Text(l10n.noOverdue, style: textTheme.titleLarge),
-            const SizedBox(height: AppSpacing.sm),
-            overdueAsync.when(
-              data: (debts) {
-                if (debts.isEmpty) {
-                  return EmptyState(
-                    icon: Icons.check_circle_outline,
-                    title: l10n.noOverdue,
-                  );
-                }
-                return Column(
-                  children: debts.map((debt) => _DebtCard(debt: debt)).toList(),
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, st) => Center(child: Text('Error: $e')),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -152,11 +184,14 @@ class _BarChart extends StatelessWidget {
         }
         final now = DateTime.now();
         final days = List.generate(7, (i) =>
-            DateTime(now.year, now.month, now.day).subtract(Duration(days: 6 - i)));
+            DateTime(now.year, now.month, now.day)
+                .subtract(Duration(days: 6 - i)));
         final totals = days.map((day) {
           final dayEnd = day.add(const Duration(days: 1));
           return payments
-              .where((p) => p.paymentDate.isAfter(day) && p.paymentDate.isBefore(dayEnd))
+              .where((p) =>
+                  p.paymentDate.isAfter(day) &&
+                  p.paymentDate.isBefore(dayEnd))
               .fold<int>(0, (sum, p) => sum + p.amount.amount);
         }).toList();
 
@@ -186,7 +221,8 @@ class _BarChart extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(dayLabel, style: const TextStyle(fontSize: 10)),
+                      Text(dayLabel,
+                          style: const TextStyle(fontSize: 10)),
                     ],
                   ),
                 );
