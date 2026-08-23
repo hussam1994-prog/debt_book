@@ -8,26 +8,41 @@ final peopleProvider = FutureProvider<List<Person>>((ref) async {
   return repo.findAll();
 });
 
-final debtsForPersonProvider = FutureProvider.family<List<Debt>, PersonId>((ref, personId) async {
+final debtsForPersonProvider =
+    FutureProvider.family<List<Debt>, PersonId>((ref, personId) async {
   final repo = ref.watch(debtRepositoryProvider);
   return repo.findByPersonId(personId);
 });
 
-/// ✅ أرصدة جميع الديون دفعة واحدة (استعلام واحد فقط لكل القيود)
+/// ✅ الأرصدة لكل الديون مرة واحدة
 final balancesForDebtsProvider =
     FutureProvider.family<Map<DebtId, Money>, List<Debt>>((ref, debts) async {
   if (debts.isEmpty) return {};
 
   final ledgerRepo = ref.watch(ledgerRepositoryProvider);
-  final allEntries = await ledgerRepo.findAll(); // استعلام واحد فقط
-
+  final allEntries = await ledgerRepo.findAll();
   final calculator = const BalanceCalculator();
+
   final balances = <DebtId, Money>{};
   for (final debt in debts) {
     final entries = allEntries.where((e) => e.debtId == debt.id).toList();
     balances[debt.id] = calculator.calculateBalance(entries);
   }
   return balances;
+});
+
+/// ✅ مجموع المبالغ المستحقة لشخص (الأرصدة الموجبة فقط)
+final totalOutstandingForPersonProvider =
+    FutureProvider.family<Money, PersonId>((ref, personId) async {
+  final debts = await ref.watch(debtsForPersonProvider(personId).future);
+  final balances = await ref.watch(balancesForDebtsProvider(debts).future);
+
+  var total = 0;
+  for (final debt in debts) {
+    final balance = balances[debt.id] ?? Money.zero;
+    if (balance.amount > 0) total += balance.amount;
+  }
+  return Money(amount: total);
 });
 
 final ledgerEntriesForDebtProvider =
@@ -42,7 +57,7 @@ final paymentsForDebtProvider =
   return repo.findByDebtId(debtId);
 });
 
-// ⚠️ للتوافق مع أي استخدام قديم — سنزيله لاحقًا
+// للتوافق مع الاستخدامات القديمة
 final balanceForDebtProvider =
     FutureProvider.family<Money, DebtId>((ref, debtId) async {
   final ledgerRepo = ref.watch(ledgerRepositoryProvider);

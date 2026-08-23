@@ -140,5 +140,15 @@
   "delete": "Delete",
   "confirmDeletePerson": "Are you sure? This will hide the person and all related data.",
   "refresh": "Refresh",
-  "personDeleted": "Person deleted successfully"
+  "personDeleted": "Person deleted successfully",
+  "totalOutstanding": "Total Outstanding",
+  "statementFor": "Statement for",
+  "sendWhatsAppStatement": "Send via WhatsApp",
+  "exportStatementPdf": "Export PDF",
+  "noDebts": "No Debts",
+  "status": "Status",
+  "description": "Description",
+  "originalAmount": "Original Amount",
+  "balance": "Balance",
+  "dueDate": "Due Date"
 }

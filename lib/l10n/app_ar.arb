@@ -140,5 +140,15 @@
   "delete": "حذف",
   "confirmDeletePerson": "هل أنت متأكد؟ سيتم إخفاء الشخص وجميع البيانات المرتبطة.",
   "refresh": "تحديث",
-  "personDeleted": "تم حذف الشخص بنجاح"
+  "personDeleted": "تم حذف الشخص بنجاح",
+  "totalOutstanding": "إجمالي المستحقات",
+  "statementFor": "كشف حساب",
+  "sendWhatsAppStatement": "إرسال عبر واتساب",
+  "exportStatementPdf": "تصدير PDF",
+  "noDebts": "لا توجد ديون",
+  "status": "الحالة",
+  "description": "الوصف",
+  "originalAmount": "المبلغ الأصلي",
+  "balance": "الرصيد",
+  "dueDate": "تاريخ الاستحقاق"
 }

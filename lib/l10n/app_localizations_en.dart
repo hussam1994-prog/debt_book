@@ -435,4 +435,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get refresh => 'Refresh';
+
+  @override
+  String get totalOutstanding => 'Total Outstanding';
+
+  @override
+  String get statementFor => 'Statement for';
+
+  @override
+  String get sendWhatsAppStatement => 'Send via WhatsApp';
+
+  @override
+  String get exportStatementPdf => 'Export PDF';
+
+  @override
+  String get status => 'Status';
 }

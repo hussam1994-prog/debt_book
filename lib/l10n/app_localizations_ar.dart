@@ -433,4 +433,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get refresh => 'تحديث';
+
+  @override
+  String get totalOutstanding => 'إجمالي المستحقات';
+
+  @override
+  String get statementFor => 'كشف حساب';
+
+  @override
+  String get sendWhatsAppStatement => 'إرسال عبر واتساب';
+
+  @override
+  String get exportStatementPdf => 'تصدير PDF';
+
+  @override
+  String get status => 'الحالة';
 }

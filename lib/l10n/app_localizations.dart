@@ -918,6 +918,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Refresh'**
   String get refresh;
+
+  /// No description provided for @totalOutstanding.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Outstanding'**
+  String get totalOutstanding;
+
+  /// No description provided for @statementFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Statement for'**
+  String get statementFor;
+
+  /// No description provided for @sendWhatsAppStatement.
+  ///
+  /// In en, this message translates to:
+  /// **'Send via WhatsApp'**
+  String get sendWhatsAppStatement;
+
+  /// No description provided for @exportStatementPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Export PDF'**
+  String get exportStatementPdf;
+
+  /// No description provided for @status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
 }
 
 class _AppLocalizationsDelegate
