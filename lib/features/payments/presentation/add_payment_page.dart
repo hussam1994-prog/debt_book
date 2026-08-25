@@ -30,6 +30,7 @@ class _AddPaymentPageState extends ConsumerState<AddPaymentPage> {
     ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
     ref.invalidate(paymentsForDebtProvider(widget.debtId));
     ref.invalidate(balanceForDebtProvider(widget.debtId));
+    ref.invalidate(installmentsForDebtProvider(widget.debtId));
   }
 
   @override
@@ -92,6 +93,21 @@ class _AddPaymentPageState extends ConsumerState<AddPaymentPage> {
 
                   // ✅ تحديث محلي
                   _refreshLocal();
+
+                  // ✅ محاولة تحديث الأقساط المدفوعة
+                  final markPaid = ref.read(markInstallmentsPaidProvider);
+                  final paidCount = await markPaid.call(
+                    debtId: widget.debtId,
+                    paymentAmount: Money(amount: amount),
+                  );
+
+                  if (paidCount > 0 && mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('تم تحديث $paidCount قسط'),
+                      ),
+                    );
+                  }
 
                   if (context.mounted) context.pop();
                 } catch (e) {

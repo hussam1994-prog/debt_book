@@ -171,5 +171,19 @@
   "numberOfInstallments": "Number of Installments",
   "firstInstallmentDate": "First Installment Date",
   "no": "No",
-  "yes": "Yes"
+  "yes": "Yes",
+  "installmentPlan": "Installment Plan",
+  "installments": "Installments",
+  "installment": "Installment",
+  "numberOfInstallments": "Number of Installments",
+  "firstInstallmentDate": "First Installment Date",
+  "noInstallments": "No installments found",
+  "installmentDueDate": "Installment Due Date",
+  "installmentAmount": "Installment Amount",
+  "installmentStatus": "Installment Status",
+  "pending": "Pending",
+  "paid": "Paid",
+  "overdue": "Overdue",
+  "markAsPaid": "Mark as Paid",
+  "installmentPaid": "Installment marked as paid"
 }

@@ -1068,6 +1068,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Yes'**
   String get yes;
+
+  /// No description provided for @noInstallments.
+  ///
+  /// In en, this message translates to:
+  /// **'No installments found'**
+  String get noInstallments;
+
+  /// No description provided for @installmentDueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Installment Due Date'**
+  String get installmentDueDate;
+
+  /// No description provided for @installmentAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Installment Amount'**
+  String get installmentAmount;
+
+  /// No description provided for @installmentStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Installment Status'**
+  String get installmentStatus;
+
+  /// No description provided for @pending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get pending;
+
+  /// No description provided for @overdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get overdue;
+
+  /// No description provided for @markAsPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Paid'**
+  String get markAsPaid;
+
+  /// No description provided for @installmentPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Installment marked as paid'**
+  String get installmentPaid;
 }
 
 class _AppLocalizationsDelegate

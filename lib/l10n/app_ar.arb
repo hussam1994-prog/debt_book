@@ -171,5 +171,19 @@
   "numberOfInstallments": "عدد الأقساط",
   "firstInstallmentDate": "تاريخ أول قسط",
   "no": "لا",
-  "yes": "نعم"
+  "yes": "نعم",
+  "installmentPlan": "خطة تقسيط",
+  "installments": "الأقساط",
+  "installment": "قسط",
+  "numberOfInstallments": "عدد الأقساط",
+  "firstInstallmentDate": "تاريخ أول قسط",
+  "noInstallments": "لا توجد أقساط",
+  "installmentDueDate": "تاريخ استحقاق القسط",
+  "installmentAmount": "مبلغ القسط",
+  "installmentStatus": "حالة القسط",
+  "pending": "قيد الانتظار",
+  "paid": "مدفوع",
+  "overdue": "متأخر",
+  "markAsPaid": "تحديد كمدفوع",
+  "installmentPaid": "تم تحديد القسط كمدفوع"
 }

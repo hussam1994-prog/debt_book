@@ -215,3 +215,7 @@ final createInstallmentsProvider = Provider<CreateInstallments>((ref) {
     uuidGenerator: ref.watch(uuidGeneratorProvider),
   );
 });
+
+final markInstallmentsPaidProvider = Provider<MarkInstallmentsPaid>((ref) {
+  return MarkInstallmentsPaid(ref.watch(installmentRepositoryProvider));
+});

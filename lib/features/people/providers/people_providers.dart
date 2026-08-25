@@ -65,3 +65,9 @@ final balanceForDebtProvider =
   final entries = await ledgerRepo.findByDebtId(debtId);
   return calculator.calculateBalance(entries);
 });
+
+final installmentsForDebtProvider =
+    FutureProvider.family<List<Installment>, DebtId>((ref, debtId) async {
+  final repo = ref.watch(installmentRepositoryProvider);
+  return repo.findByDebtId(debtId);
+});

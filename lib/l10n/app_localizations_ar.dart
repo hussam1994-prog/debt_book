@@ -81,7 +81,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get language => 'اللغة';
 
   @override
-  String get paid => 'المدفوع';
+  String get paid => 'مدفوع';
 
   @override
   String get paymentsLast7Days => 'دفعات آخر 7 أيام';
@@ -497,7 +497,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get installment => 'قسط';
 
   @override
-  String get installments => 'أقساط';
+  String get installments => 'الأقساط';
 
   @override
   String get numberOfInstallments => 'عدد الأقساط';
@@ -510,4 +510,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get yes => 'نعم';
+
+  @override
+  String get noInstallments => 'لا توجد أقساط';
+
+  @override
+  String get installmentDueDate => 'تاريخ استحقاق القسط';
+
+  @override
+  String get installmentAmount => 'مبلغ القسط';
+
+  @override
+  String get installmentStatus => 'حالة القسط';
+
+  @override
+  String get pending => 'قيد الانتظار';
+
+  @override
+  String get overdue => 'متأخر';
+
+  @override
+  String get markAsPaid => 'تحديد كمدفوع';
+
+  @override
+  String get installmentPaid => 'تم تحديد القسط كمدفوع';
 }

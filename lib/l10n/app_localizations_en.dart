@@ -513,4 +513,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yes => 'Yes';
+
+  @override
+  String get noInstallments => 'No installments found';
+
+  @override
+  String get installmentDueDate => 'Installment Due Date';
+
+  @override
+  String get installmentAmount => 'Installment Amount';
+
+  @override
+  String get installmentStatus => 'Installment Status';
+
+  @override
+  String get pending => 'Pending';
+
+  @override
+  String get overdue => 'Overdue';
+
+  @override
+  String get markAsPaid => 'Mark as Paid';
+
+  @override
+  String get installmentPaid => 'Installment marked as paid';
 }

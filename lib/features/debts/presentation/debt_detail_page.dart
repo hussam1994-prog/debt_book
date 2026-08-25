@@ -28,6 +28,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
     ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
     ref.invalidate(paymentsForDebtProvider(widget.debtId));
     ref.invalidate(balanceForDebtProvider(widget.debtId));
+    ref.invalidate(installmentsForDebtProvider(widget.debtId));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('تم تحديث التفاصيل محليًا')),
@@ -350,6 +351,73 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
     );
   }
 
+  Widget _buildInstallmentsList(
+    BuildContext context,
+    AsyncValue<List<Installment>> installmentsAsync,
+    WidgetRef ref,
+  ) {
+    final l10n = context.l10n;
+    return installmentsAsync.when(
+      data: (installments) {
+        if (installments.isEmpty) {
+          return EmptyState(
+            icon: Icons.calendar_month,
+            title: l10n.noInstallments,
+            subtitle: l10n.noInstallments,
+          );
+        }
+        return ListView.builder(
+          physics: const AlwaysScrollableScrollPhysics(),
+          itemCount: installments.length,
+          itemBuilder: (context, index) {
+            final installment = installments[index];
+            final isPaid = installment.status == InstallmentStatus.paid;
+            final isOverdue = installment.status == InstallmentStatus.overdue;
+
+            return ListTile(
+              leading: CircleAvatar(
+                child: Text('${installment.number}'),
+              ),
+              title: Text('${installment.amount.amount} IQD'),
+              subtitle: Text(
+                '${l10n.dueDate}: ${_formatDate(installment.dueDate)}',
+              ),
+              trailing: isPaid
+                  ? Icon(Icons.check_circle, color: Colors.green)
+                  : IconButton(
+                      icon: Icon(
+                        Icons.check_circle_outline,
+                        color: isOverdue
+                            ? Theme.of(context).colorScheme.error
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      onPressed: () async {
+                        final updated = installment.copyWith(
+                          status: InstallmentStatus.paid,
+                          paidAt: DateTime.now(),
+                          updatedAt: DateTime.now(),
+                          version: installment.version + 1,
+                        );
+                        final repo = ref.read(installmentRepositoryProvider);
+                        await repo.update(updated);
+                        ref.invalidate(
+                            installmentsForDebtProvider(widget.debtId));
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(l10n.installmentPaid)),
+                          );
+                        }
+                      },
+                    ),
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, st) => Center(child: Text('Error: $e')),
+    );
+  }
+
   String _formatDate(DateTime date) =>
       '${date.day}/${date.month}/${date.year}';
 
@@ -359,6 +427,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
     final debtAsync = ref.watch(debtRepositoryProvider).findById(widget.debtId);
     final entriesAsync = ref.watch(ledgerEntriesForDebtProvider(widget.debtId));
     final paymentsAsync = ref.watch(paymentsForDebtProvider(widget.debtId));
+    final installmentsAsync = ref.watch(installmentsForDebtProvider(widget.debtId));
     final getBalance = ref.read(getBalanceProvider);
     final balanceAsync = getBalance(widget.debtId);
 
@@ -452,7 +521,6 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                                 '${l10n.dueDate}: ${_formatDate(debt.dueDate!)}',
                                 style: Theme.of(context).textTheme.bodyMedium,
                               ),
-                            // ✅ عرض الصورة داخل نفس الـ Column
                             if (debt.attachmentPath != null)
                               Padding(
                                 padding: const EdgeInsets.only(top: 8),
@@ -473,13 +541,14 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                 const Divider(),
                 Expanded(
                   child: DefaultTabController(
-                    length: 2,
+                    length: 3,
                     child: Column(
                       children: [
                         TabBar(
                           tabs: [
                             Tab(text: l10n.ledger),
                             Tab(text: l10n.payments),
+                            Tab(text: l10n.installments),
                           ],
                         ),
                         Expanded(
@@ -487,6 +556,8 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                             children: [
                               _buildLedgerList(entriesAsync),
                               _buildPaymentsList(context, paymentsAsync, ref),
+                              _buildInstallmentsList(
+                                  context, installmentsAsync, ref),
                             ],
                           ),
                         ),
