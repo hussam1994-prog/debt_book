@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,7 +23,6 @@ class DebtDetailPage extends ConsumerStatefulWidget {
 class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
   Debt? _debt;
 
-  /// ✅ تحديث محلي فقط: إعادة قراءة بيانات الدين والقيود والدفعات
   void _refreshLocal() {
     ref.invalidate(debtRepositoryProvider);
     ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
@@ -104,20 +105,13 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
               if (dueDateController.text.trim().isNotEmpty) {
                 dueDate = DateTime.tryParse(dueDateController.text.trim());
               }
-              final updatedDebt = Debt(
-                id: debt.id,
-                personId: debt.personId,
+              final updatedDebt = debt.copyWith(
                 description: descriptionController.text.trim().isEmpty
                     ? null
                     : descriptionController.text.trim(),
-                amount: debt.amount,
                 dueDate: dueDate,
-                status: debt.status,
-                createdAt: debt.createdAt,
                 updatedAt: now,
                 version: debt.version + 1,
-                isDeleted: debt.isDeleted,
-                deletedAt: debt.deletedAt,
               );
               final repo = ref.read(debtRepositoryProvider);
               await repo.updateDebt(updatedDebt);
@@ -379,7 +373,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: l10n.refresh,
-            onPressed: _refreshLocal, // ✅ زر تحديث محلي
+            onPressed: _refreshLocal,
           ),
           IconButton(
             icon: const Icon(Icons.chat),
@@ -415,7 +409,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () async => _refreshLocal(), // ✅ سحب للتحديث
+        onRefresh: () async => _refreshLocal(),
         child: FutureBuilder<Debt?>(
           future: debtAsync,
           builder: (context, debtSnapshot) {
@@ -457,6 +451,19 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                               Text(
                                 '${l10n.dueDate}: ${_formatDate(debt.dueDate!)}',
                                 style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            // ✅ عرض الصورة داخل نفس الـ Column
+                            if (debt.attachmentPath != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.file(
+                                    File(debt.attachmentPath!),
+                                    height: 180,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               ),
                           ],
                         ),

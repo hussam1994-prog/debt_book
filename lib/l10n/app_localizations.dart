@@ -948,6 +948,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Status'**
   String get status;
+
+  /// No description provided for @invalidAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid amount'**
+  String get invalidAmount;
+
+  /// No description provided for @optional.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional'**
+  String get optional;
+
+  /// No description provided for @reminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder'**
+  String get reminder;
+
+  /// No description provided for @noReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'No reminder'**
+  String get noReminder;
+
+  /// No description provided for @beforeDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} day(s) before'**
+  String beforeDays(Object days);
+
+  /// No description provided for @confirmSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Save'**
+  String get confirmSave;
+
+  /// No description provided for @saveDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Debt'**
+  String get saveDebt;
+
+  /// No description provided for @attachImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach Image'**
+  String get attachImage;
+
+  /// No description provided for @changeImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Image'**
+  String get changeImage;
+
+  /// No description provided for @nameExists.
+  ///
+  /// In en, this message translates to:
+  /// **'Name Already Exists'**
+  String get nameExists;
+
+  /// No description provided for @nameExistsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'A person with this name already exists. Do you want to add a debt to them?'**
+  String get nameExistsMessage;
+
+  /// No description provided for @createNew.
+  ///
+  /// In en, this message translates to:
+  /// **'Create New'**
+  String get createNew;
+
+  /// No description provided for @addDebtToExisting.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Debt to Existing'**
+  String get addDebtToExisting;
+
+  /// No description provided for @installmentPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Installment Plan'**
+  String get installmentPlan;
+
+  /// No description provided for @installment.
+  ///
+  /// In en, this message translates to:
+  /// **'Installment'**
+  String get installment;
+
+  /// No description provided for @installments.
+  ///
+  /// In en, this message translates to:
+  /// **'Installments'**
+  String get installments;
+
+  /// No description provided for @numberOfInstallments.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of Installments'**
+  String get numberOfInstallments;
+
+  /// No description provided for @firstInstallmentDate.
+  ///
+  /// In en, this message translates to:
+  /// **'First Installment Date'**
+  String get firstInstallmentDate;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
 }
 
 class _AppLocalizationsDelegate

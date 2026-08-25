@@ -448,4 +448,66 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get status => 'الحالة';
+
+  @override
+  String get invalidAmount => 'يرجى إدخال مبلغ صحيح';
+
+  @override
+  String get optional => 'اختياري';
+
+  @override
+  String get reminder => 'تذكير';
+
+  @override
+  String get noReminder => 'بدون تذكير';
+
+  @override
+  String beforeDays(Object days) {
+    return 'قبل $days يوم';
+  }
+
+  @override
+  String get confirmSave => 'تأكيد الحفظ';
+
+  @override
+  String get saveDebt => 'حفظ الدين';
+
+  @override
+  String get attachImage => 'إرفاق صورة';
+
+  @override
+  String get changeImage => 'تغيير الصورة';
+
+  @override
+  String get nameExists => 'الاسم موجود مسبقًا';
+
+  @override
+  String get nameExistsMessage => 'يوجد شخص بهذا الاسم. هل تريد إضافة دين له؟';
+
+  @override
+  String get createNew => 'إنشاء جديد';
+
+  @override
+  String get addDebtToExisting => 'إضافة دين للشخص الموجود';
+
+  @override
+  String get installmentPlan => 'خطة تقسيط';
+
+  @override
+  String get installment => 'قسط';
+
+  @override
+  String get installments => 'أقساط';
+
+  @override
+  String get numberOfInstallments => 'عدد الأقساط';
+
+  @override
+  String get firstInstallmentDate => 'تاريخ أول قسط';
+
+  @override
+  String get no => 'لا';
+
+  @override
+  String get yes => 'نعم';
 }

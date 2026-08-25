@@ -25,6 +25,7 @@ class DebtRepositoryImpl implements DebtRepository {
               version: Value(debt.version),
               isDeleted: Value(debt.isDeleted),
               deletedAt: Value(debt.deletedAt?.millisecondsSinceEpoch),
+              attachmentPath: Value(debt.attachmentPath),
             ),
           );
 
@@ -83,6 +84,7 @@ class DebtRepositoryImpl implements DebtRepository {
           version: Value(debt.version),
           isDeleted: Value(debt.isDeleted),
           deletedAt: Value(debt.deletedAt?.millisecondsSinceEpoch),
+          attachmentPath: Value(debt.attachmentPath),
         ));
   }
 

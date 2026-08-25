@@ -89,19 +89,36 @@ class NotificationService {
     }
   }
 
-  /// جدولة إشعار قبل يوم من الاستحقاق
+  /// جدولة تذكير قبل يوم من الاستحقاق
   Future<void> scheduleDueSoonNotification({
     required int id,
     required String title,
     required String body,
     required DateTime dueDate,
   }) async {
+    await scheduleReminderBeforeDays(
+      id: id,
+      title: title,
+      body: body,
+      dueDate: dueDate,
+      daysBefore: 1,
+    );
+  }
+
+  /// جدولة تذكير قبل أيام محددة من الاستحقاق
+  Future<void> scheduleReminderBeforeDays({
+    required int id,
+    required String title,
+    required String body,
+    required DateTime dueDate,
+    required int daysBefore,
+  }) async {
     if (!_isSupported) return;
     await _ensureInitialized();
     if (!_initialized) return;
 
-    final tz.TZDateTime scheduledDate = tz.TZDateTime.from(
-      dueDate.subtract(const Duration(days: 1)),
+    final scheduledDate = tz.TZDateTime.from(
+      dueDate.subtract(Duration(days: daysBefore)),
       tz.local,
     );
 
@@ -126,7 +143,7 @@ class NotificationService {
             UILocalNotificationDateInterpretation.absoluteTime,
       );
     } catch (e) {
-      debugPrint('Schedule due soon notification failed: $e');
+      debugPrint('Schedule reminder before days failed: $e');
     }
   }
 

@@ -450,4 +450,67 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get status => 'Status';
+
+  @override
+  String get invalidAmount => 'Please enter a valid amount';
+
+  @override
+  String get optional => 'Optional';
+
+  @override
+  String get reminder => 'Reminder';
+
+  @override
+  String get noReminder => 'No reminder';
+
+  @override
+  String beforeDays(Object days) {
+    return '$days day(s) before';
+  }
+
+  @override
+  String get confirmSave => 'Confirm Save';
+
+  @override
+  String get saveDebt => 'Save Debt';
+
+  @override
+  String get attachImage => 'Attach Image';
+
+  @override
+  String get changeImage => 'Change Image';
+
+  @override
+  String get nameExists => 'Name Already Exists';
+
+  @override
+  String get nameExistsMessage =>
+      'A person with this name already exists. Do you want to add a debt to them?';
+
+  @override
+  String get createNew => 'Create New';
+
+  @override
+  String get addDebtToExisting => 'Add Debt to Existing';
+
+  @override
+  String get installmentPlan => 'Installment Plan';
+
+  @override
+  String get installment => 'Installment';
+
+  @override
+  String get installments => 'Installments';
+
+  @override
+  String get numberOfInstallments => 'Number of Installments';
+
+  @override
+  String get firstInstallmentDate => 'First Installment Date';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get yes => 'Yes';
 }

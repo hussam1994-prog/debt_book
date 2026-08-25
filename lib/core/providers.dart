@@ -17,6 +17,7 @@ import '../data/repositories/person_repository_impl.dart';
 import '../data/repositories/debt_repository_impl.dart';
 import '../data/repositories/payment_repository_impl.dart';
 import '../data/repositories/ledger_repository_impl.dart';
+import '../data/repositories/installment_repository_impl.dart';
 
 final appDatabaseProvider = Provider<AppDatabase>((ref) {
   final db = AppDatabase();
@@ -202,4 +203,15 @@ final realtimeServiceProvider = Provider<RealtimeService>((ref) {
 
 final pdfExportServiceProvider = Provider<PdfExportService>((ref) {
   return PdfExportService();
+});
+
+final installmentRepositoryProvider = Provider<InstallmentRepository>((ref) {
+  return InstallmentRepositoryImpl(ref.watch(appDatabaseProvider));
+});
+
+final createInstallmentsProvider = Provider<CreateInstallments>((ref) {
+  return CreateInstallments(
+    repository: ref.watch(installmentRepositoryProvider),
+    uuidGenerator: ref.watch(uuidGeneratorProvider),
+  );
 });

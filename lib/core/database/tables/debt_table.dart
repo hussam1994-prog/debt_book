@@ -15,6 +15,7 @@ class Debts extends Table {
   IntColumn get version => integer().withDefault(const Constant(1))();
   BoolColumn get isDeleted => boolean().withDefault(const Constant(false))();
   IntColumn get deletedAt => integer().nullable()();
+  TextColumn get attachmentPath => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};

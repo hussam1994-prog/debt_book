@@ -15,6 +15,7 @@ import 'tables/sync_queue_table.dart';
 import 'tables/category_table.dart';
 import 'tables/reminder_table.dart';
 import 'tables/attachment_table.dart';
+import 'tables/installment_table.dart';
 
 part 'app_database.g.dart';
 
@@ -29,6 +30,7 @@ part 'app_database.g.dart';
     Categories,
     Reminders,
     Attachments,
+    Installments,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -37,7 +39,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.memory() : super(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -46,8 +48,8 @@ class AppDatabase extends _$AppDatabase {
           await _createIndexes();
         },
         onUpgrade: (m, from, to) async {
-          if (from < 2) {
-            await _createIndexes();
+          if (from < 4) {
+            await m.createTable(installments);
           }
         },
       );

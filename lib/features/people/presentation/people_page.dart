@@ -29,7 +29,6 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
     super.dispose();
   }
 
-  /// ✅ تحديث محلي فقط: إعادة قراءة البيانات من SQLite
   void _refreshLocal() {
     ref.invalidate(peopleProvider);
     if (mounted) {
@@ -84,7 +83,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: l10n.refresh,
-            onPressed: _refreshLocal, // ✅ تحديث محلي
+            onPressed: _refreshLocal,
           ),
           IconButton(
             icon: const Icon(Icons.receipt_long),
@@ -132,7 +131,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
           ),
           Expanded(
             child: RefreshIndicator(
-              onRefresh: () async => _refreshLocal(), // ✅ سحب للتحديث
+              onRefresh: () async => _refreshLocal(),
               child: peopleAsync.when(
                 data: (people) {
                   final filtered = _query.isEmpty
@@ -238,6 +237,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
     );
   }
 
+  // ✅ الدالة الجديدة: فحص الاسم ثم إضافة أو تحويل لإضافة دين
   void _showAddPersonDialog(BuildContext context) {
     final nameController = TextEditingController();
     final phoneController = TextEditingController();
@@ -275,28 +275,49 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                 final name = nameController.text.trim();
                 if (name.isEmpty) return;
 
-                if (name.length > 50) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.nameTooLong)),
+                // ✅ البحث عن شخص بنفس الاسم
+                final personRepo = ref.read(personRepositoryProvider);
+                final existing = await personRepo.findByName(name);
+
+                if (dialogContext.mounted) {
+                  Navigator.pop(dialogContext);
+                }
+
+                if (existing != null) {
+                  // ✅ الاسم موجود: عرض خيار إضافة دين
+                  final shouldAddDebt = await showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: Text(l10n.nameExists),
+                      content: Text(
+                          '${l10n.nameExistsMessage}\n${existing.name}'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx, false),
+                          child: Text(l10n.createNew),
+                        ),
+                        ElevatedButton(
+                          onPressed: () => Navigator.pop(ctx, true),
+                          child: Text(l10n.addDebtToExisting),
+                        ),
+                      ],
+                    ),
                   );
+
+                  if (shouldAddDebt == true && context.mounted) {
+                    context.go('/person/${existing.id.value}/add-debt');
+                  }
                   return;
                 }
 
+                // ✅ لا يوجد مكرر: إنشاء شخص جديد
                 final phone = phoneController.text.trim();
-                if (phone.isNotEmpty && phone.length < 10) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.invalidPhone)),
-                  );
-                  return;
-                }
-
                 final createPerson = ref.read(createPersonProvider);
                 await createPerson(
                   name: name,
                   phone: phone.isEmpty ? null : phone,
                 );
                 ref.invalidate(peopleProvider);
-                if (dialogContext.mounted) Navigator.pop(dialogContext);
               },
               child: Text(l10n.save),
             ),

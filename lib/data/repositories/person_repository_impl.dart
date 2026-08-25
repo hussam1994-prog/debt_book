@@ -59,7 +59,17 @@ class PersonRepositoryImpl implements PersonRepository {
           deletedAt: Value(person.deletedAt?.millisecondsSinceEpoch),
         ));
   }
-
+ 
+  @override
+  Future<Person?> findByName(String name) async {
+    final all = await findAll();
+    for (final person in all) {
+      if (person.name.trim().toLowerCase() == name.trim().toLowerCase()) {
+        return person;
+      }
+    }
+    return null;
+  }
   @override
   Future<void> softDelete(PersonId id) async {
     final now = DateTime.now().millisecondsSinceEpoch;
