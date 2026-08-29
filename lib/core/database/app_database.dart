@@ -53,6 +53,18 @@ class AppDatabase extends _$AppDatabase {
           }
         },
       );
+  /// مسح جميع البيانات المحلية
+  Future<void> clearAllData() async {
+    await transaction(() async {
+      await delete(ledgerEntries).go();
+      await delete(payments).go();
+      await delete(installments).go();
+      await delete(debts).go();
+      await delete(persons).go();
+      await delete(auditLogs).go();
+      await delete(syncQueue).go();
+    });
+  }
 
   Future<void> _createIndexes() async {
     await customStatement(

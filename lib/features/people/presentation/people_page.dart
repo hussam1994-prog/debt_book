@@ -62,6 +62,11 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
 
     final deletePerson = ref.read(deletePersonProvider);
     await deletePerson(person.id);
+
+    // ✅ حذف من السحابة أيضًا
+    final cloudSync = ref.read(cloudSyncServiceProvider);
+    await cloudSync.softDeletePersonOnCloud(person.id);
+
     if (!mounted) return;
     ref.invalidate(peopleProvider);
     ScaffoldMessenger.of(context).showSnackBar(

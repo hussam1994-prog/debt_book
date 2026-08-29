@@ -537,4 +537,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get installmentPaid => 'Installment marked as paid';
+
+  @override
+  String get cleanupViolations => 'Clean Violations';
+
+  @override
+  String get cleanupConfirm =>
+      'This will fix duplicate payments, broken reversals, and invalid foreign keys. Continue?';
+
+  @override
+  String get cleanupYes => 'Clean';
 }

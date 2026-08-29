@@ -1116,6 +1116,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Installment marked as paid'**
   String get installmentPaid;
+
+  /// No description provided for @cleanupViolations.
+  ///
+  /// In en, this message translates to:
+  /// **'Clean Violations'**
+  String get cleanupViolations;
+
+  /// No description provided for @cleanupConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'This will fix duplicate payments, broken reversals, and invalid foreign keys. Continue?'**
+  String get cleanupConfirm;
+
+  /// No description provided for @cleanupYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Clean'**
+  String get cleanupYes;
 }
 
 class _AppLocalizationsDelegate

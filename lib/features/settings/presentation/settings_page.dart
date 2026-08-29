@@ -23,6 +23,47 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   List<IntegrityViolation>? _violations;
   bool _isLoading = false;
 
+  Future<void> _runCleanup() async {
+    final l10n = context.l10n;   // ✅ أضف هذا السطر
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.cleanupViolations),
+        content: Text(l10n.cleanupConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(l10n.cleanupYes),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    setState(() => _isLoading = true);
+    final checker = ref.read(ledgerIntegrityCheckerProvider);
+    try {
+      final fixed = await checker.cleanupViolations();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('تم تصحيح $fixed مخالفة')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
   Future<void> _runIntegrityCheck() async {
     final logger = ref.read(loggingServiceProvider);
     logger.info('Starting ledger integrity check');
@@ -139,6 +180,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               padding: const EdgeInsets.all(16.0),
               child: ListView(
                 children: [
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: _isLoading ? null : _runCleanup,
+                    icon: const Icon(Icons.cleaning_services),
+                    label: Text(l10n.cleanupViolations),
+                  ),
                   SwitchListTile(
                     title: Text(l10n.darkMode),
                     secondary: const Icon(Icons.dark_mode),

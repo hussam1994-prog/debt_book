@@ -1,5 +1,5 @@
 import 'package:domain/domain.dart';
-import 'package:drift/drift.dart' show Value;
+import 'package:drift/drift.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/observability/debug_logger.dart';
@@ -9,6 +9,7 @@ import '../../data/repositories/person_repository_impl.dart';
 import '../../data/repositories/debt_repository_impl.dart';
 import '../../data/repositories/payment_repository_impl.dart';
 import '../../data/repositories/ledger_repository_impl.dart';
+import '../../data/mappers/person_mapper.dart';
 
 class CloudSyncService {
   final SupabaseClient _client = Supabase.instance.client;
@@ -29,7 +30,6 @@ class CloudSyncService {
     }
 
     for (final person in persons) {
-      logDebug('📤 Upserting person id=${person.id.value}, name=${person.name}');
       await _client.from('persons').upsert({
         'id': person.id.value,
         'user_id': userId,
@@ -41,6 +41,16 @@ class CloudSyncService {
         'is_deleted': person.isDeleted,
       });
     }
+  }
+
+  Future<void> softDeletePersonOnCloud(PersonId personId) async {
+    final userId = _userId;
+    if (userId == null) return;
+
+    await _client.from('persons').update({
+      'is_deleted': true,
+      'updated_at': DateTime.now().toIso8601String(),
+    }).eq('id', personId.value).eq('user_id', userId);
   }
 
   Future<List<Map<String, dynamic>>> fetchPersons() async {
@@ -70,19 +80,20 @@ class CloudSyncService {
             .getSingleOrNull();
         if (existing == null) {
           await _db.into(_db.persons).insert(
-            PersonsCompanion.insert(
-              id: row['id'] as String,
-              name: row['name'] as String,
-              phone: Value(row['phone'] as String?),
-              email: Value(row['email'] as String?),
-              createdAt:
-                  DateTime.parse(row['created_at'] as String).millisecondsSinceEpoch,
-              updatedAt:
-                  DateTime.parse(row['updated_at'] as String).millisecondsSinceEpoch,
-              version: Value(row['version'] as int? ?? 1),
-              isDeleted: Value(row['is_deleted'] as bool? ?? false),
-            ),
-          );
+                PersonsCompanion.insert(
+                  id: row['id'] as String,
+                  name: row['name'] as String,
+                  phone: Value(row['phone'] as String?),
+                  email: Value(row['email'] as String?),
+                  createdAt: DateTime.parse(row['created_at'] as String)
+                      .millisecondsSinceEpoch,
+                  updatedAt: DateTime.parse(row['updated_at'] as String)
+                      .millisecondsSinceEpoch,
+                  version: Value(row['version'] as int? ?? 1),
+                  isDeleted: Value(row['is_deleted'] as bool? ?? false),
+                ),
+                mode: InsertMode.insertOrIgnore, // ✅ الصحيح
+              );
           count++;
         }
       }
@@ -111,6 +122,7 @@ class CloudSyncService {
         'updated_at': debt.updatedAt.toIso8601String(),
         'version': debt.version,
         'is_deleted': debt.isDeleted,
+        'attachment_path': debt.attachmentPath,
       });
     }
   }
@@ -142,26 +154,27 @@ class CloudSyncService {
             .getSingleOrNull();
         if (existing == null) {
           await _db.into(_db.debts).insert(
-            DebtsCompanion.insert(
-              id: row['id'] as String,
-              personId: row['person_id'] as String,
-              description: Value(row['description'] as String?),
-              amount: row['amount'] as int,
-              currency: Value(row['currency'] as String? ?? 'IQD'),
-              dueDate: row['due_date'] != null
-                  ? Value(
-                      DateTime.parse(row['due_date'] as String).millisecondsSinceEpoch,
-                    )
-                  : const Value(null),
-              status: Value(row['status'] as String? ?? 'active'),
-              createdAt:
-                  DateTime.parse(row['created_at'] as String).millisecondsSinceEpoch,
-              updatedAt:
-                  DateTime.parse(row['updated_at'] as String).millisecondsSinceEpoch,
-              version: Value(row['version'] as int? ?? 1),
-              isDeleted: Value(row['is_deleted'] as bool? ?? false),
-            ),
-          );
+                DebtsCompanion.insert(
+                  id: row['id'] as String,
+                  personId: row['person_id'] as String,
+                  description: Value(row['description'] as String?),
+                  amount: row['amount'] as int,
+                  currency: Value(row['currency'] as String? ?? 'IQD'),
+                  dueDate: row['due_date'] != null
+                      ? Value(DateTime.parse(row['due_date'] as String)
+                          .millisecondsSinceEpoch)
+                      : const Value(null),
+                  status: Value(row['status'] as String? ?? 'active'),
+                  createdAt: DateTime.parse(row['created_at'] as String)
+                      .millisecondsSinceEpoch,
+                  updatedAt: DateTime.parse(row['updated_at'] as String)
+                      .millisecondsSinceEpoch,
+                  version: Value(row['version'] as int? ?? 1),
+                  isDeleted: Value(row['is_deleted'] as bool? ?? false),
+                  attachmentPath: Value(row['attachment_path'] as String?),
+                ),
+                mode: InsertMode.insertOrIgnore, // ✅
+              );
           count++;
         }
       }
@@ -221,23 +234,24 @@ class CloudSyncService {
             .getSingleOrNull();
         if (existing == null) {
           await _db.into(_db.payments).insert(
-            PaymentsCompanion.insert(
-              id: row['id'] as String,
-              debtId: row['debt_id'] as String,
-              amount: row['amount'] as int,
-              currency: Value(row['currency'] as String? ?? 'IQD'),
-              paymentDate: DateTime.parse(row['payment_date'] as String)
-                  .millisecondsSinceEpoch,
-              method: Value(row['method'] as String? ?? 'cash'),
-              notes: Value(row['notes'] as String?),
-              createdAt:
-                  DateTime.parse(row['created_at'] as String).millisecondsSinceEpoch,
-              updatedAt:
-                  DateTime.parse(row['updated_at'] as String).millisecondsSinceEpoch,
-              version: Value(row['version'] as int? ?? 1),
-              isDeleted: Value(row['is_deleted'] as bool? ?? false),
-            ),
-          );
+                PaymentsCompanion.insert(
+                  id: row['id'] as String,
+                  debtId: row['debt_id'] as String,
+                  amount: row['amount'] as int,
+                  currency: Value(row['currency'] as String? ?? 'IQD'),
+                  paymentDate: DateTime.parse(row['payment_date'] as String)
+                      .millisecondsSinceEpoch,
+                  method: Value(row['method'] as String? ?? 'cash'),
+                  notes: Value(row['notes'] as String?),
+                  createdAt: DateTime.parse(row['created_at'] as String)
+                      .millisecondsSinceEpoch,
+                  updatedAt: DateTime.parse(row['updated_at'] as String)
+                      .millisecondsSinceEpoch,
+                  version: Value(row['version'] as int? ?? 1),
+                  isDeleted: Value(row['is_deleted'] as bool? ?? false),
+                ),
+                mode: InsertMode.insertOrIgnore, // ✅
+              );
           count++;
         }
       }
@@ -295,20 +309,21 @@ class CloudSyncService {
             .getSingleOrNull();
         if (existing == null) {
           await _db.into(_db.ledgerEntries).insert(
-            LedgerEntriesCompanion.insert(
-              id: row['id'] as String,
-              debtId: row['debt_id'] as String,
-              entryType: row['entry_type'] as String,
-              amount: row['amount'] as int,
-              currency: Value(row['currency'] as String? ?? 'IQD'),
-              correlationId: Value(row['correlation_id'] as String?),
-              sourceEntryId: Value(row['source_entry_id'] as String?),
-              paymentId: Value(row['payment_id'] as String?),
-              createdAt:
-                  DateTime.parse(row['created_at'] as String).millisecondsSinceEpoch,
-              serverSequence: Value(row['server_sequence'] as int?),
-            ),
-          );
+                LedgerEntriesCompanion.insert(
+                  id: row['id'] as String,
+                  debtId: row['debt_id'] as String,
+                  entryType: row['entry_type'] as String,
+                  amount: row['amount'] as int,
+                  currency: Value(row['currency'] as String? ?? 'IQD'),
+                  correlationId: Value(row['correlation_id'] as String?),
+                  sourceEntryId: Value(row['source_entry_id'] as String?),
+                  paymentId: Value(row['payment_id'] as String?),
+                  createdAt: DateTime.parse(row['created_at'] as String)
+                      .millisecondsSinceEpoch,
+                  serverSequence: Value(row['server_sequence'] as int?),
+                ),
+                mode: InsertMode.insertOrIgnore, // ✅
+              );
           count++;
         }
       }
@@ -321,17 +336,16 @@ class CloudSyncService {
 
   // ========== Sync All ==========
   Future<Map<String, int>> syncAll() async {
-    // ✅ إشعار بدء المزامنة
     _statusNotifier.startSync();
 
     try {
-      final personRepo = PersonRepositoryImpl(_db);
+      final personRows = await _db.select(_db.persons).get();
+      final persons = personRows.map(PersonMapper.fromRow).toList();
+
       final debtRepo = DebtRepositoryImpl(_db);
       final paymentRepo = PaymentRepositoryImpl(_db);
       final ledgerRepo = LedgerRepositoryImpl(_db);
 
-      // رفع
-      final persons = await personRepo.findAll();
       final debts = await debtRepo.findAll();
       final payments = await paymentRepo.findAll();
       final ledger = await ledgerRepo.findAll();
@@ -341,7 +355,6 @@ class CloudSyncService {
       await pushPaymentsToCloud(payments);
       await pushLedgerEntriesToCloud(ledger);
 
-      // جلب
       await syncPersonsFromCloud();
       await syncDebtsFromCloud();
       await syncPaymentsFromCloud();
@@ -352,7 +365,6 @@ class CloudSyncService {
       final cloudPayments = await fetchPayments();
       final cloudLedger = await fetchLedgerEntries();
 
-      // ✅ إشعار نجاح المزامنة
       _statusNotifier.finishSync(DateTime.now());
 
       return {
@@ -362,7 +374,6 @@ class CloudSyncService {
         'ledger': cloudLedger.length,
       };
     } catch (e) {
-      // ✅ إشعار فشل المزامنة (لا يوجد وقت نجاح)
       _statusNotifier.finishSync(null);
       rethrow;
     }

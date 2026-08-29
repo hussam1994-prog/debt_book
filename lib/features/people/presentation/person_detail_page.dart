@@ -23,7 +23,6 @@ class PersonDetailPage extends ConsumerStatefulWidget {
 class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
   Person? _person;
 
-  /// ✅ تحديث محلي فقط: إعادة قراءة بيانات الشخص والديون
   void _refreshLocal() {
     ref.invalidate(personRepositoryProvider);
     ref.invalidate(debtsForPersonProvider(widget.personId));
@@ -34,7 +33,6 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
     }
   }
 
-  /// ✅ إرسال كشف المستحقات عبر واتساب
   Future<void> _sendWhatsAppStatement(Person person) async {
     try {
       final debts =
@@ -75,7 +73,6 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
     }
   }
 
-  /// ✅ تصدير كشف PDF والمشاركة
   Future<void> _exportPersonStatementPdf(Person person) async {
     try {
       final debts =
@@ -222,7 +219,6 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        // ✅ بطاقة إجمالي المستحقات
                         totalAsync.when(
                           data: (total) => Container(
                             width: double.infinity,
@@ -260,7 +256,6 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
                           error: (e, st) => const Text('---'),
                         ),
                         const SizedBox(height: 12),
-                        // ✅ أزرار كشف الحساب
                         Row(
                           children: [
                             Expanded(
@@ -331,7 +326,6 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
     );
   }
 
-  // ✅ حوار تعديل الشخص
   void _showEditPersonDialog(Person person) {
     final l10n = context.l10n;
     final nameController = TextEditingController(text: person.name);
@@ -396,7 +390,6 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
     );
   }
 
-  // ✅ تأكيد حذف الشخص
   Future<void> _confirmDeletePerson(Person person) async {
     final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
@@ -419,13 +412,17 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
 
     final deletePerson = ref.read(deletePersonProvider);
     await deletePerson(person.id);
+
+    // ✅ حذف من السحابة
+    final cloudSync = ref.read(cloudSyncServiceProvider);
+    await cloudSync.softDeletePersonOnCloud(person.id);
+
     if (!mounted) return;
     ref.invalidate(peopleProvider);
     context.go('/');
   }
 }
 
-// ✅ كارت الدين
 class _DebtCard extends ConsumerWidget {
   final Debt debt;
   final Money? balance;

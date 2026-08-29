@@ -9,6 +9,13 @@ class LedgerRepositoryImpl implements LedgerRepository {
   LedgerRepositoryImpl(this._db);
 
   @override
+  Future<void> hardDeleteEntry(LedgerEntryId id) async {
+    await (_db.delete(_db.ledgerEntries)
+          ..where((t) => t.id.equals(id.value)))
+        .go();
+  }
+
+  @override
   Future<void> append(LedgerEntry entry) async {
     await _db.into(_db.ledgerEntries).insert(
           LedgerEntriesCompanion.insert(

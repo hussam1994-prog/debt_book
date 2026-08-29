@@ -185,5 +185,8 @@
   "paid": "Paid",
   "overdue": "Overdue",
   "markAsPaid": "Mark as Paid",
-  "installmentPaid": "Installment marked as paid"
+  "installmentPaid": "Installment marked as paid",
+  "cleanupViolations": "Clean Violations",
+  "cleanupConfirm": "This will fix duplicate payments, broken reversals, and invalid foreign keys. Continue?",
+  "cleanupYes": "Clean"
 }

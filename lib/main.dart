@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app/lock_screen.dart';
 import 'app/router.dart';
+import 'core/auth/user_id_store.dart';
 import 'core/cloud/supabase_config.dart';
 import 'core/notifications/notification_provider.dart';
 import 'core/providers.dart';
@@ -39,7 +40,7 @@ class DebtBookApp extends ConsumerStatefulWidget {
 class _DebtBookAppState extends ConsumerState<DebtBookApp> {
   bool _showSplash = true;
   bool _isLocked = false;
-  bool _autoSyncDone = false; // ✅ يمنع التكرار
+  String? _lastSyncedUserId;   // ✅ لتتبع آخر مستخدم قمنا بتجهيز بياناته
 
   @override
   void initState() {
@@ -51,24 +52,7 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
           _showSplash = false;
         });
         _refreshLockState();
-
-        // ✅ نسخ احتياطي تلقائي مرة واحدة فقط
-        Future.microtask(() async {
-          try {
-            await ref.read(backupServiceProvider).autoBackupIfNeeded();
-          } catch (_) {}
-
-          // ✅ مزامنة تلقائية مرة واحدة فقط
-          if (!_autoSyncDone &&
-              Supabase.instance.client.auth.currentUser != null) {
-            _autoSyncDone = true;
-            try {
-              await ref.read(cloudSyncServiceProvider).syncAll();
-              ref.invalidate(peopleProvider);
-              ref.invalidate(allDebtsProvider);
-            } catch (_) {}
-          }
-        });
+        _handleUserData();
       }
     });
   }
@@ -82,6 +66,43 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
     }
   }
 
+  /// ✅ منطق تجهيز بيانات المستخدم عند كل تغيير في المصادقة
+  Future<void> _handleUserData() async {
+    final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+    if (currentUserId == null) return;
+
+    if (_lastSyncedUserId != currentUserId) {
+      // مستخدم مختلف: مسح البيانات المحلية
+      final db = ref.read(appDatabaseProvider);
+      await db.clearAllData();
+
+      // حفظ معرف المستخدم الجديد
+      final userIdStore = UserIdStore();
+      await userIdStore.saveUserId(currentUserId);
+
+      _lastSyncedUserId = currentUserId;
+
+      // نسخ احتياطي
+      try {
+        await ref.read(backupServiceProvider).autoBackupIfNeeded();
+      } catch (_) {}
+
+      // مزامنة من السحابة
+      try {
+        await ref.read(cloudSyncServiceProvider).syncAll();
+        ref.invalidate(peopleProvider);
+        ref.invalidate(allDebtsProvider);
+      } catch (_) {}
+    } else {
+      // نفس المستخدم: فقط مزامنة عادية (اختياري)
+      try {
+        await ref.read(cloudSyncServiceProvider).syncAll();
+        ref.invalidate(peopleProvider);
+        ref.invalidate(allDebtsProvider);
+      } catch (_) {}
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeModeProvider);
@@ -89,7 +110,6 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
     final notificationsEnabled = ref.watch(notificationsEnabledProvider);
     final notificationService = ref.read(notificationServiceProvider);
 
-    // ✅ جدولة الإشعارات فقط عند الحاجة (بدون تكرار)
     Future.microtask(() async {
       if (notificationsEnabled) {
         try {
@@ -132,7 +152,11 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp> {
           );
         }
 
-        // ✅ بدء Realtime مرة واحدة فقط
+        // ✅ عند كل تغيير في حالة المصادقة، تحقق من المستخدم
+        Future.microtask(() {
+          _handleUserData();
+        });
+
         Future.microtask(() {
           try {
             ref.read(realtimeServiceProvider).start();

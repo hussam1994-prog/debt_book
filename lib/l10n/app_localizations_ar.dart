@@ -534,4 +534,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get installmentPaid => 'تم تحديد القسط كمدفوع';
+
+  @override
+  String get cleanupViolations => 'تنظيف المخالفات';
+
+  @override
+  String get cleanupConfirm =>
+      'سيتم إصلاح الدفعات المكررة والقيود العكسية المكسورة والمفاتيح الأجنبية غير الصالحة. متابعة؟';
+
+  @override
+  String get cleanupYes => 'تنظيف';
 }
