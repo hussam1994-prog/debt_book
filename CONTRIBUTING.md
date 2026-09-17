@@ -26,7 +26,7 @@ debt_book/
 ### 1. Fork & Clone
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/debt_book.git
+git clone https://github.com/hussam1994-prog/debt_book.git
 cd debt_book
 
 2. الإعداد
