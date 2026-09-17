@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سياسة الخصوصية — دفتر الديون</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 24px;
+      line-height: 1.8;
+      color: #333;
+      background: #fafafa;
+    }
+    h1 { color: #1E88E5; border-bottom: 2px solid #1E88E5; padding-bottom: 12px; }
+    h2 { color: #0D47A1; margin-top: 32px; }
+    h3 { color: #1565C0; }
+    a { color: #1E88E5; }
+    .last-update { background: #e3f2fd; padding: 12px; border-right: 4px solid #1E88E5; margin: 20px 0; }
+    ul { padding-right: 24px; }
+    code { background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; }
+    footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #666; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+
+<h1>سياسة الخصوصية — دفتر الديون (Debt Book)</h1>
+
+<div class="last-update">
+  <strong>آخر تحديث:</strong> 17 سبتمبر 2026
+</div>
+
+<p>نحن في <strong>دفتر الديون</strong> نأخذ خصوصيتك على محمل الجد. توضح هذه السياسة كيفية جمع بياناتك واستخدامها وحمايتها عند استخدامك لتطبيقنا.</p>
+
+<h2>1. البيانات التي نجمعها</h2>
+
+<h3>1.1 البيانات التي تُدخلها بنفسك</h3>
+<ul>
+  <li><strong>بيانات الأشخاص:</strong> الاسم، رقم الهاتف، البريد الإلكتروني، ملاحظات.</li>
+  <li><strong>بيانات الديون:</strong> المبالغ، التواريخ، الأوصاف، حالة الدين.</li>
+  <li><strong>بيانات الدفعات:</strong> المبالغ، طرق الدفع، الملاحظات.</li>
+  <li><strong>المرفقات:</strong> صور أو ملفات تضيفها يدوياً.</li>
+</ul>
+
+<h3>1.2 البيانات التي تُجمع تلقائياً</h3>
+<ul>
+  <li><strong>بيانات الحساب:</strong> البريد الإلكتروني ومعرّف المستخدم عند تسجيل الدخول (عبر Google أو Supabase Auth).</li>
+  <li><strong>بيانات الجهاز:</strong> نوع الجهاز، نظام التشغيل، إصدار التطبيق.</li>
+  <li><strong>رموز الإشعارات (FCM Token):</strong> لإرسال التنبيهات.</li>
+  <li><strong>سجلات الأخطاء:</strong> لتشخيص المشاكل (بدون بياناتك الشخصية).</li>
+</ul>
+
+<h3>1.3 البيانات التي لا نجمعها</h3>
+<ul>
+  <li>❌ لا نصل إلى جهات الاتصال الخاصة بك.</li>
+  <li>❌ لا نصل إلى الرسائل النصية أو المكالمات.</li>
+  <li>❌ لا نصل إلى الصور إلا التي تختار رفعها يدوياً كمرفقات.</li>
+  <li>❌ لا نتتبع موقعك الجغرافي.</li>
+</ul>
+
+<h2>2. كيفية استخدام البيانات</h2>
+
+<p>نستخدم بياناتك للأغراض التالية فقط:</p>
+<ul>
+  <li>✅ تشغيل التطبيق وتقديم خدماته (إدارة الديون، التقارير، الإشعارات).</li>
+  <li>✅ مزامنة بياناتك بين أجهزتك عبر حسابك.</li>
+  <li>✅ إرسال تنبيهات حول الديون المستحقة.</li>
+  <li>✅ إنشاء نسخ احتياطية محلية وسحابية.</li>
+  <li>✅ تحسين أداء التطبيق وإصلاح الأخطاء.</li>
+</ul>
+
+<p><strong>لا نبيع بياناتك ولا نشاركها مع أي طرف ثالث لأغراض تسويقية.</strong></p>
+
+<h2>3. تخزين البيانات وحمايتها</h2>
+
+<h3>3.1 التخزين المحلي</h3>
+<ul>
+  <li>تُخزَّن بياناتك محلياً على جهازك في قاعدة بيانات مشفّرة (SQLite + Drift).</li>
+  <li>يمكنك تفعيل PIN لحماية إضافية.</li>
+  <li>يتم تمكين <code>FLAG_SECURE</code> لمنع لقطات الشاشة.</li>
+</ul>
+
+<h3>3.2 التخزين السحابي</h3>
+<ul>
+  <li>يتم تخزين بياناتك في <strong>Supabase</strong> (PostgreSQL) مع تشفير كامل.</li>
+  <li>جميع الجداول محمية بـ <strong>Row Level Security (RLS)</strong>.</li>
+  <li>الاتصالات مشفّرة عبر <strong>HTTPS/TLS 1.3</strong>.</li>
+</ul>
+
+<h3>3.3 مدة الاحتفاظ</h3>
+<ul>
+  <li>تبقى بياناتك طالما حسابك نشط.</li>
+  <li>يمكنك حذف بياناتك في أي وقت من الإعدادات.</li>
+  <li>عند حذف الحساب، تُحذف جميع البيانات خلال 30 يوماً.</li>
+</ul>
+
+<h2>4. مشاركة البيانات</h2>
+
+<p>لا نشارك بياناتك إلا في الحالات التالية:</p>
+<ul>
+  <li><strong>مقدّمو الخدمات:</strong> Supabase (تخزين)، Firebase (إشعارات)، Google (تسجيل دخول).</li>
+  <li><strong>المتطلبات القانونية:</strong> إذا طُلب منا قانونياً.</li>
+  <li><strong>حماية الحقوق:</strong> لمنع الاحتيال أو الانتهاكات.</li>
+</ul>
+
+<h2>5. حقوقك</h2>
+
+<ul>
+  <li>📖 <strong>الوصول:</strong> طلب نسخة من بياناتك.</li>
+  <li>✏️ <strong>التصحيح:</strong> تعديل أي بيانات غير دقيقة.</li>
+  <li>🗑️ <strong>الحذف:</strong> حذف حسابك وبياناتك نهائياً.</li>
+  <li>📤 <strong>التصدير:</strong> تصدير بياناتك (PDF، Excel، CSV).</li>
+  <li>🔕 <strong>إلغاء الاشتراك:</strong> إيقاف الإشعارات في أي وقت.</li>
+</ul>
+
+<h2>6. أمان الأطفال</h2>
+
+<p>تطبيقنا غير موجّه للأطفال تحت 13 عاماً. لا نجمع بيانات من الأطفال عن قصد.</p>
+
+<h2>7. التغييرات على السياسة</h2>
+
+<p>قد نحدّث هذه السياسة من وقت لآخر. سنُخطرك بأي تغييرات جوهرية عبر:</p>
+<ul>
+  <li>إشعار داخل التطبيق.</li>
+  <li>البريد الإلكتروني المسجّل.</li>
+  <li>تحديث تاريخ "آخر تحديث" في الأعلى.</li>
+</ul>
+
+<h2>8. التواصل معنا</h2>
+
+<p>لأي استفسار حول سياسة الخصوصية، تواصل معنا عبر:</p>
+<ul>
+  <li>📧 البريد الإلكتروني: <a href="mailto:privacy@debtbook.app">privacy@debtbook.app</a></li>
+  <li>🐛 GitHub Issues: <a href="https://github.com/YOUR_USERNAME/debt_book/issues">github.com/YOUR_USERNAME/debt_book/issues</a></li>
+</ul>
+
+<footer>
+  <p>© 2026 Debt Book. جميع الحقوق محفوظة.</p>
+  <p>
+    <a href="../../">الرئيسية</a> ·
+    <a href="../README.md">التوثيق</a>
+  </p>
+</footer>
+
+</body>
+</html>
