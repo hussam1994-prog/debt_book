@@ -4,7 +4,9 @@ import 'debt_table.dart';
 @DataClassName('ReminderRow')
 class Reminders extends Table {
   TextColumn get id => text()();
-  TextColumn get debtId => text().references(Debts, #id)();
+  TextColumn get debtId => text()
+    .customConstraint('NOT NULL REFERENCES debts(id)')
+    .references(Debts, #id)();
   IntColumn get remindAt => integer()();
   BoolColumn get isSent => boolean().withDefault(const Constant(false))();
   IntColumn get createdAt => integer()();

@@ -43,3 +43,41 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# SQLite database files (لا ترفع قاعدة البيانات الحقيقية)
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+debt_book.sqlite
+key.properties
+*.jks
+*.keystore
+
+# ============ حماية ملفات الإنتاج ============
+# Firebase config (يحتوي مفاتيح API)
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+# Keystore & signing
+key.properties
+*.jks
+*.keystore
+
+# قواعد البيانات المحلية
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+debt_book.sqlite
+
+# Backup files
+*.bak
+*.bak2
+*.backup
+
+
+# IDE
+.idea/
+.vscode/
+android/build/

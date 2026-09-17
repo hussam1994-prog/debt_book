@@ -4,7 +4,9 @@ import 'person_table.dart';
 @DataClassName('DebtRow')
 class Debts extends Table {
   TextColumn get id => text()();
-  TextColumn get personId => text().references(Persons, #id)();
+  TextColumn get personId => text()
+    .customConstraint('NOT NULL REFERENCES persons(id)')
+    .references(Persons, #id)();
   TextColumn get description => text().nullable()();
   IntColumn get amount => integer()(); // المبلغ الأصلي بالدينار
   TextColumn get currency => text().withDefault(const Constant('IQD'))();

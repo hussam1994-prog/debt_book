@@ -14,7 +14,6 @@ final debtsForPersonProvider =
   return repo.findByPersonId(personId);
 });
 
-/// ✅ الأرصدة لكل الديون مرة واحدة
 final balancesForDebtsProvider =
     FutureProvider.family<Map<DebtId, Money>, List<Debt>>((ref, debts) async {
   if (debts.isEmpty) return {};
@@ -31,7 +30,6 @@ final balancesForDebtsProvider =
   return balances;
 });
 
-/// ✅ مجموع المبالغ المستحقة لشخص (الأرصدة الموجبة فقط)
 final totalOutstandingForPersonProvider =
     FutureProvider.family<Money, PersonId>((ref, personId) async {
   final debts = await ref.watch(debtsForPersonProvider(personId).future);
@@ -57,7 +55,6 @@ final paymentsForDebtProvider =
   return repo.findByDebtId(debtId);
 });
 
-// للتوافق مع الاستخدامات القديمة
 final balanceForDebtProvider =
     FutureProvider.family<Money, DebtId>((ref, debtId) async {
   final ledgerRepo = ref.watch(ledgerRepositoryProvider);
@@ -71,3 +68,47 @@ final installmentsForDebtProvider =
   final repo = ref.watch(installmentRepositoryProvider);
   return repo.findByDebtId(debtId);
 });
+
+// ─── Pagination للأشخاص ───────────────────────────────
+
+final peoplePaginatedProvider =
+    NotifierProvider<PeoplePaginatedNotifier, List<Person>>(() {
+  return PeoplePaginatedNotifier();
+});
+
+class PeoplePaginatedNotifier extends Notifier<List<Person>> {
+  int _offset = 0;
+  bool _hasMore = true;
+  bool _isLoading = false;
+  static const int _pageSize = 50;
+
+  @override
+  List<Person> build() {
+    return [];
+  }
+
+  bool get hasMore => _hasMore;
+  bool get isLoading => _isLoading;
+
+  Future<void> loadMore() async {
+    if (_isLoading || !_hasMore) return;
+    _isLoading = true;
+    try {
+      final repo = ref.read(personRepositoryProvider);
+      final newItems =
+          await repo.findAllPaginated(limit: _pageSize, offset: _offset);
+      state = [...state, ...newItems];
+      _offset += newItems.length;
+      if (newItems.length < _pageSize) _hasMore = false;
+    } finally {
+      _isLoading = false;
+    }
+  }
+
+  Future<void> refresh() async {
+    _offset = 0;
+    _hasMore = true;
+    state = [];
+    await loadMore();
+  }
+}

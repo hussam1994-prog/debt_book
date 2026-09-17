@@ -242,6 +242,12 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get language;
 
+  /// No description provided for @debts.
+  ///
+  /// In en, this message translates to:
+  /// **'debts'**
+  String get debts;
+
   /// No description provided for @paid.
   ///
   /// In en, this message translates to:
@@ -620,36 +626,6 @@ abstract class AppLocalizations {
   /// **'Adjustment'**
   String get adjustment;
 
-  /// No description provided for @enterPin.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter PIN'**
-  String get enterPin;
-
-  /// No description provided for @unlock.
-  ///
-  /// In en, this message translates to:
-  /// **'Unlock'**
-  String get unlock;
-
-  /// No description provided for @notifications.
-  ///
-  /// In en, this message translates to:
-  /// **'Notifications'**
-  String get notifications;
-
-  /// No description provided for @notificationsSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Enable debt due reminders'**
-  String get notificationsSubtitle;
-
-  /// No description provided for @whatsappMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Hello, you owe {amount} IQD. Please settle your debt. Thank you'**
-  String whatsappMessage(Object amount);
-
   /// No description provided for @whatsappTooltip.
   ///
   /// In en, this message translates to:
@@ -662,17 +638,47 @@ abstract class AppLocalizations {
   /// **'Hello, this is a reminder from Debt Book.'**
   String get whatsappGeneralMessage;
 
-  /// No description provided for @nameTooLong.
+  /// No description provided for @cloudSync.
   ///
   /// In en, this message translates to:
-  /// **'Name is too long (max 50 characters)'**
-  String get nameTooLong;
+  /// **'Cloud Sync'**
+  String get cloudSync;
 
-  /// No description provided for @invalidPhone.
+  /// No description provided for @cloudSyncSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Invalid phone number'**
-  String get invalidPhone;
+  /// **'Synced persons count:'**
+  String get cloudSyncSuccess;
+
+  /// No description provided for @cloudSyncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync failed: {error}'**
+  String cloudSyncFailed(Object error);
+
+  /// No description provided for @cloudSyncResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Synced: {persons} persons, {debts} debts, {payments} payments, {ledger} ledger, {installments} installments'**
+  String cloudSyncResult(
+    Object debts,
+    Object installments,
+    Object ledger,
+    Object payments,
+    Object persons,
+  );
+
+  /// No description provided for @pleaseLoginFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Please login first'**
+  String get pleaseLoginFirst;
+
+  /// No description provided for @logoutConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to logout?'**
+  String get logoutConfirm;
 
   /// No description provided for @english.
   ///
@@ -686,160 +692,83 @@ abstract class AppLocalizations {
   /// **'Arabic'**
   String get arabic;
 
-  /// No description provided for @cloudSync.
+  /// No description provided for @notifications.
   ///
   /// In en, this message translates to:
-  /// **'Cloud Sync'**
-  String get cloudSync;
+  /// **'Notifications'**
+  String get notifications;
 
-  /// No description provided for @cloudSyncSuccess.
+  /// No description provided for @notificationsSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Fetched persons from cloud:'**
-  String get cloudSyncSuccess;
+  /// **'Enable debt due reminders'**
+  String get notificationsSubtitle;
 
-  /// No description provided for @cloudSyncResult.
+  /// No description provided for @refresh.
   ///
   /// In en, this message translates to:
-  /// **'Synced: {persons} persons, {debts} debts, {payments} payments, {ledger} ledger entries'**
-  String cloudSyncResult(
-    Object debts,
-    Object ledger,
-    Object payments,
-    Object persons,
-  );
+  /// **'Refresh'**
+  String get refresh;
 
-  /// No description provided for @cloudSyncFailed.
+  /// No description provided for @enterPin.
   ///
   /// In en, this message translates to:
-  /// **'Sync failed: {error}'**
-  String cloudSyncFailed(Object error);
+  /// **'Enter PIN'**
+  String get enterPin;
 
-  /// No description provided for @login.
+  /// No description provided for @unlock.
   ///
   /// In en, this message translates to:
-  /// **'Login'**
-  String get login;
+  /// **'Unlock'**
+  String get unlock;
 
-  /// No description provided for @register.
+  /// No description provided for @no.
   ///
   /// In en, this message translates to:
-  /// **'Register'**
-  String get register;
+  /// **'No'**
+  String get no;
 
-  /// No description provided for @password.
+  /// No description provided for @yes.
   ///
   /// In en, this message translates to:
-  /// **'Password'**
-  String get password;
+  /// **'Yes'**
+  String get yes;
 
-  /// No description provided for @logoutConfirm.
+  /// No description provided for @installments.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to logout?'**
-  String get logoutConfirm;
+  /// **'Installments'**
+  String get installments;
 
-  /// No description provided for @pleaseFillFields.
+  /// No description provided for @installment.
   ///
   /// In en, this message translates to:
-  /// **'Please enter email and password'**
-  String get pleaseFillFields;
+  /// **'Installment'**
+  String get installment;
 
-  /// No description provided for @passwordTooShort.
+  /// No description provided for @installmentPlan.
   ///
   /// In en, this message translates to:
-  /// **'Password must be at least 6 characters'**
-  String get passwordTooShort;
+  /// **'Installment Plan'**
+  String get installmentPlan;
 
-  /// No description provided for @checkEmailToConfirm.
+  /// No description provided for @numberOfInstallments.
   ///
   /// In en, this message translates to:
-  /// **'Account created. Check your email to confirm.'**
-  String get checkEmailToConfirm;
+  /// **'Number of Installments'**
+  String get numberOfInstallments;
 
-  /// No description provided for @forgotPassword.
+  /// No description provided for @firstInstallmentDate.
   ///
   /// In en, this message translates to:
-  /// **'Forgot Password?'**
-  String get forgotPassword;
+  /// **'First Installment Date'**
+  String get firstInstallmentDate;
 
-  /// No description provided for @send.
+  /// No description provided for @noInstallments.
   ///
   /// In en, this message translates to:
-  /// **'Send'**
-  String get send;
-
-  /// No description provided for @resetEmailSent.
-  ///
-  /// In en, this message translates to:
-  /// **'Reset email sent. Check your inbox.'**
-  String get resetEmailSent;
-
-  /// No description provided for @invalidEmail.
-  ///
-  /// In en, this message translates to:
-  /// **'Invalid email address'**
-  String get invalidEmail;
-
-  /// No description provided for @pleaseLoginFirst.
-  ///
-  /// In en, this message translates to:
-  /// **'Please login first'**
-  String get pleaseLoginFirst;
-
-  /// No description provided for @profile.
-  ///
-  /// In en, this message translates to:
-  /// **'Profile'**
-  String get profile;
-
-  /// No description provided for @changePassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Change Password'**
-  String get changePassword;
-
-  /// No description provided for @deleteAccount.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete Account'**
-  String get deleteAccount;
-
-  /// No description provided for @deleteAccountConfirm.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to delete your account? This action cannot be undone.'**
-  String get deleteAccountConfirm;
-
-  /// No description provided for @newPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'New Password'**
-  String get newPassword;
-
-  /// No description provided for @confirmPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Confirm Password'**
-  String get confirmPassword;
-
-  /// No description provided for @passwordsDoNotMatch.
-  ///
-  /// In en, this message translates to:
-  /// **'Passwords do not match'**
-  String get passwordsDoNotMatch;
-
-  /// No description provided for @passwordChanged.
-  ///
-  /// In en, this message translates to:
-  /// **'Password changed successfully'**
-  String get passwordChanged;
-
-  /// No description provided for @accountDeleted.
-  ///
-  /// In en, this message translates to:
-  /// **'Account deleted'**
-  String get accountDeleted;
+  /// **'No installments found'**
+  String get noInstallments;
 
   /// No description provided for @pdfReportTitle.
   ///
@@ -906,48 +835,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your debt is due soon'**
   String get dueSoonNotificationBody;
-
-  /// No description provided for @personDeleted.
-  ///
-  /// In en, this message translates to:
-  /// **'Person deleted successfully'**
-  String get personDeleted;
-
-  /// No description provided for @refresh.
-  ///
-  /// In en, this message translates to:
-  /// **'Refresh'**
-  String get refresh;
-
-  /// No description provided for @totalOutstanding.
-  ///
-  /// In en, this message translates to:
-  /// **'Total Outstanding'**
-  String get totalOutstanding;
-
-  /// No description provided for @statementFor.
-  ///
-  /// In en, this message translates to:
-  /// **'Statement for'**
-  String get statementFor;
-
-  /// No description provided for @sendWhatsAppStatement.
-  ///
-  /// In en, this message translates to:
-  /// **'Send via WhatsApp'**
-  String get sendWhatsAppStatement;
-
-  /// No description provided for @exportStatementPdf.
-  ///
-  /// In en, this message translates to:
-  /// **'Export PDF'**
-  String get exportStatementPdf;
-
-  /// No description provided for @status.
-  ///
-  /// In en, this message translates to:
-  /// **'Status'**
-  String get status;
 
   /// No description provided for @invalidAmount.
   ///
@@ -1027,95 +914,125 @@ abstract class AppLocalizations {
   /// **'Add Debt to Existing'**
   String get addDebtToExisting;
 
-  /// No description provided for @installmentPlan.
+  /// No description provided for @invalidPhone.
   ///
   /// In en, this message translates to:
-  /// **'Installment Plan'**
-  String get installmentPlan;
+  /// **'Invalid phone number'**
+  String get invalidPhone;
 
-  /// No description provided for @installment.
+  /// No description provided for @nameTooLong.
   ///
   /// In en, this message translates to:
-  /// **'Installment'**
-  String get installment;
+  /// **'Name is too long (max 50 characters)'**
+  String get nameTooLong;
 
-  /// No description provided for @installments.
+  /// No description provided for @passwordTooShort.
   ///
   /// In en, this message translates to:
-  /// **'Installments'**
-  String get installments;
+  /// **'Password must be at least 6 characters'**
+  String get passwordTooShort;
 
-  /// No description provided for @numberOfInstallments.
+  /// No description provided for @checkEmailToConfirm.
   ///
   /// In en, this message translates to:
-  /// **'Number of Installments'**
-  String get numberOfInstallments;
+  /// **'Account created. Check your email to confirm.'**
+  String get checkEmailToConfirm;
 
-  /// No description provided for @firstInstallmentDate.
+  /// No description provided for @forgotPassword.
   ///
   /// In en, this message translates to:
-  /// **'First Installment Date'**
-  String get firstInstallmentDate;
+  /// **'Forgot Password?'**
+  String get forgotPassword;
 
-  /// No description provided for @no.
+  /// No description provided for @send.
   ///
   /// In en, this message translates to:
-  /// **'No'**
-  String get no;
+  /// **'Send'**
+  String get send;
 
-  /// No description provided for @yes.
+  /// No description provided for @resetEmailSent.
   ///
   /// In en, this message translates to:
-  /// **'Yes'**
-  String get yes;
+  /// **'Reset email sent. Check your inbox.'**
+  String get resetEmailSent;
 
-  /// No description provided for @noInstallments.
+  /// No description provided for @passwordChanged.
   ///
   /// In en, this message translates to:
-  /// **'No installments found'**
-  String get noInstallments;
+  /// **'Password changed successfully'**
+  String get passwordChanged;
 
-  /// No description provided for @installmentDueDate.
+  /// No description provided for @deleteAccount.
   ///
   /// In en, this message translates to:
-  /// **'Installment Due Date'**
-  String get installmentDueDate;
+  /// **'Delete Account'**
+  String get deleteAccount;
 
-  /// No description provided for @installmentAmount.
+  /// No description provided for @deleteAccountConfirm.
   ///
   /// In en, this message translates to:
-  /// **'Installment Amount'**
-  String get installmentAmount;
+  /// **'Are you sure you want to delete your account? This action cannot be undone.'**
+  String get deleteAccountConfirm;
 
-  /// No description provided for @installmentStatus.
+  /// No description provided for @changePassword.
   ///
   /// In en, this message translates to:
-  /// **'Installment Status'**
-  String get installmentStatus;
+  /// **'Change Password'**
+  String get changePassword;
 
-  /// No description provided for @pending.
+  /// No description provided for @newPassword.
   ///
   /// In en, this message translates to:
-  /// **'Pending'**
-  String get pending;
+  /// **'New Password'**
+  String get newPassword;
 
-  /// No description provided for @overdue.
+  /// No description provided for @confirmPassword.
   ///
   /// In en, this message translates to:
-  /// **'Overdue'**
-  String get overdue;
+  /// **'Confirm Password'**
+  String get confirmPassword;
 
-  /// No description provided for @markAsPaid.
+  /// No description provided for @passwordsDoNotMatch.
   ///
   /// In en, this message translates to:
-  /// **'Mark as Paid'**
-  String get markAsPaid;
+  /// **'Passwords do not match'**
+  String get passwordsDoNotMatch;
 
-  /// No description provided for @installmentPaid.
+  /// No description provided for @profile.
   ///
   /// In en, this message translates to:
-  /// **'Installment marked as paid'**
-  String get installmentPaid;
+  /// **'Profile'**
+  String get profile;
+
+  /// No description provided for @totalOutstanding.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Outstanding'**
+  String get totalOutstanding;
+
+  /// No description provided for @statementFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Statement for'**
+  String get statementFor;
+
+  /// No description provided for @sendWhatsAppStatement.
+  ///
+  /// In en, this message translates to:
+  /// **'Send via WhatsApp'**
+  String get sendWhatsAppStatement;
+
+  /// No description provided for @exportStatementPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Export PDF'**
+  String get exportStatementPdf;
+
+  /// No description provided for @status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
 
   /// No description provided for @cleanupViolations.
   ///
@@ -1134,6 +1051,324 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clean'**
   String get cleanupYes;
+
+  /// No description provided for @personDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Person deleted successfully'**
+  String get personDeleted;
+
+  /// No description provided for @invalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email address'**
+  String get invalidEmail;
+
+  /// No description provided for @pleaseFillFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill all fields'**
+  String get pleaseFillFields;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @login.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get login;
+
+  /// No description provided for @register.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get register;
+
+  /// No description provided for @installmentPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Installment paid'**
+  String get installmentPaid;
+
+  /// No description provided for @notificationSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification Settings'**
+  String get notificationSettings;
+
+  /// No description provided for @notificationSettingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize reminders and quiet hours'**
+  String get notificationSettingsSubtitle;
+
+  /// No description provided for @enableNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Notifications'**
+  String get enableNotifications;
+
+  /// No description provided for @enableNotificationsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn all notifications on/off'**
+  String get enableNotificationsSubtitle;
+
+  /// No description provided for @quietHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiet Hours'**
+  String get quietHours;
+
+  /// No description provided for @quietHoursSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t send notifications during these hours'**
+  String get quietHoursSubtitle;
+
+  /// No description provided for @quietHoursFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get quietHoursFrom;
+
+  /// No description provided for @quietHoursTo.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get quietHoursTo;
+
+  /// No description provided for @dueReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Due Reminders'**
+  String get dueReminders;
+
+  /// No description provided for @remind7Days.
+  ///
+  /// In en, this message translates to:
+  /// **'7 days before'**
+  String get remind7Days;
+
+  /// No description provided for @remind3Days.
+  ///
+  /// In en, this message translates to:
+  /// **'3 days before'**
+  String get remind3Days;
+
+  /// No description provided for @remind1Day.
+  ///
+  /// In en, this message translates to:
+  /// **'1 day before'**
+  String get remind1Day;
+
+  /// No description provided for @remindOverdueDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily overdue reminder'**
+  String get remindOverdueDaily;
+
+  /// No description provided for @remindOverdueSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notify every day for overdue debts'**
+  String get remindOverdueSubtitle;
+
+  /// No description provided for @otherNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Notifications'**
+  String get otherNotifications;
+
+  /// No description provided for @weeklySummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Summary'**
+  String get weeklySummary;
+
+  /// No description provided for @weeklySummarySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Every Sunday morning'**
+  String get weeklySummarySubtitle;
+
+  /// No description provided for @paymentNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Notifications'**
+  String get paymentNotifications;
+
+  /// No description provided for @paymentNotificationsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'When a new payment is received (from other devices)'**
+  String get paymentNotificationsSubtitle;
+
+  /// No description provided for @notificationInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are sent automatically based on your settings. They will be updated when you open the app or modify debts.'**
+  String get notificationInfo;
+
+  /// No description provided for @syncDashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync Dashboard'**
+  String get syncDashboard;
+
+  /// No description provided for @syncDashboardSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync status and statistics'**
+  String get syncDashboardSubtitle;
+
+  /// No description provided for @syncedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Synced successfully'**
+  String get syncedSuccessfully;
+
+  /// No description provided for @syncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync failed'**
+  String get syncFailed;
+
+  /// No description provided for @pendingSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get pendingSync;
+
+  /// No description provided for @failedSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get failedSync;
+
+  /// No description provided for @syncedSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Synced'**
+  String get syncedSync;
+
+  /// No description provided for @lastSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Sync'**
+  String get lastSync;
+
+  /// No description provided for @neverSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Never synced'**
+  String get neverSynced;
+
+  /// No description provided for @syncNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync Now'**
+  String get syncNow;
+
+  /// No description provided for @retryFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry Failed'**
+  String get retryFailed;
+
+  /// No description provided for @clearSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Synced'**
+  String get clearSynced;
+
+  /// No description provided for @deleteSyncedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Synced Records'**
+  String get deleteSyncedTitle;
+
+  /// No description provided for @deleteSyncedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'All synced records will be removed from the Outbox queue.'**
+  String get deleteSyncedMessage;
+
+  /// No description provided for @howSyncWorks.
+  ///
+  /// In en, this message translates to:
+  /// **'How Sync Works'**
+  String get howSyncWorks;
+
+  /// No description provided for @howSyncWorksBody.
+  ///
+  /// In en, this message translates to:
+  /// **'• Automatic sync every 30 seconds.\n• Operations are batched for speed.\n• Syncs automatically when internet returns.\n• Failed attempts retry with increasing intervals.'**
+  String get howSyncWorksBody;
+
+  /// No description provided for @clearDataTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All Data'**
+  String get clearDataTitle;
+
+  /// No description provided for @clearDataMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to clear all local data? This cannot be undone.'**
+  String get clearDataMessage;
+
+  /// No description provided for @paymentReceivedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Received'**
+  String get paymentReceivedTitle;
+
+  /// No description provided for @paymentReceivedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{personName} paid {amount} IQD'**
+  String paymentReceivedBody(String personName, int amount);
+
+  /// No description provided for @debtDueInWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Debt due in a week'**
+  String get debtDueInWeek;
+
+  /// No description provided for @debtDueInThreeDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Debt due in 3 days'**
+  String get debtDueInThreeDays;
+
+  /// No description provided for @debtDueTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Debt due tomorrow'**
+  String get debtDueTomorrow;
+
+  /// No description provided for @debtOverdueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue Debt'**
+  String get debtOverdueTitle;
+
+  /// No description provided for @weeklySummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Summary'**
+  String get weeklySummaryTitle;
+
+  /// No description provided for @weeklySummaryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You have {active} active debts, {overdue} overdue, total {total} IQD'**
+  String weeklySummaryBody(int active, int overdue, int total);
 }
 
 class _AppLocalizationsDelegate

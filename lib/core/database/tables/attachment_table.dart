@@ -4,7 +4,9 @@ import 'debt_table.dart';
 @DataClassName('AttachmentRow')
 class Attachments extends Table {
   TextColumn get id => text()();
-  TextColumn get debtId => text().references(Debts, #id)();
+  TextColumn get debtId => text()
+    .customConstraint('NOT NULL REFERENCES debts(id)')
+    .references(Debts, #id)();
   TextColumn get fileName => text()();
   TextColumn get filePath => text()();
   TextColumn get mimeType => text().nullable()();

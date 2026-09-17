@@ -1,22 +1,25 @@
 import 'package:domain/domain.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/core/database/app_database.dart';
-import 'package:mobile/data/repositories/payment_repository_impl.dart';
+import 'package:mobile/core/database/outbox_repository.dart';
 import 'package:mobile/data/repositories/debt_repository_impl.dart';
 import 'package:mobile/data/repositories/ledger_repository_impl.dart';
+import 'package:mobile/data/repositories/payment_repository_impl.dart';
 import 'package:mobile/data/repositories/person_repository_impl.dart';
 
 void main() {
   late AppDatabase db;
+  late OutboxRepository outboxRepo;
   late DebtRepositoryImpl debtRepo;
   late PaymentRepositoryImpl paymentRepo;
   late LedgerRepositoryImpl ledgerRepo;
 
   setUp(() {
     db = AppDatabase.memory();
-    debtRepo = DebtRepositoryImpl(db);
-    paymentRepo = PaymentRepositoryImpl(db);
-    ledgerRepo = LedgerRepositoryImpl(db);
+    outboxRepo = OutboxRepository(db);
+    debtRepo = DebtRepositoryImpl(db, outboxRepo);
+    paymentRepo = PaymentRepositoryImpl(db, outboxRepo);
+    ledgerRepo = LedgerRepositoryImpl(db, outboxRepo);
   });
 
   tearDown(() async {
@@ -24,7 +27,6 @@ void main() {
   });
 
   test('recordPayment inserts payment and ledger entry atomically', () async {
-    // Create a person
     final personId = PersonId('person-1');
     final person = Person(
       id: personId,
@@ -32,9 +34,8 @@ void main() {
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
-    await PersonRepositoryImpl(db).save(person);
+    await PersonRepositoryImpl(db, outboxRepo).save(person);
 
-    // Create a debt with opening entry
     final debtId = DebtId('debt-1');
     final debt = Debt(
       id: debtId,
@@ -53,7 +54,6 @@ void main() {
     );
     await debtRepo.createDebt(debt, openingEntry);
 
-    // Record a payment
     final payment = Payment(
       id: PaymentId('payment-1'),
       debtId: debtId,
@@ -72,7 +72,6 @@ void main() {
     );
     await paymentRepo.recordPayment(payment, paymentEntry);
 
-    // Verify
     final entries = await ledgerRepo.findByDebtId(debtId);
     expect(entries.length, 2);
     final balance = entries.fold<int>(0, (sum, e) => sum + e.amount.amount);
@@ -83,7 +82,7 @@ void main() {
   });
 
   test('recordPayment rolls back on failure', () async {
-    // Simulate failure by trying to insert payment with invalid debtId (FK violation)
+    // نحاول إدراج دفعة بدين غير موجود (FK violation متوقع)
     final payment = Payment(
       id: PaymentId('payment-2'),
       debtId: DebtId('non-existent-debt'),
@@ -100,9 +99,14 @@ void main() {
       paymentId: payment.id,
       createdAt: DateTime.now(),
     );
-    expect(() async => await paymentRepo.recordPayment(payment, paymentEntry),
-        throwsA(anything));
-    // لا يجب أن يوجد قيد
+
+    // ✅ النمط الصحيح لاختبار Future يرمي
+    await expectLater(
+      paymentRepo.recordPayment(payment, paymentEntry),
+      throwsA(anything),
+    );
+
+    // ✅ لا يجب أن يوجد قيد بعد الفشل
     final entries = await ledgerRepo.findAll();
     expect(entries, isEmpty);
   });

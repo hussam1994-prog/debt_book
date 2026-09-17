@@ -5,13 +5,21 @@ import 'payment_table.dart';
 @DataClassName('LedgerEntryRow')
 class LedgerEntries extends Table {
   TextColumn get id => text()();
-  TextColumn get debtId => text().references(Debts, #id)();
+  TextColumn get debtId => text()
+    .customConstraint('NOT NULL REFERENCES debts(id)')
+    .references(Debts, #id)();
   TextColumn get entryType => text()();
   IntColumn get amount => integer()(); // موجب = زيادة، سالب = تخفيض
   TextColumn get currency => text().withDefault(const Constant('IQD'))();
   TextColumn get correlationId => text().nullable()();
-  TextColumn get sourceEntryId => text().nullable().references(LedgerEntries, #id)();
-  TextColumn get paymentId => text().nullable().references(Payments, #id)();
+  TextColumn get sourceEntryId => text()
+    .nullable()
+    .customConstraint('REFERENCES ledger_entries(id)')
+    .references(LedgerEntries, #id)();
+  TextColumn get paymentId => text()
+    .nullable()
+    .customConstraint('REFERENCES payments(id)')
+    .references(Payments, #id)();
   IntColumn get createdAt => integer()();
   IntColumn get serverSequence => integer().nullable().unique()();
 

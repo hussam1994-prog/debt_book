@@ -111,3 +111,56 @@ final insightsProvider = FutureProvider<List<Insight>>((ref) async {
     paymentsByDebt: paymentsByDebt,
   );
 });
+
+final debtStatsProvider = FutureProvider<Map<String, int>>((ref) async {
+  final repo = ref.watch(debtRepositoryProvider);
+  final debts = await repo.findAll();
+  final now = DateTime.now();
+
+  int active = 0, overdue = 0, completed = 0;
+  for (final d in debts) {
+    if (d.isDeleted) continue;
+
+    // ✅ عدّل هذه الشروط حسب قيم DebtStatus الفعلية
+    if (d.status == DebtStatus.cancelled) {
+      continue; // تجاهل الملغاة
+    }
+
+    // إذا كان الدين "مكتمل" (رصيده صفر)، احسبه كمكتمل
+    // بدلاً من الاعتماد على DebtStatus.completed غير الموجود
+    final balance = await ref
+        .read(getBalanceProvider)
+        .call(d.id);
+
+    if (balance.amount <= 0) {
+      completed++;
+    } else if (d.dueDate != null && d.dueDate!.isBefore(now)) {
+      overdue++;
+    } else {
+      active++;
+    }
+  }
+  return {'active': active, 'overdue': overdue, 'completed': completed};
+});
+
+final monthlyTrendProvider = FutureProvider<List<MapEntry<DateTime, double>>>((ref) async {
+  final ledgerRepo = ref.watch(ledgerRepositoryProvider);
+  final entries = await ledgerRepo.findAll();
+
+  final now = DateTime.now();
+  final months = List.generate(6, (i) {
+    final date = DateTime(now.year, now.month - (5 - i), 1);
+    return date;
+  });
+
+  final result = <MapEntry<DateTime, double>>[];
+  for (final month in months) {
+    final nextMonth = DateTime(month.year, month.month + 1, 1);
+    final monthTotal = entries
+        .where((e) =>
+            !e.createdAt.isBefore(month) && e.createdAt.isBefore(nextMonth))
+        .fold<int>(0, (sum, e) => sum + e.amount.amount);
+    result.add(MapEntry(month, monthTotal.toDouble()));
+  }
+  return result;
+});

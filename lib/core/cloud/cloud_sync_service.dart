@@ -5,13 +5,44 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/observability/debug_logger.dart';
 import '../../core/sync/sync_status_provider.dart';
 import '../../core/database/app_database.dart';
-import '../../data/repositories/person_repository_impl.dart';
-import '../../data/repositories/debt_repository_impl.dart';
-import '../../data/repositories/payment_repository_impl.dart';
-import '../../data/repositories/ledger_repository_impl.dart';
-import '../../data/mappers/person_mapper.dart';
 
+/// خدمة المزامنة السحابية.
 class CloudSyncService {
+  // ─────────────────────────────────────────────
+  // دوال الرفع الـ idempotent
+  // ✅ نستخدم onConflict: 'id' بدل 'client_id'
+  // لتجنب خطأ duplicate key عند التحديثات
+  // ─────────────────────────────────────────────
+
+  static Future<void> upsertPerson(
+      Map<String, dynamic> payload, SupabaseClient client) async {
+    await client.from('persons').upsert(payload, onConflict: 'id');
+  }
+
+  static Future<void> upsertDebt(
+      Map<String, dynamic> payload, SupabaseClient client) async {
+    await client.from('debts').upsert(payload, onConflict: 'id');
+  }
+
+  static Future<void> upsertPayment(
+      Map<String, dynamic> payload, SupabaseClient client) async {
+    await client.from('payments').upsert(payload, onConflict: 'id');
+  }
+
+  static Future<void> upsertLedgerEntry(
+      Map<String, dynamic> payload, SupabaseClient client) async {
+    await client.from('ledger_entries').upsert(payload, onConflict: 'id');
+  }
+
+  static Future<void> upsertInstallment(
+      Map<String, dynamic> payload, SupabaseClient client) async {
+    await client.from('installments').upsert(payload, onConflict: 'id');
+  }
+
+  // ─────────────────────────────────────────────
+  // الخدمة التقليدية
+  // ─────────────────────────────────────────────
+
   final SupabaseClient _client = Supabase.instance.client;
   final AppDatabase _db;
   final SyncStatusNotifier _statusNotifier;
@@ -20,140 +51,110 @@ class CloudSyncService {
 
   String? get _userId => _client.auth.currentUser?.id;
 
-  // ========== Persons ==========
-  Future<void> pushPersonsToCloud(List<Person> persons) async {
-    final userId = _userId;
-    logDebug('🔑 User ID: $userId');
-    if (userId == null) {
-      logError('pushPersonsToCloud', 'User ID is null', null);
-      return;
-    }
+  // ─────────────────────────────────────────────
+  // Sync State (Delta Sync)
+  // ─────────────────────────────────────────────
 
-    for (final person in persons) {
-      await _client.from('persons').upsert({
-        'id': person.id.value,
-        'user_id': userId,
-        'name': person.name,
-        'phone': person.phone,
-        'email': person.email,
-        'created_at': person.createdAt.toIso8601String(),
-        'updated_at': person.updatedAt.toIso8601String(),
-        'is_deleted': person.isDeleted,
-      });
-    }
+  Future<DateTime?> _getLastSyncTime(String entityType) async {
+    final row = await (_db.select(_db.syncStates)
+          ..where((t) => t.entityType.equals(entityType)))
+        .getSingleOrNull();
+    return row?.lastSyncedAt;
   }
 
-  Future<void> softDeletePersonOnCloud(PersonId personId) async {
-    final userId = _userId;
-    if (userId == null) return;
-
-    await _client.from('persons').update({
-      'is_deleted': true,
-      'updated_at': DateTime.now().toIso8601String(),
-    }).eq('id', personId.value).eq('user_id', userId);
+  Future<void> _setLastSyncTime(String entityType, DateTime time) async {
+    await _db.into(_db.syncStates).insertOnConflictUpdate(
+          SyncStatesCompanion.insert(
+            entityType: entityType,
+            lastSyncedAt: time,
+          ),
+        );
   }
 
-  Future<List<Map<String, dynamic>>> fetchPersons() async {
+  // ─────────────────────────────────────────────
+  // Persons
+  // ─────────────────────────────────────────────
+
+  Future<List<Map<String, dynamic>>> fetchPersons({DateTime? since}) async {
     try {
       final userId = _userId;
       if (userId == null) return [];
-      final data = await _client
-          .from('persons')
-          .select()
-          .eq('user_id', userId)
-          .eq('is_deleted', false);
-      return data;
+      var query = _client.from('persons').select().eq('user_id', userId);
+      if (since != null) {
+        query = query.gt('updated_at', since.toIso8601String());
+      }
+      return await query;
     } catch (e, st) {
       logError('fetchPersons', e, st);
       return [];
     }
   }
 
-  Future<int> syncPersonsFromCloud() async {
+  Future<int> syncPersonsFromCloud({DateTime? since}) async {
     try {
-      final data = await fetchPersons();
-      var count = 0;
-      for (final row in data) {
-        final personId = row['id'] as String;
-        final existing = await (_db.select(_db.persons)
-              ..where((t) => t.id.equals(personId)))
-            .getSingleOrNull();
-        if (existing == null) {
-          await _db.into(_db.persons).insert(
+      final data = await fetchPersons(since: since);
+      if (data.isEmpty) return 0;
+
+      return await _db.transaction(() async {
+        var count = 0;
+        for (final row in data) {
+          await _db.into(_db.persons).insertOnConflictUpdate(
                 PersonsCompanion.insert(
                   id: row['id'] as String,
                   name: row['name'] as String,
                   phone: Value(row['phone'] as String?),
                   email: Value(row['email'] as String?),
+                  notes: Value(row['notes'] as String?),
                   createdAt: DateTime.parse(row['created_at'] as String)
                       .millisecondsSinceEpoch,
                   updatedAt: DateTime.parse(row['updated_at'] as String)
                       .millisecondsSinceEpoch,
                   version: Value(row['version'] as int? ?? 1),
                   isDeleted: Value(row['is_deleted'] as bool? ?? false),
+                  deletedAt: row['deleted_at'] != null
+                      ? Value(DateTime.parse(row['deleted_at'] as String)
+                          .millisecondsSinceEpoch)
+                      : const Value(null),
                 ),
-                mode: InsertMode.insertOrIgnore, // ✅ الصحيح
               );
           count++;
         }
-      }
-      return count;
+        return count;
+      });
     } catch (e, st) {
       logError('syncPersonsFromCloud', e, st);
       return 0;
     }
   }
 
-  // ========== Debts ==========
-  Future<void> pushDebtsToCloud(List<Debt> debts) async {
-    final userId = _userId;
-    if (userId == null) return;
-    for (final debt in debts) {
-      await _client.from('debts').upsert({
-        'id': debt.id.value,
-        'user_id': userId,
-        'person_id': debt.personId.value,
-        'description': debt.description,
-        'amount': debt.amount.amount,
-        'currency': debt.amount.currency,
-        'due_date': debt.dueDate?.toIso8601String(),
-        'status': debt.status.name,
-        'created_at': debt.createdAt.toIso8601String(),
-        'updated_at': debt.updatedAt.toIso8601String(),
-        'version': debt.version,
-        'is_deleted': debt.isDeleted,
-        'attachment_path': debt.attachmentPath,
-      });
-    }
-  }
+  // ─────────────────────────────────────────────
+  // Debts
+  // ─────────────────────────────────────────────
 
-  Future<List<Map<String, dynamic>>> fetchDebts() async {
+  Future<List<Map<String, dynamic>>> fetchDebts({DateTime? since}) async {
     try {
       final userId = _userId;
       if (userId == null) return [];
-      final data = await _client
-          .from('debts')
-          .select()
-          .eq('user_id', userId)
-          .eq('is_deleted', false);
-      return data;
+      var query = _client.from('debts').select().eq('user_id', userId);
+      if (since != null) {
+        query = query.gt('updated_at', since.toIso8601String());
+      }
+      return await query;
     } catch (e, st) {
       logError('fetchDebts', e, st);
       return [];
     }
   }
 
-  Future<int> syncDebtsFromCloud() async {
+  Future<int> syncDebtsFromCloud({DateTime? since}) async {
     try {
-      final data = await fetchDebts();
-      var count = 0;
-      for (final row in data) {
-        final debtId = row['id'] as String;
-        final existing = await (_db.select(_db.debts)
-              ..where((t) => t.id.equals(debtId)))
-            .getSingleOrNull();
-        if (existing == null) {
-          await _db.into(_db.debts).insert(
+      final data = await fetchDebts(since: since);
+      if (data.isEmpty) return 0;
+
+      return await _db.transaction(() async {
+        var count = 0;
+        for (final row in data) {
+          await _db.into(_db.debts).insertOnConflictUpdate(
                 DebtsCompanion.insert(
                   id: row['id'] as String,
                   personId: row['person_id'] as String,
@@ -171,69 +172,51 @@ class CloudSyncService {
                       .millisecondsSinceEpoch,
                   version: Value(row['version'] as int? ?? 1),
                   isDeleted: Value(row['is_deleted'] as bool? ?? false),
+                  deletedAt: row['deleted_at'] != null
+                      ? Value(DateTime.parse(row['deleted_at'] as String)
+                          .millisecondsSinceEpoch)
+                      : const Value(null),
                   attachmentPath: Value(row['attachment_path'] as String?),
                 ),
-                mode: InsertMode.insertOrIgnore, // ✅
               );
           count++;
         }
-      }
-      return count;
+        return count;
+      });
     } catch (e, st) {
       logError('syncDebtsFromCloud', e, st);
       return 0;
     }
   }
 
-  // ========== Payments ==========
-  Future<void> pushPaymentsToCloud(List<Payment> payments) async {
-    final userId = _userId;
-    if (userId == null) return;
-    for (final payment in payments) {
-      await _client.from('payments').upsert({
-        'id': payment.id.value,
-        'user_id': userId,
-        'debt_id': payment.debtId.value,
-        'amount': payment.amount.amount,
-        'currency': payment.amount.currency,
-        'payment_date': payment.paymentDate.toIso8601String(),
-        'method': payment.method.name,
-        'notes': payment.notes,
-        'created_at': payment.createdAt.toIso8601String(),
-        'updated_at': payment.updatedAt.toIso8601String(),
-        'version': payment.version,
-        'is_deleted': payment.isDeleted,
-      });
-    }
-  }
+  // ─────────────────────────────────────────────
+  // Payments
+  // ─────────────────────────────────────────────
 
-  Future<List<Map<String, dynamic>>> fetchPayments() async {
+  Future<List<Map<String, dynamic>>> fetchPayments({DateTime? since}) async {
     try {
       final userId = _userId;
       if (userId == null) return [];
-      final data = await _client
-          .from('payments')
-          .select()
-          .eq('user_id', userId)
-          .eq('is_deleted', false);
-      return data;
+      var query = _client.from('payments').select().eq('user_id', userId);
+      if (since != null) {
+        query = query.gt('updated_at', since.toIso8601String());
+      }
+      return await query;
     } catch (e, st) {
       logError('fetchPayments', e, st);
       return [];
     }
   }
 
-  Future<int> syncPaymentsFromCloud() async {
+  Future<int> syncPaymentsFromCloud({DateTime? since}) async {
     try {
-      final data = await fetchPayments();
-      var count = 0;
-      for (final row in data) {
-        final paymentId = row['id'] as String;
-        final existing = await (_db.select(_db.payments)
-              ..where((t) => t.id.equals(paymentId)))
-            .getSingleOrNull();
-        if (existing == null) {
-          await _db.into(_db.payments).insert(
+      final data = await fetchPayments(since: since);
+      if (data.isEmpty) return 0;
+
+      return await _db.transaction(() async {
+        var count = 0;
+        for (final row in data) {
+          await _db.into(_db.payments).insertOnConflictUpdate(
                 PaymentsCompanion.insert(
                   id: row['id'] as String,
                   debtId: row['debt_id'] as String,
@@ -249,66 +232,52 @@ class CloudSyncService {
                       .millisecondsSinceEpoch,
                   version: Value(row['version'] as int? ?? 1),
                   isDeleted: Value(row['is_deleted'] as bool? ?? false),
+                  deletedAt: row['deleted_at'] != null
+                      ? Value(DateTime.parse(row['deleted_at'] as String)
+                          .millisecondsSinceEpoch)
+                      : const Value(null),
                 ),
-                mode: InsertMode.insertOrIgnore, // ✅
               );
           count++;
         }
-      }
-      return count;
+        return count;
+      });
     } catch (e, st) {
       logError('syncPaymentsFromCloud', e, st);
       return 0;
     }
   }
 
-  // ========== Ledger ==========
-  Future<void> pushLedgerEntriesToCloud(List<LedgerEntry> entries) async {
-    final userId = _userId;
-    if (userId == null) return;
-    for (final entry in entries) {
-      await _client.from('ledger_entries').upsert({
-        'id': entry.id.value,
-        'user_id': userId,
-        'debt_id': entry.debtId.value,
-        'entry_type': entry.entryType.name,
-        'amount': entry.amount.amount,
-        'currency': entry.amount.currency,
-        'correlation_id': entry.correlationId?.value,
-        'source_entry_id': entry.sourceEntryId?.value,
-        'payment_id': entry.paymentId?.value,
-        'created_at': entry.createdAt.toIso8601String(),
-        'server_sequence': entry.serverSequence,
-      });
-    }
-  }
+  // ─────────────────────────────────────────────
+  // Ledger Entries
+  // ─────────────────────────────────────────────
 
-  Future<List<Map<String, dynamic>>> fetchLedgerEntries() async {
+  Future<List<Map<String, dynamic>>> fetchLedgerEntries(
+      {DateTime? since}) async {
     try {
       final userId = _userId;
       if (userId == null) return [];
-      final data = await _client
-          .from('ledger_entries')
-          .select()
-          .eq('user_id', userId);
-      return data;
+      var query =
+          _client.from('ledger_entries').select().eq('user_id', userId);
+      if (since != null) {
+        query = query.gt('created_at', since.toIso8601String());
+      }
+      return await query;
     } catch (e, st) {
       logError('fetchLedgerEntries', e, st);
       return [];
     }
   }
 
-  Future<int> syncLedgerEntriesFromCloud() async {
+  Future<int> syncLedgerEntriesFromCloud({DateTime? since}) async {
     try {
-      final data = await fetchLedgerEntries();
-      var count = 0;
-      for (final row in data) {
-        final entryId = row['id'] as String;
-        final existing = await (_db.select(_db.ledgerEntries)
-              ..where((t) => t.id.equals(entryId)))
-            .getSingleOrNull();
-        if (existing == null) {
-          await _db.into(_db.ledgerEntries).insert(
+      final data = await fetchLedgerEntries(since: since);
+      if (data.isEmpty) return 0;
+
+      return await _db.transaction(() async {
+        var count = 0;
+        for (final row in data) {
+          await _db.into(_db.ledgerEntries).insertOnConflictUpdate(
                 LedgerEntriesCompanion.insert(
                   id: row['id'] as String,
                   debtId: row['debt_id'] as String,
@@ -322,60 +291,167 @@ class CloudSyncService {
                       .millisecondsSinceEpoch,
                   serverSequence: Value(row['server_sequence'] as int?),
                 ),
-                mode: InsertMode.insertOrIgnore, // ✅
               );
           count++;
         }
-      }
-      return count;
+        return count;
+      });
     } catch (e, st) {
       logError('syncLedgerEntriesFromCloud', e, st);
       return 0;
     }
   }
 
-  // ========== Sync All ==========
-  Future<Map<String, int>> syncAll() async {
-    _statusNotifier.startSync();
+  // ─────────────────────────────────────────────
+  // Installments
+  // ─────────────────────────────────────────────
 
+  Future<List<Map<String, dynamic>>> fetchInstallments(
+      {DateTime? since}) async {
     try {
-      final personRows = await _db.select(_db.persons).get();
-      final persons = personRows.map(PersonMapper.fromRow).toList();
+      final userId = _userId;
+      if (userId == null) return [];
+      var query =
+          _client.from('installments').select().eq('user_id', userId);
+      if (since != null) {
+        query = query.gt('updated_at', since.toIso8601String());
+      }
+      return await query;
+    } catch (e, st) {
+      logError('fetchInstallments', e, st);
+      return [];
+    }
+  }
 
-      final debtRepo = DebtRepositoryImpl(_db);
-      final paymentRepo = PaymentRepositoryImpl(_db);
-      final ledgerRepo = LedgerRepositoryImpl(_db);
+  Future<int> syncInstallmentsFromCloud({DateTime? since}) async {
+    try {
+      final data = await fetchInstallments(since: since);
+      if (data.isEmpty) return 0;
 
-      final debts = await debtRepo.findAll();
-      final payments = await paymentRepo.findAll();
-      final ledger = await ledgerRepo.findAll();
+      return await _db.transaction(() async {
+        var count = 0;
+        for (final row in data) {
+          await _db.into(_db.installments).insertOnConflictUpdate(
+                InstallmentsCompanion.insert(
+                  id: row['id'] as String,
+                  debtId: row['debt_id'] as String,
+                  number: row['number'] as int,
+                  amount: row['amount'] as int,
+                  currency: Value(row['currency'] as String? ?? 'IQD'),
+                  dueDate: DateTime.parse(row['due_date'] as String)
+                      .millisecondsSinceEpoch,
+                  status: Value(row['status'] as String? ?? 'pending'),
+                  paidAt: row['paid_at'] != null
+                      ? Value(DateTime.parse(row['paid_at'] as String)
+                          .millisecondsSinceEpoch)
+                      : const Value(null),
+                  notes: Value(row['notes'] as String?),
+                  createdAt: DateTime.parse(row['created_at'] as String)
+                      .millisecondsSinceEpoch,
+                  updatedAt: DateTime.parse(row['updated_at'] as String)
+                      .millisecondsSinceEpoch,
+                  version: Value(row['version'] as int? ?? 1),
+                  isDeleted: Value(row['is_deleted'] as bool? ?? false),
+                  deletedAt: row['deleted_at'] != null
+                      ? Value(DateTime.parse(row['deleted_at'] as String)
+                          .millisecondsSinceEpoch)
+                      : const Value(null),
+                ),
+              );
+          count++;
+        }
+        return count;
+      });
+    } catch (e, st) {
+      logError('syncInstallmentsFromCloud', e, st);
+      return 0;
+    }
+  }
 
-      await pushPersonsToCloud(persons);
-      await pushDebtsToCloud(debts);
-      await pushPaymentsToCloud(payments);
-      await pushLedgerEntriesToCloud(ledger);
+  // ─────────────────────────────────────────────
+  // المزامنة اليدوية الشاملة
+  // ─────────────────────────────────────────────
 
-      await syncPersonsFromCloud();
-      await syncDebtsFromCloud();
-      await syncPaymentsFromCloud();
-      await syncLedgerEntriesFromCloud();
+  Future<ManualSyncResult> fullManualSync({
+    required Future<void> Function() pushOutbox,
+  }) async {
+    _statusNotifier.startSync();
+    try {
+      try {
+        await pushOutbox();
+      } catch (e, st) {
+        logError('fullManualSync.push', e, st);
+      }
 
-      final cloudPersons = await fetchPersons();
-      final cloudDebts = await fetchDebts();
-      final cloudPayments = await fetchPayments();
-      final cloudLedger = await fetchLedgerEntries();
+      final online = await _isReachable();
 
-      _statusNotifier.finishSync(DateTime.now());
+      if (online) {
+        final personsSince = await _getLastSyncTime('persons');
+        await syncPersonsFromCloud(since: personsSince);
+        await _setLastSyncTime('persons', DateTime.now());
 
-      return {
-        'persons': cloudPersons.length,
-        'debts': cloudDebts.length,
-        'payments': cloudPayments.length,
-        'ledger': cloudLedger.length,
-      };
+        final debtsSince = await _getLastSyncTime('debts');
+        await syncDebtsFromCloud(since: debtsSince);
+        await _setLastSyncTime('debts', DateTime.now());
+
+        final paymentsSince = await _getLastSyncTime('payments');
+        await syncPaymentsFromCloud(since: paymentsSince);
+        await _setLastSyncTime('payments', DateTime.now());
+
+        final ledgerSince = await _getLastSyncTime('ledger_entries');
+        await syncLedgerEntriesFromCloud(since: ledgerSince);
+        await _setLastSyncTime('ledger_entries', DateTime.now());
+
+        final installmentsSince = await _getLastSyncTime('installments');
+        await syncInstallmentsFromCloud(since: installmentsSince);
+        await _setLastSyncTime('installments', DateTime.now());
+      }
+
+      final localCounts = await _localCounts();
+      _statusNotifier.finishSync(online ? DateTime.now() : null);
+      return ManualSyncResult(localCounts: localCounts, wasOnline: online);
     } catch (e) {
       _statusNotifier.finishSync(null);
       rethrow;
     }
   }
+
+  Future<bool> _isReachable() async {
+    try {
+      await _client.from('persons').select('id').limit(1);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<Map<String, int>> _localCounts() async {
+    final persons = await (_db.select(_db.persons)
+          ..where((t) => t.isDeleted.equals(false)))
+        .get();
+    final debts = await (_db.select(_db.debts)
+          ..where((t) => t.isDeleted.equals(false)))
+        .get();
+    final payments = await (_db.select(_db.payments)
+          ..where((t) => t.isDeleted.equals(false)))
+        .get();
+    final ledger = await _db.select(_db.ledgerEntries).get();
+    final installments = await (_db.select(_db.installments)
+          ..where((t) => t.isDeleted.equals(false)))
+        .get();
+    return {
+      'persons': persons.length,
+      'debts': debts.length,
+      'payments': payments.length,
+      'ledger': ledger.length,
+      'installments': installments.length,
+    };
+  }
+}
+
+class ManualSyncResult {
+  final Map<String, int> localCounts;
+  final bool wasOnline;
+
+  ManualSyncResult({required this.localCounts, required this.wasOnline});
 }

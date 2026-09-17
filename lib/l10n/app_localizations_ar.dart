@@ -81,7 +81,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get language => 'اللغة';
 
   @override
-  String get paid => 'مدفوع';
+  String get debts => 'ديون';
+
+  @override
+  String get paid => 'المدفوع';
 
   @override
   String get paymentsLast7Days => 'دفعات آخر 7 أيام';
@@ -274,33 +277,38 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adjustment => 'تسوية';
 
   @override
-  String get enterPin => 'أدخل PIN';
-
-  @override
-  String get unlock => 'فتح';
-
-  @override
-  String get notifications => 'الإشعارات';
-
-  @override
-  String get notificationsSubtitle => 'تفعيل تذكيرات الديون المستحقة';
-
-  @override
-  String whatsappMessage(Object amount) {
-    return 'مرحباً، المطلوب منك تسديد مبلغ $amount دينار عراقي. شكراً';
-  }
-
-  @override
   String get whatsappTooltip => 'إرسال رسالة واتساب';
 
   @override
   String get whatsappGeneralMessage => 'مرحباً، هذا تذكير من دفتر الديون.';
 
   @override
-  String get nameTooLong => 'الاسم طويل جداً (الحد الأقصى 50 حرف)';
+  String get cloudSync => 'مزامنة سحابية';
 
   @override
-  String get invalidPhone => 'رقم الهاتف غير صالح';
+  String get cloudSyncSuccess => 'عدد الأشخاص المزامنين:';
+
+  @override
+  String cloudSyncFailed(Object error) {
+    return 'فشلت المزامنة: $error';
+  }
+
+  @override
+  String cloudSyncResult(
+    Object debts,
+    Object installments,
+    Object ledger,
+    Object payments,
+    Object persons,
+  ) {
+    return 'تمت المزامنة: $persons أشخاص، $debts ديون، $payments دفعات، $ledger قيود، $installments أقساط';
+  }
+
+  @override
+  String get pleaseLoginFirst => 'يرجى تسجيل الدخول أولاً';
+
+  @override
+  String get logoutConfirm => 'هل أنت متأكد من تسجيل الخروج؟';
 
   @override
   String get english => 'الإنجليزية';
@@ -309,89 +317,43 @@ class AppLocalizationsAr extends AppLocalizations {
   String get arabic => 'العربية';
 
   @override
-  String get cloudSync => 'مزامنة سحابية';
+  String get notifications => 'الإشعارات';
 
   @override
-  String get cloudSyncSuccess => 'تم جلب الأشخاص من السحابة:';
+  String get notificationsSubtitle => 'تفعيل تذكيرات الديون المستحقة';
 
   @override
-  String cloudSyncResult(
-    Object debts,
-    Object ledger,
-    Object payments,
-    Object persons,
-  ) {
-    return 'تمت المزامنة: $persons أشخاص، $debts ديون، $payments دفعات، $ledger قيود';
-  }
+  String get refresh => 'تحديث';
 
   @override
-  String cloudSyncFailed(Object error) {
-    return 'فشلت المزامنة: $error';
-  }
+  String get enterPin => 'أدخل PIN';
 
   @override
-  String get login => 'تسجيل الدخول';
+  String get unlock => 'فتح';
 
   @override
-  String get register => 'إنشاء حساب';
+  String get no => 'لا';
 
   @override
-  String get password => 'كلمة المرور';
+  String get yes => 'نعم';
 
   @override
-  String get logoutConfirm => 'هل أنت متأكد من تسجيل الخروج؟';
+  String get installments => 'الأقساط';
 
   @override
-  String get pleaseFillFields => 'يرجى إدخال البريد وكلمة المرور';
+  String get installment => 'قسط';
 
   @override
-  String get passwordTooShort => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+  String get installmentPlan => 'خطة تقسيط';
 
   @override
-  String get checkEmailToConfirm => 'تم إنشاء الحساب. تحقق من بريدك للتأكيد.';
+  String get numberOfInstallments => 'عدد الأقساط';
 
   @override
-  String get forgotPassword => 'نسيت كلمة المرور؟';
+  String get firstInstallmentDate => 'تاريخ أول قسط';
 
   @override
-  String get send => 'إرسال';
-
-  @override
-  String get resetEmailSent => 'تم إرسال رابط إعادة التعيين. تحقق من بريدك.';
-
-  @override
-  String get invalidEmail => 'البريد الإلكتروني غير صالح';
-
-  @override
-  String get pleaseLoginFirst => 'يرجى تسجيل الدخول أولاً';
-
-  @override
-  String get profile => 'الملف الشخصي';
-
-  @override
-  String get changePassword => 'تغيير كلمة المرور';
-
-  @override
-  String get deleteAccount => 'حذف الحساب';
-
-  @override
-  String get deleteAccountConfirm =>
-      'هل أنت متأكد من حذف حسابك؟ لا يمكن التراجع عن هذا الإجراء.';
-
-  @override
-  String get newPassword => 'كلمة المرور الجديدة';
-
-  @override
-  String get confirmPassword => 'تأكيد كلمة المرور';
-
-  @override
-  String get passwordsDoNotMatch => 'كلمتا المرور غير متطابقتين';
-
-  @override
-  String get passwordChanged => 'تم تغيير كلمة المرور بنجاح';
-
-  @override
-  String get accountDeleted => 'تم حذف الحساب';
+  String get noInstallments => 'لا توجد أقساط';
 
   @override
   String get pdfReportTitle => 'تقرير دفتر الديون';
@@ -427,27 +389,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get dueSoonNotificationBody => 'دينك يستحق قريبًا';
-
-  @override
-  String get personDeleted => 'تم حذف الشخص بنجاح';
-
-  @override
-  String get refresh => 'تحديث';
-
-  @override
-  String get totalOutstanding => 'إجمالي المستحقات';
-
-  @override
-  String get statementFor => 'كشف حساب';
-
-  @override
-  String get sendWhatsAppStatement => 'إرسال عبر واتساب';
-
-  @override
-  String get exportStatementPdf => 'تصدير PDF';
-
-  @override
-  String get status => 'الحالة';
 
   @override
   String get invalidAmount => 'يرجى إدخال مبلغ صحيح';
@@ -491,49 +432,65 @@ class AppLocalizationsAr extends AppLocalizations {
   String get addDebtToExisting => 'إضافة دين للشخص الموجود';
 
   @override
-  String get installmentPlan => 'خطة تقسيط';
+  String get invalidPhone => 'رقم الهاتف غير صالح';
 
   @override
-  String get installment => 'قسط';
+  String get nameTooLong => 'الاسم طويل جداً (الحد الأقصى 50 حرف)';
 
   @override
-  String get installments => 'الأقساط';
+  String get passwordTooShort => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
 
   @override
-  String get numberOfInstallments => 'عدد الأقساط';
+  String get checkEmailToConfirm => 'تم إنشاء الحساب. تحقق من بريدك للتأكيد.';
 
   @override
-  String get firstInstallmentDate => 'تاريخ أول قسط';
+  String get forgotPassword => 'نسيت كلمة المرور؟';
 
   @override
-  String get no => 'لا';
+  String get send => 'إرسال';
 
   @override
-  String get yes => 'نعم';
+  String get resetEmailSent => 'تم إرسال رابط إعادة التعيين. تحقق من بريدك.';
 
   @override
-  String get noInstallments => 'لا توجد أقساط';
+  String get passwordChanged => 'تم تغيير كلمة المرور بنجاح';
 
   @override
-  String get installmentDueDate => 'تاريخ استحقاق القسط';
+  String get deleteAccount => 'حذف الحساب';
 
   @override
-  String get installmentAmount => 'مبلغ القسط';
+  String get deleteAccountConfirm =>
+      'هل أنت متأكد من حذف حسابك؟ لا يمكن التراجع عن هذا الإجراء.';
 
   @override
-  String get installmentStatus => 'حالة القسط';
+  String get changePassword => 'تغيير كلمة المرور';
 
   @override
-  String get pending => 'قيد الانتظار';
+  String get newPassword => 'كلمة المرور الجديدة';
 
   @override
-  String get overdue => 'متأخر';
+  String get confirmPassword => 'تأكيد كلمة المرور';
 
   @override
-  String get markAsPaid => 'تحديد كمدفوع';
+  String get passwordsDoNotMatch => 'كلمتا المرور غير متطابقتين';
 
   @override
-  String get installmentPaid => 'تم تحديد القسط كمدفوع';
+  String get profile => 'الملف الشخصي';
+
+  @override
+  String get totalOutstanding => 'إجمالي المستحقات';
+
+  @override
+  String get statementFor => 'كشف حساب';
+
+  @override
+  String get sendWhatsAppStatement => 'إرسال عبر واتساب';
+
+  @override
+  String get exportStatementPdf => 'تصدير PDF';
+
+  @override
+  String get status => 'الحالة';
 
   @override
   String get cleanupViolations => 'تنظيف المخالفات';
@@ -544,4 +501,172 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get cleanupYes => 'تنظيف';
+
+  @override
+  String get personDeleted => 'تم حذف الشخص بنجاح';
+
+  @override
+  String get invalidEmail => 'بريد إلكتروني غير صالح';
+
+  @override
+  String get pleaseFillFields => 'يرجى ملء جميع الحقول';
+
+  @override
+  String get password => 'كلمة المرور';
+
+  @override
+  String get login => 'تسجيل الدخول';
+
+  @override
+  String get register => 'إنشاء حساب';
+
+  @override
+  String get installmentPaid => 'تم دفع القسط';
+
+  @override
+  String get notificationSettings => 'إعدادات الإشعارات';
+
+  @override
+  String get notificationSettingsSubtitle => 'تخصيص التذكيرات وساعات الهدوء';
+
+  @override
+  String get enableNotifications => 'تفعيل الإشعارات';
+
+  @override
+  String get enableNotificationsSubtitle => 'تشغيل/إيقاف جميع الإشعارات';
+
+  @override
+  String get quietHours => 'ساعات الهدوء';
+
+  @override
+  String get quietHoursSubtitle => 'لا ترسل إشعارات في هذه الأوقات';
+
+  @override
+  String get quietHoursFrom => 'من';
+
+  @override
+  String get quietHoursTo => 'إلى';
+
+  @override
+  String get dueReminders => 'تذكيرات الاستحقاق';
+
+  @override
+  String get remind7Days => 'قبل 7 أيام';
+
+  @override
+  String get remind3Days => 'قبل 3 أيام';
+
+  @override
+  String get remind1Day => 'قبل يوم واحد';
+
+  @override
+  String get remindOverdueDaily => 'تذكير يومي بالمتأخرة';
+
+  @override
+  String get remindOverdueSubtitle => 'إشعار كل يوم للديون التي تجاوزت موعدها';
+
+  @override
+  String get otherNotifications => 'أنواع أخرى';
+
+  @override
+  String get weeklySummary => 'ملخص أسبوعي';
+
+  @override
+  String get weeklySummarySubtitle => 'كل يوم أحد صباحًا';
+
+  @override
+  String get paymentNotifications => 'إشعارات الدفعات';
+
+  @override
+  String get paymentNotificationsSubtitle =>
+      'عند استلام دفعة جديدة (من أجهزة أخرى)';
+
+  @override
+  String get notificationInfo =>
+      'الإشعارات تُرسل تلقائيًا حسب إعداداتك. ستُحدَّث عند فتح التطبيق أو تعديل الديون.';
+
+  @override
+  String get syncDashboard => 'لوحة المزامنة';
+
+  @override
+  String get syncDashboardSubtitle => 'حالة المزامنة والإحصائيات';
+
+  @override
+  String get syncedSuccessfully => 'تمت المزامنة بنجاح';
+
+  @override
+  String get syncFailed => 'فشلت المزامنة';
+
+  @override
+  String get pendingSync => 'معلّقة';
+
+  @override
+  String get failedSync => 'فاشلة';
+
+  @override
+  String get syncedSync => 'متزامنة';
+
+  @override
+  String get lastSync => 'آخر مزامنة';
+
+  @override
+  String get neverSynced => 'لم تتم بعد';
+
+  @override
+  String get syncNow => 'مزامنة الآن';
+
+  @override
+  String get retryFailed => 'إعادة المحاولة';
+
+  @override
+  String get clearSynced => 'تنظيف المتزامنة';
+
+  @override
+  String get deleteSyncedTitle => 'حذف السجلات المتزامنة';
+
+  @override
+  String get deleteSyncedMessage =>
+      'سيتم حذف جميع السجلات المتزامنة من طابور Outbox.';
+
+  @override
+  String get howSyncWorks => 'كيف تعمل المزامنة؟';
+
+  @override
+  String get howSyncWorksBody =>
+      '• المزامنة تلقائية كل 30 ثانية.\n• تُجمع العمليات في دفعة واحدة.\n• عند عودة الإنترنت، تُزامن تلقائيًا.\n• المحاولات الفاشلة تُعاد بفاصل متزايد.';
+
+  @override
+  String get clearDataTitle => 'مسح جميع البيانات';
+
+  @override
+  String get clearDataMessage =>
+      'هل أنت متأكد من مسح جميع البيانات المحلية؟ لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get paymentReceivedTitle => 'تم استلام دفعة';
+
+  @override
+  String paymentReceivedBody(String personName, int amount) {
+    return '$personName دفع $amount دينار';
+  }
+
+  @override
+  String get debtDueInWeek => 'دين يستحق بعد أسبوع';
+
+  @override
+  String get debtDueInThreeDays => 'دين يستحق بعد 3 أيام';
+
+  @override
+  String get debtDueTomorrow => 'دين يستحق غدًا';
+
+  @override
+  String get debtOverdueTitle => 'دين متأخر';
+
+  @override
+  String get weeklySummaryTitle => 'الملخص الأسبوعي';
+
+  @override
+  String weeklySummaryBody(int active, int overdue, int total) {
+    return 'لديك $active دين نشط، $overdue متأخر، إجمالي $total دينار';
+  }
 }

@@ -81,6 +81,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get language => 'Language';
 
   @override
+  String get debts => 'debts';
+
+  @override
   String get paid => 'Paid';
 
   @override
@@ -274,23 +277,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adjustment => 'Adjustment';
 
   @override
-  String get enterPin => 'Enter PIN';
-
-  @override
-  String get unlock => 'Unlock';
-
-  @override
-  String get notifications => 'Notifications';
-
-  @override
-  String get notificationsSubtitle => 'Enable debt due reminders';
-
-  @override
-  String whatsappMessage(Object amount) {
-    return 'Hello, you owe $amount IQD. Please settle your debt. Thank you';
-  }
-
-  @override
   String get whatsappTooltip => 'Send WhatsApp message';
 
   @override
@@ -298,10 +284,32 @@ class AppLocalizationsEn extends AppLocalizations {
       'Hello, this is a reminder from Debt Book.';
 
   @override
-  String get nameTooLong => 'Name is too long (max 50 characters)';
+  String get cloudSync => 'Cloud Sync';
 
   @override
-  String get invalidPhone => 'Invalid phone number';
+  String get cloudSyncSuccess => 'Synced persons count:';
+
+  @override
+  String cloudSyncFailed(Object error) {
+    return 'Sync failed: $error';
+  }
+
+  @override
+  String cloudSyncResult(
+    Object debts,
+    Object installments,
+    Object ledger,
+    Object payments,
+    Object persons,
+  ) {
+    return 'Synced: $persons persons, $debts debts, $payments payments, $ledger ledger, $installments installments';
+  }
+
+  @override
+  String get pleaseLoginFirst => 'Please login first';
+
+  @override
+  String get logoutConfirm => 'Are you sure you want to logout?';
 
   @override
   String get english => 'English';
@@ -310,90 +318,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get arabic => 'Arabic';
 
   @override
-  String get cloudSync => 'Cloud Sync';
+  String get notifications => 'Notifications';
 
   @override
-  String get cloudSyncSuccess => 'Fetched persons from cloud:';
+  String get notificationsSubtitle => 'Enable debt due reminders';
 
   @override
-  String cloudSyncResult(
-    Object debts,
-    Object ledger,
-    Object payments,
-    Object persons,
-  ) {
-    return 'Synced: $persons persons, $debts debts, $payments payments, $ledger ledger entries';
-  }
+  String get refresh => 'Refresh';
 
   @override
-  String cloudSyncFailed(Object error) {
-    return 'Sync failed: $error';
-  }
+  String get enterPin => 'Enter PIN';
 
   @override
-  String get login => 'Login';
+  String get unlock => 'Unlock';
 
   @override
-  String get register => 'Register';
+  String get no => 'No';
 
   @override
-  String get password => 'Password';
+  String get yes => 'Yes';
 
   @override
-  String get logoutConfirm => 'Are you sure you want to logout?';
+  String get installments => 'Installments';
 
   @override
-  String get pleaseFillFields => 'Please enter email and password';
+  String get installment => 'Installment';
 
   @override
-  String get passwordTooShort => 'Password must be at least 6 characters';
+  String get installmentPlan => 'Installment Plan';
 
   @override
-  String get checkEmailToConfirm =>
-      'Account created. Check your email to confirm.';
+  String get numberOfInstallments => 'Number of Installments';
 
   @override
-  String get forgotPassword => 'Forgot Password?';
+  String get firstInstallmentDate => 'First Installment Date';
 
   @override
-  String get send => 'Send';
-
-  @override
-  String get resetEmailSent => 'Reset email sent. Check your inbox.';
-
-  @override
-  String get invalidEmail => 'Invalid email address';
-
-  @override
-  String get pleaseLoginFirst => 'Please login first';
-
-  @override
-  String get profile => 'Profile';
-
-  @override
-  String get changePassword => 'Change Password';
-
-  @override
-  String get deleteAccount => 'Delete Account';
-
-  @override
-  String get deleteAccountConfirm =>
-      'Are you sure you want to delete your account? This action cannot be undone.';
-
-  @override
-  String get newPassword => 'New Password';
-
-  @override
-  String get confirmPassword => 'Confirm Password';
-
-  @override
-  String get passwordsDoNotMatch => 'Passwords do not match';
-
-  @override
-  String get passwordChanged => 'Password changed successfully';
-
-  @override
-  String get accountDeleted => 'Account deleted';
+  String get noInstallments => 'No installments found';
 
   @override
   String get pdfReportTitle => 'Debt Book Report';
@@ -429,27 +390,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dueSoonNotificationBody => 'Your debt is due soon';
-
-  @override
-  String get personDeleted => 'Person deleted successfully';
-
-  @override
-  String get refresh => 'Refresh';
-
-  @override
-  String get totalOutstanding => 'Total Outstanding';
-
-  @override
-  String get statementFor => 'Statement for';
-
-  @override
-  String get sendWhatsAppStatement => 'Send via WhatsApp';
-
-  @override
-  String get exportStatementPdf => 'Export PDF';
-
-  @override
-  String get status => 'Status';
 
   @override
   String get invalidAmount => 'Please enter a valid amount';
@@ -494,49 +434,66 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addDebtToExisting => 'Add Debt to Existing';
 
   @override
-  String get installmentPlan => 'Installment Plan';
+  String get invalidPhone => 'Invalid phone number';
 
   @override
-  String get installment => 'Installment';
+  String get nameTooLong => 'Name is too long (max 50 characters)';
 
   @override
-  String get installments => 'Installments';
+  String get passwordTooShort => 'Password must be at least 6 characters';
 
   @override
-  String get numberOfInstallments => 'Number of Installments';
+  String get checkEmailToConfirm =>
+      'Account created. Check your email to confirm.';
 
   @override
-  String get firstInstallmentDate => 'First Installment Date';
+  String get forgotPassword => 'Forgot Password?';
 
   @override
-  String get no => 'No';
+  String get send => 'Send';
 
   @override
-  String get yes => 'Yes';
+  String get resetEmailSent => 'Reset email sent. Check your inbox.';
 
   @override
-  String get noInstallments => 'No installments found';
+  String get passwordChanged => 'Password changed successfully';
 
   @override
-  String get installmentDueDate => 'Installment Due Date';
+  String get deleteAccount => 'Delete Account';
 
   @override
-  String get installmentAmount => 'Installment Amount';
+  String get deleteAccountConfirm =>
+      'Are you sure you want to delete your account? This action cannot be undone.';
 
   @override
-  String get installmentStatus => 'Installment Status';
+  String get changePassword => 'Change Password';
 
   @override
-  String get pending => 'Pending';
+  String get newPassword => 'New Password';
 
   @override
-  String get overdue => 'Overdue';
+  String get confirmPassword => 'Confirm Password';
 
   @override
-  String get markAsPaid => 'Mark as Paid';
+  String get passwordsDoNotMatch => 'Passwords do not match';
 
   @override
-  String get installmentPaid => 'Installment marked as paid';
+  String get profile => 'Profile';
+
+  @override
+  String get totalOutstanding => 'Total Outstanding';
+
+  @override
+  String get statementFor => 'Statement for';
+
+  @override
+  String get sendWhatsAppStatement => 'Send via WhatsApp';
+
+  @override
+  String get exportStatementPdf => 'Export PDF';
+
+  @override
+  String get status => 'Status';
 
   @override
   String get cleanupViolations => 'Clean Violations';
@@ -547,4 +504,174 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cleanupYes => 'Clean';
+
+  @override
+  String get personDeleted => 'Person deleted successfully';
+
+  @override
+  String get invalidEmail => 'Invalid email address';
+
+  @override
+  String get pleaseFillFields => 'Please fill all fields';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get login => 'Login';
+
+  @override
+  String get register => 'Register';
+
+  @override
+  String get installmentPaid => 'Installment paid';
+
+  @override
+  String get notificationSettings => 'Notification Settings';
+
+  @override
+  String get notificationSettingsSubtitle =>
+      'Customize reminders and quiet hours';
+
+  @override
+  String get enableNotifications => 'Enable Notifications';
+
+  @override
+  String get enableNotificationsSubtitle => 'Turn all notifications on/off';
+
+  @override
+  String get quietHours => 'Quiet Hours';
+
+  @override
+  String get quietHoursSubtitle =>
+      'Don\'t send notifications during these hours';
+
+  @override
+  String get quietHoursFrom => 'From';
+
+  @override
+  String get quietHoursTo => 'To';
+
+  @override
+  String get dueReminders => 'Due Reminders';
+
+  @override
+  String get remind7Days => '7 days before';
+
+  @override
+  String get remind3Days => '3 days before';
+
+  @override
+  String get remind1Day => '1 day before';
+
+  @override
+  String get remindOverdueDaily => 'Daily overdue reminder';
+
+  @override
+  String get remindOverdueSubtitle => 'Notify every day for overdue debts';
+
+  @override
+  String get otherNotifications => 'Other Notifications';
+
+  @override
+  String get weeklySummary => 'Weekly Summary';
+
+  @override
+  String get weeklySummarySubtitle => 'Every Sunday morning';
+
+  @override
+  String get paymentNotifications => 'Payment Notifications';
+
+  @override
+  String get paymentNotificationsSubtitle =>
+      'When a new payment is received (from other devices)';
+
+  @override
+  String get notificationInfo =>
+      'Notifications are sent automatically based on your settings. They will be updated when you open the app or modify debts.';
+
+  @override
+  String get syncDashboard => 'Sync Dashboard';
+
+  @override
+  String get syncDashboardSubtitle => 'Sync status and statistics';
+
+  @override
+  String get syncedSuccessfully => 'Synced successfully';
+
+  @override
+  String get syncFailed => 'Sync failed';
+
+  @override
+  String get pendingSync => 'Pending';
+
+  @override
+  String get failedSync => 'Failed';
+
+  @override
+  String get syncedSync => 'Synced';
+
+  @override
+  String get lastSync => 'Last Sync';
+
+  @override
+  String get neverSynced => 'Never synced';
+
+  @override
+  String get syncNow => 'Sync Now';
+
+  @override
+  String get retryFailed => 'Retry Failed';
+
+  @override
+  String get clearSynced => 'Clear Synced';
+
+  @override
+  String get deleteSyncedTitle => 'Delete Synced Records';
+
+  @override
+  String get deleteSyncedMessage =>
+      'All synced records will be removed from the Outbox queue.';
+
+  @override
+  String get howSyncWorks => 'How Sync Works';
+
+  @override
+  String get howSyncWorksBody =>
+      '• Automatic sync every 30 seconds.\n• Operations are batched for speed.\n• Syncs automatically when internet returns.\n• Failed attempts retry with increasing intervals.';
+
+  @override
+  String get clearDataTitle => 'Clear All Data';
+
+  @override
+  String get clearDataMessage =>
+      'Are you sure you want to clear all local data? This cannot be undone.';
+
+  @override
+  String get paymentReceivedTitle => 'Payment Received';
+
+  @override
+  String paymentReceivedBody(String personName, int amount) {
+    return '$personName paid $amount IQD';
+  }
+
+  @override
+  String get debtDueInWeek => 'Debt due in a week';
+
+  @override
+  String get debtDueInThreeDays => 'Debt due in 3 days';
+
+  @override
+  String get debtDueTomorrow => 'Debt due tomorrow';
+
+  @override
+  String get debtOverdueTitle => 'Overdue Debt';
+
+  @override
+  String get weeklySummaryTitle => 'Weekly Summary';
+
+  @override
+  String weeklySummaryBody(int active, int overdue, int total) {
+    return 'You have $active active debts, $overdue overdue, total $total IQD';
+  }
 }

@@ -9,6 +9,7 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/sync_status_banner.dart';
 import '../providers/analytics_providers.dart';
+import '../widgets/debts_pie_chart.dart';
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
@@ -21,6 +22,7 @@ class DashboardPage extends ConsumerWidget {
     ref.invalidate(overdueDebtsProvider);
     ref.invalidate(last7DaysPaymentsProvider);
     ref.invalidate(balancesByDebtProvider);
+    ref.invalidate(debtStatsProvider);
   }
 
   @override
@@ -32,6 +34,7 @@ class DashboardPage extends ConsumerWidget {
     final peopleCountAsync = ref.watch(peopleWithDebtsCountProvider);
     final overdueAsync = ref.watch(overdueDebtsProvider);
     final last7PaymentsAsync = ref.watch(last7DaysPaymentsProvider);
+    final debtStatsAsync = ref.watch(debtStatsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -42,9 +45,14 @@ class DashboardPage extends ConsumerWidget {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.analytics),
+            tooltip: 'الإحصائيات الشهرية',
+            onPressed: () => context.go('/monthly-stats'),
+),
+          IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: l10n.refresh,
-            onPressed: () => _refreshLocal(ref), // ✅ تحديث محلي
+            onPressed: () => _refreshLocal(ref),
           ),
         ],
       ),
@@ -53,13 +61,14 @@ class DashboardPage extends ConsumerWidget {
           const SyncStatusBanner(),
           Expanded(
             child: RefreshIndicator(
-              onRefresh: () async => _refreshLocal(ref), // ✅ سحب للتحديث
+              onRefresh: () async => _refreshLocal(ref),
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(AppSpacing.md),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // ─── بطاقات الإحصائيات ───
                     Row(
                       children: [
                         _StatCard(
@@ -72,7 +81,7 @@ class DashboardPage extends ConsumerWidget {
                           label: l10n.paid,
                           valueAsync: paidAsync,
                           icon: Icons.payments,
-                          color: Colors.green,
+                          color: AppColors.success,
                         ),
                         _StatCard(
                           label: l10n.people,
@@ -83,11 +92,56 @@ class DashboardPage extends ConsumerWidget {
                         ),
                       ],
                     ),
+
                     const SizedBox(height: AppSpacing.lg),
+
+                    // ─── الرسم الدائري لتوزيع الديون ───
+                    Text('توزيع الديون', style: textTheme.titleLarge),
+                    const SizedBox(height: AppSpacing.sm),
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        child: debtStatsAsync.when(
+                          data: (stats) => Column(
+                            children: [
+                              DebtsPieChart(
+                                activeCount: stats['active'] ?? 0,
+                                overdueCount: stats['overdue'] ?? 0,
+                                completedCount: stats['completed'] ?? 0,
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  _legendItem('نشط', AppColors.success),
+                                  const SizedBox(width: 16),
+                                  _legendItem('متأخر', AppColors.error),
+                                  const SizedBox(width: 16),
+                                  _legendItem('مكتمل', AppColors.info),
+                                ],
+                              ),
+                            ],
+                          ),
+                          loading: () => const SizedBox(
+                            height: 220,
+                            child: Center(child: CircularProgressIndicator()),
+                          ),
+                          error: (e, st) =>
+                              Center(child: Text('Error: $e')),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: AppSpacing.lg),
+
+                    // ─── الرسم البياني لدفعات آخر 7 أيام ───
                     Text(l10n.paymentsLast7Days, style: textTheme.titleLarge),
                     const SizedBox(height: AppSpacing.sm),
                     _BarChart(paymentsAsync: last7PaymentsAsync),
+
                     const SizedBox(height: AppSpacing.lg),
+
+                    // ─── الديون المتأخرة ───
                     Text(l10n.noOverdue, style: textTheme.titleLarge),
                     const SizedBox(height: AppSpacing.sm),
                     overdueAsync.when(
@@ -117,8 +171,24 @@ class DashboardPage extends ConsumerWidget {
       ),
     );
   }
+
+  Widget _legendItem(String label, Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 6),
+        Text(label, style: const TextStyle(fontSize: 12)),
+      ],
+    );
+  }
 }
 
+// ─── بطاقة إحصائية ───
 class _StatCard extends ConsumerWidget {
   final String label;
   final AsyncValue<Object> valueAsync;
@@ -171,6 +241,7 @@ class _StatCard extends ConsumerWidget {
   }
 }
 
+// ─── الرسم البياني للأعمدة ───
 class _BarChart extends StatelessWidget {
   final AsyncValue<List<Payment>> paymentsAsync;
   const _BarChart({required this.paymentsAsync});
@@ -180,12 +251,17 @@ class _BarChart extends StatelessWidget {
     return paymentsAsync.when(
       data: (payments) {
         if (payments.isEmpty) {
-          return const Text('No payments in last 7 days.');
+          return const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text('No payments in last 7 days.'),
+          );
         }
         final now = DateTime.now();
-        final days = List.generate(7, (i) =>
-            DateTime(now.year, now.month, now.day)
-                .subtract(Duration(days: 6 - i)));
+        final days = List.generate(
+          7,
+          (i) => DateTime(now.year, now.month, now.day)
+              .subtract(Duration(days: 6 - i)),
+        );
         final totals = days.map((day) {
           final dayEnd = day.add(const Duration(days: 1));
           return payments
@@ -210,8 +286,10 @@ class _BarChart extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('${totals[index]}',
-                          style: const TextStyle(fontSize: 10)),
+                      Text(
+                        '${totals[index]}',
+                        style: const TextStyle(fontSize: 10),
+                      ),
                       const SizedBox(height: 4),
                       Container(
                         height: barHeight + 1,
@@ -221,8 +299,7 @@ class _BarChart extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(dayLabel,
-                          style: const TextStyle(fontSize: 10)),
+                      Text(dayLabel, style: const TextStyle(fontSize: 10)),
                     ],
                   ),
                 );
@@ -237,6 +314,7 @@ class _BarChart extends StatelessWidget {
   }
 }
 
+// ─── بطاقة الدين ───
 class _DebtCard extends ConsumerWidget {
   final Debt debt;
   const _DebtCard({required this.debt});

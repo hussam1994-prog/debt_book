@@ -43,12 +43,22 @@ class SyncStatusBanner extends ConsumerWidget {
       color = colorScheme.primary;
     } else if (syncStatus.lastSyncTime != null) {
       final diff = DateTime.now().difference(syncStatus.lastSyncTime!);
+      String timeAgo;
       if (diff.inSeconds < 60) {
-        text = 'آخر مزامنة: قبل ${diff.inSeconds} ثانية';
+        timeAgo = 'قبل ${diff.inSeconds} ثانية';
       } else if (diff.inMinutes < 60) {
-        text = 'آخر مزامنة: قبل ${diff.inMinutes} دقيقة';
+        timeAgo = 'قبل ${diff.inMinutes} دقيقة';
       } else {
-        text = 'آخر مزامنة: قبل ${diff.inHours} ساعة';
+        timeAgo = 'قبل ${diff.inHours} ساعة';
+      }
+
+      // ✅ إظهار الأعداد إذا كانت متوفرة
+      final counts = syncStatus.counts;
+      if (counts != null && counts.isNotEmpty) {
+        text = 'آخر مزامنة: $timeAgo • '
+            '${counts['persons'] ?? 0} أشخاص، ${counts['debts'] ?? 0} ديون';
+      } else {
+        text = 'آخر مزامنة: $timeAgo';
       }
       icon = Icons.cloud_done;
       color = Colors.green;

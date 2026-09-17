@@ -10,6 +10,10 @@ import UIKit
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
+  override func applicationDidEnterBackground(_ application: UIApplication) {
+    UIApplication.shared.ignoreSnapshotOnNextApplicationLaunch()
+  }
+
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
   }

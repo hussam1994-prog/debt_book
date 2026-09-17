@@ -8,7 +8,11 @@ import '../../../core/localization/l10n_extension.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../../core/widgets/skeletons.dart';
 import '../../dashboard/providers/analytics_providers.dart';
+import '../../debts/providers/debts_grouped_provider.dart';
+import '../widgets/debts_trend_chart.dart';
+import '../widgets/top_debtors_chart.dart';
 
 class ReportsPage extends ConsumerStatefulWidget {
   const ReportsPage({super.key});
@@ -18,11 +22,12 @@ class ReportsPage extends ConsumerStatefulWidget {
 }
 
 class _ReportsPageState extends ConsumerState<ReportsPage> {
-  /// ✅ تحديث محلي فقط: إعادة تحميل بيانات التقارير
   void _refreshLocal() {
     ref.invalidate(allDebtsProvider);
     ref.invalidate(balancesByDebtProvider);
     ref.invalidate(overdueDebtsProvider);
+    ref.invalidate(monthlyTrendProvider);
+    ref.invalidate(debtsGroupedByPersonProvider);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('تم تحديث التقارير محليًا')),
@@ -30,6 +35,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
     }
   }
 
+  // ─── تصدير CSV ───
   Future<void> _exportToCsv() async {
     try {
       final allDebts = await ref.read(allDebtsProvider.future);
@@ -65,6 +71,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
     }
   }
 
+  // ─── تصدير PDF ───
   Future<void> _exportToPdf() async {
     try {
       final allDebts = await ref.read(allDebtsProvider.future);
@@ -111,6 +118,53 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
     }
   }
 
+  // ─── ✅ تصدير Excel ───
+  Future<void> _exportToExcel() async {
+    try {
+      final allDebts = await ref.read(allDebtsProvider.future);
+      final balances = await ref.read(balancesByDebtProvider.future);
+      final personRepo = ref.read(personRepositoryProvider);
+
+      final rows = <Map<String, String>>[];
+      for (final debt in allDebts) {
+        final person = await personRepo.findById(debt.personId);
+        final balance = balances[debt.id] ?? Money.zero;
+        rows.add({
+          'person': person?.name ?? 'Unknown',
+          'description': debt.description ?? '',
+          'originalAmount': '${debt.amount.amount}',
+          'balance': '${balance.amount}',
+          'status': debt.status.name,
+          'dueDate': debt.dueDate?.toIso8601String() ?? '',
+        });
+      }
+
+      final l10n = context.l10n;
+      final labels = <String, String>{
+        'person': l10n.pdfPerson,
+        'description': l10n.pdfDescription,
+        'originalAmount': l10n.pdfOriginalAmount,
+        'balance': l10n.pdfBalance,
+        'status': l10n.pdfStatus,
+        'dueDate': l10n.pdfDueDate,
+      };
+
+      final service = ref.read(excelExportServiceProvider);
+      final file =
+          await service.exportDebtsToExcel(rows: rows, labels: labels);
+
+      if (mounted) {
+        _showShareDialog(file.path);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('فشل تصدير Excel: $e')),
+        );
+      }
+    }
+  }
+
   void _showShareDialog(String filePath) {
     showDialog(
       context: context,
@@ -144,6 +198,8 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
     final allDebtsAsync = ref.watch(allDebtsProvider);
     final balancesAsync = ref.watch(balancesByDebtProvider);
     final overdueAsync = ref.watch(overdueDebtsProvider);
+    final trendAsync = ref.watch(monthlyTrendProvider);
+    final groupedAsync = ref.watch(debtsGroupedByPersonProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -156,12 +212,24 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: l10n.refresh,
-            onPressed: _refreshLocal, // ✅ زر تحديث محلي
+            onPressed: _refreshLocal,
+          ),
+          // ✅ تقرير متعدد
+          IconButton(
+            icon: const Icon(Icons.group),
+            tooltip: 'تقرير متعدد',
+            onPressed: () => context.go('/multi-person-report'),
           ),
           IconButton(
             icon: const Icon(Icons.picture_as_pdf),
             tooltip: 'Export PDF',
             onPressed: _exportToPdf,
+          ),
+          // ✅ Excel
+          IconButton(
+            icon: const Icon(Icons.table_chart, color: Colors.green),
+            tooltip: 'تصدير Excel',
+            onPressed: _exportToExcel,
           ),
           IconButton(
             icon: const Icon(Icons.file_download),
@@ -171,20 +239,66 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () async => _refreshLocal(), // ✅ سحب للتحديث
+        onRefresh: () async => _refreshLocal(),
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // ─── الملخص العام ───
               Text(l10n.overview, style: textTheme.titleLarge),
               const SizedBox(height: AppSpacing.sm),
               _SummarySection(
                 allDebtsAsync: allDebtsAsync,
                 balancesAsync: balancesAsync,
               ),
+
               const SizedBox(height: AppSpacing.lg),
+
+              // ─── رسم الاتجاه الشهري ───
+              Text('تطور الديون الشهري', style: textTheme.titleLarge),
+              const SizedBox(height: AppSpacing.sm),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: trendAsync.when(
+                    data: (data) => DebtsTrendChart(
+                      months: data.map((e) => e.key).toList(),
+                      totals: data.map((e) => e.value).toList(),
+                    ),
+                    loading: () => const ChartSkeleton(),
+                    error: (e, st) => SizedBox(
+                      height: 220,
+                      child: Center(child: Text('Error: $e')),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: AppSpacing.lg),
+
+              // ─── رسم أعلى 5 مدينين ───
+              Text('أعلى 5 مدينين', style: textTheme.titleLarge),
+              const SizedBox(height: AppSpacing.sm),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: groupedAsync.when(
+                    data: (summaries) =>
+                        TopDebtorsChart(summaries: summaries),
+                    loading: () => const ChartSkeleton(),
+                    error: (e, st) => SizedBox(
+                      height: 250,
+                      child: Center(child: Text('Error: $e')),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: AppSpacing.lg),
+
+              // ─── الديون المتأخرة ───
               Text(l10n.noOverdue, style: textTheme.titleLarge),
               const SizedBox(height: AppSpacing.sm),
               overdueAsync.when(
@@ -196,12 +310,15 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
                     );
                   }
                   return Column(
-                    children: debts.map((debt) => _DebtTile(debt: debt)).toList(),
+                    children:
+                        debts.map((debt) => _DebtTile(debt: debt)).toList(),
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, st) => Center(child: Text('Error: $e')),
               ),
+
+              const SizedBox(height: AppSpacing.xl),
             ],
           ),
         ),

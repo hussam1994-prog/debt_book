@@ -11,6 +11,8 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/whatsapp/whatsapp_service.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../people/providers/people_providers.dart';
+import '../providers/ledger_paginated_provider.dart';
+import '../widgets/ledger_timeline.dart';
 
 class DebtDetailPage extends ConsumerStatefulWidget {
   final DebtId debtId;
@@ -23,9 +25,16 @@ class DebtDetailPage extends ConsumerStatefulWidget {
 class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
   Debt? _debt;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(ledgerPaginatedProvider(widget.debtId).notifier).loadMore();
+    });
+  }
+
   void _refreshLocal() {
-    ref.invalidate(debtRepositoryProvider);
-    ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
+    ref.read(ledgerPaginatedProvider(widget.debtId).notifier).refresh();
     ref.invalidate(paymentsForDebtProvider(widget.debtId));
     ref.invalidate(balanceForDebtProvider(widget.debtId));
     ref.invalidate(installmentsForDebtProvider(widget.debtId));
@@ -36,32 +45,36 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
     }
   }
 
-  String _entryTypeLabel(LedgerEntryType type) {
-    final l10n = context.l10n;
-    switch (type) {
-      case LedgerEntryType.debt_creation:
-        return l10n.debtCreation;
-      case LedgerEntryType.payment:
-        return l10n.payment;
-      case LedgerEntryType.reversal:
-        return l10n.reversal;
-      case LedgerEntryType.adjustment:
-        return l10n.adjustment;
-    }
-  }
-
-  Future<void> _sendWhatsAppReminder(Debt debt) async {
+  // ─── ✅ إرسال رسالة بقوالب جاهزة ───
+  Future<void> _sendTemplatedMessage(Debt debt, String template) async {
     try {
       final person =
           await ref.read(personRepositoryProvider).findById(debt.personId);
       if (person == null || person.phone == null || person.phone!.isEmpty) {
-        throw Exception('No phone number for this person');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('لا يوجد رقم هاتف لهذا الشخص')),
+          );
+        }
+        return;
       }
 
       final balance = await ref.read(getBalanceProvider).call(debt.id);
-      final message =
-          'مرحباً، المطلوب منك تسديد مبلغ ${balance.amount} دينار عراقي. شكراً';
-      await WhatsAppService.sendReminder(phone: person.phone!, message: message);
+      final dueDateStr = debt.dueDate != null
+          ? _formatDate(debt.dueDate!)
+          : 'غير محدد';
+
+      final message = WhatsAppService.getTemplate(
+        template: template,
+        personName: person.name,
+        amount: balance.amount,
+        dueDate: dueDateStr,
+      );
+
+      await WhatsAppService.sendReminder(
+        phone: person.phone!,
+        message: message,
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -149,7 +162,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
     final deleteDebt = ref.read(deleteDebtProvider);
     await deleteDebt(debt.id);
     if (!mounted) return;
-    ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
+    ref.read(ledgerPaginatedProvider(widget.debtId).notifier).refresh();
     ref.invalidate(paymentsForDebtProvider(widget.debtId));
     if (context.mounted) context.go('/');
   }
@@ -177,7 +190,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
     final cancelDebt = ref.read(cancelDebtProvider);
     await cancelDebt(widget.debtId);
     if (!mounted) return;
-    ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
+    ref.read(ledgerPaginatedProvider(widget.debtId).notifier).refresh();
     ref.invalidate(paymentsForDebtProvider(widget.debtId));
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -204,7 +217,8 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                   TextField(
                     controller: amountController,
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(labelText: l10n.adjustmentAmount),
+                    decoration:
+                        InputDecoration(labelText: l10n.adjustmentAmount),
                   ),
                   const SizedBox(height: 12),
                   Wrap(
@@ -240,7 +254,9 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                       debtId: widget.debtId,
                       amount: Money(amount: adjustmentAmount),
                     );
-                    ref.invalidate(ledgerEntriesForDebtProvider(widget.debtId));
+                    ref
+                        .read(ledgerPaginatedProvider(widget.debtId).notifier)
+                        .refresh();
                     if (dialogContext.mounted) Navigator.pop(dialogContext);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -261,45 +277,38 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
   Color _balanceColor(BuildContext context, Money? balance) {
     final colorScheme = Theme.of(context).colorScheme;
     if (balance == null) return colorScheme.onSurface;
-    if (balance.amount > 0) return colorScheme.error;
-    if (balance.amount < 0) return Colors.green;
+    if (balance.amount > 0) return AppColors.error;
+    if (balance.amount < 0) return AppColors.success;
     return colorScheme.onSurface;
   }
 
-  Widget _buildLedgerList(AsyncValue<List<LedgerEntry>> entriesAsync) {
+  // ─── دفتر الأستاذ: Timeline ───
+  Widget _buildLedgerList() {
     final l10n = context.l10n;
-    return entriesAsync.when(
-      data: (entries) {
-        if (entries.isEmpty) {
-          return EmptyState(
-              icon: Icons.list_alt, title: l10n.noLedgerEntries);
+    final ledgerState = ref.watch(ledgerPaginatedProvider(widget.debtId));
+    final notifier =
+        ref.watch(ledgerPaginatedProvider(widget.debtId).notifier);
+
+    if (ledgerState.isEmpty) {
+      if (notifier.isLoading) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      return EmptyState(icon: Icons.list_alt, title: l10n.noLedgerEntries);
+    }
+
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        if (notification.metrics.pixels >=
+            notification.metrics.maxScrollExtent - 200) {
+          notifier.loadMore();
         }
-        return ListView.builder(
-          physics: const AlwaysScrollableScrollPhysics(),
-          itemCount: entries.length,
-          itemBuilder: (context, index) {
-            final entry = entries[index];
-            return ListTile(
-              leading: Icon(
-                entry.amount.amount >= 0
-                    ? Icons.add_circle
-                    : Icons.remove_circle,
-                color: entry.amount.amount >= 0
-                    ? Theme.of(context).colorScheme.error
-                    : Colors.green,
-              ),
-              title: Text(_entryTypeLabel(entry.entryType)),
-              subtitle: Text('${entry.amount.amount} IQD'),
-              trailing: Text(_formatDate(entry.createdAt)),
-            );
-          },
-        );
+        return false;
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, st) => Center(child: Text('Error: $e')),
+      child: LedgerTimeline(entries: ledgerState),
     );
   }
 
+  // ─── الدفعات ───
   Widget _buildPaymentsList(
     BuildContext context,
     AsyncValue<List<Payment>> paymentsAsync,
@@ -313,35 +322,46 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         }
         return ListView.builder(
           physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(AppSpacing.md),
           itemCount: payments.length,
           itemBuilder: (context, index) {
             final payment = payments[index];
-            return ListTile(
-              leading: const Icon(Icons.payment, color: AppColors.primary),
-              title: Text('${l10n.payments} ${payment.amount.amount} IQD'),
-              subtitle: Text(payment.paymentDate.toString()),
-              trailing: payment.isDeleted
-                  ? Icon(
-                      Icons.block,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    )
-                  : IconButton(
-                      icon: const Icon(Icons.undo, color: AppColors.error),
-                      onPressed: () async {
-                        final reversePayment = ref.read(reversePaymentProvider);
-                        await reversePayment(payment.id);
-                        if (!mounted) return;
-                        ref.invalidate(
-                            ledgerEntriesForDebtProvider(widget.debtId));
-                        ref.invalidate(
-                            paymentsForDebtProvider(widget.debtId));
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(l10n.paymentReversed)),
-                          );
-                        }
-                      },
-                    ),
+            return Card(
+              margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                  child: const Icon(Icons.payment, color: AppColors.primary),
+                ),
+                title: Text(
+                  '${payment.amount.amount} IQD',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(_formatDate(payment.paymentDate)),
+                trailing: payment.isDeleted
+                    ? const Icon(Icons.block, color: AppColors.textHint)
+                    : IconButton(
+                        icon: const Icon(Icons.undo, color: AppColors.error),
+                        tooltip: l10n.reversal,
+                        onPressed: () async {
+                          final reversePayment =
+                              ref.read(reversePaymentProvider);
+                          await reversePayment(payment.id);
+                          if (!mounted) return;
+                          ref
+                              .read(ledgerPaginatedProvider(widget.debtId)
+                                  .notifier)
+                              .refresh();
+                          ref.invalidate(
+                              paymentsForDebtProvider(widget.debtId));
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(l10n.paymentReversed)),
+                            );
+                          }
+                        },
+                      ),
+              ),
             );
           },
         );
@@ -351,6 +371,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
     );
   }
 
+  // ─── الأقساط ───
   Widget _buildInstallmentsList(
     BuildContext context,
     AsyncValue<List<Installment>> installmentsAsync,
@@ -368,47 +389,63 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         }
         return ListView.builder(
           physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(AppSpacing.md),
           itemCount: installments.length,
           itemBuilder: (context, index) {
             final installment = installments[index];
             final isPaid = installment.status == InstallmentStatus.paid;
             final isOverdue = installment.status == InstallmentStatus.overdue;
 
-            return ListTile(
-              leading: CircleAvatar(
-                child: Text('${installment.number}'),
-              ),
-              title: Text('${installment.amount.amount} IQD'),
-              subtitle: Text(
-                '${l10n.dueDate}: ${_formatDate(installment.dueDate)}',
-              ),
-              trailing: isPaid
-                  ? Icon(Icons.check_circle, color: Colors.green)
-                  : IconButton(
-                      icon: Icon(
-                        Icons.check_circle_outline,
-                        color: isOverdue
-                            ? Theme.of(context).colorScheme.error
-                            : Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                      onPressed: () async {
-                        final updated = installment.copyWith(
-                          status: InstallmentStatus.paid,
-                          paidAt: DateTime.now(),
-                          updatedAt: DateTime.now(),
-                          version: installment.version + 1,
-                        );
-                        final repo = ref.read(installmentRepositoryProvider);
-                        await repo.update(updated);
-                        ref.invalidate(
-                            installmentsForDebtProvider(widget.debtId));
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(l10n.installmentPaid)),
-                          );
-                        }
-                      },
+            return Card(
+              margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: isPaid
+                      ? AppColors.success.withValues(alpha: 0.1)
+                      : AppColors.primary.withValues(alpha: 0.1),
+                  child: Text(
+                    '${installment.number}',
+                    style: TextStyle(
+                      color: isPaid ? AppColors.success : AppColors.primary,
+                      fontWeight: FontWeight.bold,
                     ),
+                  ),
+                ),
+                title: Text(
+                  '${installment.amount.amount} IQD',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  '${l10n.dueDate}: ${_formatDate(installment.dueDate)}',
+                ),
+                trailing: isPaid
+                    ? const Icon(Icons.check_circle, color: AppColors.success)
+                    : IconButton(
+                        icon: Icon(
+                          Icons.check_circle_outline,
+                          color: isOverdue
+                              ? AppColors.error
+                              : AppColors.textHint,
+                        ),
+                        onPressed: () async {
+                          final updated = installment.copyWith(
+                            status: InstallmentStatus.paid,
+                            paidAt: DateTime.now(),
+                            updatedAt: DateTime.now(),
+                            version: installment.version + 1,
+                          );
+                          final repo = ref.read(installmentRepositoryProvider);
+                          await repo.update(updated);
+                          ref.invalidate(
+                              installmentsForDebtProvider(widget.debtId));
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(l10n.installmentPaid)),
+                            );
+                          }
+                        },
+                      ),
+              ),
             );
           },
         );
@@ -425,9 +462,9 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final debtAsync = ref.watch(debtRepositoryProvider).findById(widget.debtId);
-    final entriesAsync = ref.watch(ledgerEntriesForDebtProvider(widget.debtId));
     final paymentsAsync = ref.watch(paymentsForDebtProvider(widget.debtId));
-    final installmentsAsync = ref.watch(installmentsForDebtProvider(widget.debtId));
+    final installmentsAsync =
+        ref.watch(installmentsForDebtProvider(widget.debtId));
     final getBalance = ref.read(getBalanceProvider);
     final balanceAsync = getBalance(widget.debtId);
 
@@ -444,36 +481,139 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
             tooltip: l10n.refresh,
             onPressed: _refreshLocal,
           ),
-          IconButton(
-            icon: const Icon(Icons.chat),
-            tooltip: l10n.whatsappTooltip,
-            onPressed: () {
-              if (_debt != null) _sendWhatsAppReminder(_debt!);
+          // ✅ زر قوالب رسائل واتساب
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.chat, color: Colors.green),
+            tooltip: 'إرسال رسالة واتساب',
+            onSelected: (template) {
+              if (_debt != null) _sendTemplatedMessage(_debt!, template);
             },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'reminder',
+                child: Row(
+                  children: [
+                    Text('📩', style: TextStyle(fontSize: 18)),
+                    SizedBox(width: 8),
+                    Text('تذكير عادي'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'reminder_urgent',
+                child: Row(
+                  children: [
+                    Text('⚡', style: TextStyle(fontSize: 18)),
+                    SizedBox(width: 8),
+                    Text('تذكير عاجل'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'reminder_overdue',
+                child: Row(
+                  children: [
+                    Text('⚠️', style: TextStyle(fontSize: 18)),
+                    SizedBox(width: 8),
+                    Text('تذكير بالمتأخر'),
+                  ],
+                ),
+              ),
+              const PopupMenuDivider(),
+              const PopupMenuItem(
+                value: 'thank_you',
+                child: Row(
+                  children: [
+                    Text('🙏', style: TextStyle(fontSize: 18)),
+                    SizedBox(width: 8),
+                    Text('شكر'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'postpone',
+                child: Row(
+                  children: [
+                    Text('⏰', style: TextStyle(fontSize: 18)),
+                    SizedBox(width: 8),
+                    Text('تأجيل'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'congratulations',
+                child: Row(
+                  children: [
+                    Text('🎉', style: TextStyle(fontSize: 18)),
+                    SizedBox(width: 8),
+                    Text('تهنئة'),
+                  ],
+                ),
+              ),
+            ],
           ),
-          IconButton(
-            icon: const Icon(Icons.edit),
-            tooltip: l10n.edit,
-            onPressed: () {
-              if (_debt != null) _showEditDebtDialog(_debt!);
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) {
+              if (_debt == null) return;
+              switch (value) {
+                case 'edit':
+                  _showEditDebtDialog(_debt!);
+                  break;
+                case 'adjust':
+                  _showAdjustmentDialog(context, ref);
+                  break;
+                case 'cancel':
+                  _confirmCancelDebt();
+                  break;
+                case 'delete':
+                  _confirmDeleteDebt(_debt!);
+                  break;
+              }
             },
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete),
-            tooltip: l10n.deleteDebt,
-            onPressed: () {
-              if (_debt != null) _confirmDeleteDebt(_debt!);
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.tune),
-            tooltip: l10n.addAdjustment,
-            onPressed: () => _showAdjustmentDialog(context, ref),
-          ),
-          IconButton(
-            icon: const Icon(Icons.cancel_outlined),
-            tooltip: l10n.cancelDebt,
-            onPressed: () => _confirmCancelDebt(),
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'edit',
+                child: Row(
+                  children: [
+                    const Icon(Icons.edit, size: 18),
+                    const SizedBox(width: 8),
+                    Text(l10n.edit),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'adjust',
+                child: Row(
+                  children: [
+                    const Icon(Icons.tune, size: 18),
+                    const SizedBox(width: 8),
+                    Text(l10n.addAdjustment),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'cancel',
+                child: Row(
+                  children: [
+                    const Icon(Icons.cancel_outlined, size: 18),
+                    const SizedBox(width: 8),
+                    Text(l10n.cancelDebt),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'delete',
+                child: Row(
+                  children: [
+                    const Icon(Icons.delete, size: 18, color: AppColors.error),
+                    const SizedBox(width: 8),
+                    Text(l10n.deleteDebt,
+                        style: const TextStyle(color: AppColors.error)),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -501,7 +641,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                               debt.description ?? l10n.description,
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 12),
                             FutureBuilder<Money>(
                               future: balanceAsync,
                               builder: (context, balanceSnapshot) {
@@ -509,21 +649,32 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                                 return Text(
                                   '${l10n.balance}: ${balance != null ? balance.amount : "---"} IQD',
                                   style: TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 22,
                                     fontWeight: FontWeight.bold,
                                     color: _balanceColor(context, balance),
                                   ),
                                 );
                               },
                             ),
-                            if (debt.dueDate != null)
-                              Text(
-                                '${l10n.dueDate}: ${_formatDate(debt.dueDate!)}',
-                                style: Theme.of(context).textTheme.bodyMedium,
+                            if (debt.dueDate != null) ...[
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  const Icon(Icons.event,
+                                      size: 16, color: AppColors.textHint),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    '${l10n.dueDate}: ${_formatDate(debt.dueDate!)}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium,
+                                  ),
+                                ],
                               ),
+                            ],
                             if (debt.attachmentPath != null)
                               Padding(
-                                padding: const EdgeInsets.only(top: 8),
+                                padding: const EdgeInsets.only(top: 12),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(12),
                                   child: Image.file(
@@ -538,23 +689,22 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                       ),
                     ),
                   ),
-                const Divider(),
                 Expanded(
                   child: DefaultTabController(
                     length: 3,
                     child: Column(
                       children: [
-                        TabBar(
+                        const TabBar(
                           tabs: [
-                            Tab(text: l10n.ledger),
-                            Tab(text: l10n.payments),
-                            Tab(text: l10n.installments),
+                            Tab(text: 'دفتر الأستاذ'),
+                            Tab(text: 'الدفعات'),
+                            Tab(text: 'الأقساط'),
                           ],
                         ),
                         Expanded(
                           child: TabBarView(
                             children: [
-                              _buildLedgerList(entriesAsync),
+                              _buildLedgerList(),
                               _buildPaymentsList(context, paymentsAsync, ref),
                               _buildInstallmentsList(
                                   context, installmentsAsync, ref),
@@ -571,7 +721,8 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go('/debt/${widget.debtId.value}/add-payment'),
+        onPressed: () =>
+            context.go('/debt/${widget.debtId.value}/add-payment'),
         backgroundColor: AppColors.primary,
         icon: const Icon(Icons.add),
         label: Text(l10n.addPayment),
