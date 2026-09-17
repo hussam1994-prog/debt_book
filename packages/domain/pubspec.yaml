@@ -1,0 +1,14 @@
+name: domain
+description: Domain layer for Debt Book
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  collection: ^1.18.0
+  uuid: ^4.0.0
+
+dev_dependencies:
+  test: ^1.25.0
