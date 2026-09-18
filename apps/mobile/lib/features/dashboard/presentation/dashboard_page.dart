@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/localization/l10n_extension.dart';
+import '../../../core/localization/app_formatters.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/empty_state.dart';
@@ -96,7 +97,7 @@ class DashboardPage extends ConsumerWidget {
                     const SizedBox(height: AppSpacing.lg),
 
                     // ─── الرسم الدائري لتوزيع الديون ───
-                    Text('توزيع الديون', style: textTheme.titleLarge),
+                    Text(context.l10n.debtDistribution, style: textTheme.titleLarge),
                     const SizedBox(height: AppSpacing.sm),
                     Card(
                       child: Padding(
@@ -127,7 +128,7 @@ class DashboardPage extends ConsumerWidget {
                             child: Center(child: CircularProgressIndicator()),
                           ),
                           error: (e, st) =>
-                              Center(child: Text('Error: $e')),
+                              Center(child: Text(context.l10n.errorGeneric(e.toString()))),
                         ),
                       ),
                     ),
@@ -160,7 +161,7 @@ class DashboardPage extends ConsumerWidget {
                       },
                       loading: () =>
                           const Center(child: CircularProgressIndicator()),
-                      error: (e, st) => Center(child: Text('Error: $e')),
+                      error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
                     ),
                   ],
                 ),
@@ -219,7 +220,7 @@ class _StatCard extends ConsumerWidget {
             valueAsync.when(
               data: (value) {
                 final display = isMoney
-                    ? '${(value as Money).amount} IQD'
+                    ? AppFormatters.money(context, (value as Money).amount)
                     : '$value';
                 return Text(
                   display,
@@ -253,7 +254,7 @@ class _BarChart extends StatelessWidget {
         if (payments.isEmpty) {
           return const Padding(
             padding: EdgeInsets.all(16),
-            child: Text('No payments in last 7 days.'),
+            child: Text(context.l10n.noPaymentsInWeek),
           );
         }
         final now = DateTime.now();
@@ -309,7 +310,7 @@ class _BarChart extends StatelessWidget {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, st) => Center(child: Text('Error: $e')),
+      error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
     );
   }
 }
@@ -323,7 +324,7 @@ class _DebtCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return ListTile(
       title: Text(debt.description ?? 'Debt'),
-      subtitle: Text('${debt.amount.amount} IQD'),
+      subtitle: Text(AppFormatters.money(context, debt.amount.amount)),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => context.go('/debt/${debt.id.value}'),
     );

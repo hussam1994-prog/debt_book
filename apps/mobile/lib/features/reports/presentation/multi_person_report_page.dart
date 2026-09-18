@@ -106,7 +106,7 @@ class _MultiPersonReportPageState
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, st) => Center(child: Text('Error: $e')),
+              error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
             ),
           ),
 
@@ -227,7 +227,7 @@ class _MultiPersonReportPageState
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('فشل: $e')),
+          SnackBar(content: Text(context.l10n.errorGeneric(e.toString()))),
         );
       }
     } finally {

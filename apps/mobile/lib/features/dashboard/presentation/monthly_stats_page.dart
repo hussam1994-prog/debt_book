@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/localization/l10n_extension.dart';
 import '../../../core/theme/app_theme.dart';
@@ -20,7 +21,7 @@ class MonthlyStatsPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('الإحصائيات الشهرية'),
+        title: Text(l10n.monthlyStats),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/dashboard'),
@@ -87,7 +88,7 @@ class MonthlyStatsPage extends ConsumerWidget {
                     loading: () => const Center(
                       child: CircularProgressIndicator(),
                     ),
-                    error: (e, st) => Center(child: Text('Error: $e')),
+                    error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
                   ),
                 ),
               ),
@@ -106,10 +107,10 @@ class MonthlyStatsPage extends ConsumerWidget {
                 child: topDebtorsAsync.when(
                   data: (debtors) {
                     if (debtors.isEmpty) {
-                      return const Center(
+                      return Center(
                         child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Text('لا توجد بيانات'),
+                          padding: const EdgeInsets.all(16),
+                          child: Text(l10n.noData),
                         ),
                       );
                     }
@@ -162,7 +163,7 @@ class MonthlyStatsPage extends ConsumerWidget {
                       child: CircularProgressIndicator(),
                     ),
                   ),
-                  error: (e, st) => Center(child: Text('Error: $e')),
+                  error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
                 ),
               ),
             ),
@@ -181,7 +182,7 @@ class MonthlyStatsPage extends ConsumerWidget {
                   data: (stats) {
                     return Column(
                       children: stats.map((s) {
-                        final monthName = _monthName(s.month.month);
+                        final monthName = _monthName(context, s.month.month);
                         return ListTile(
                           dense: true,
                           title: Text('$monthName ${s.month.year}'),
@@ -219,7 +220,7 @@ class MonthlyStatsPage extends ConsumerWidget {
                       child: CircularProgressIndicator(),
                     ),
                   ),
-                  error: (e, st) => Center(child: Text('Error: $e')),
+                  error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
                 ),
               ),
             ),
@@ -229,12 +230,9 @@ class MonthlyStatsPage extends ConsumerWidget {
     );
   }
 
-  String _monthName(int month) {
-    const names = [
-      'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
-    ];
-    return names[month - 1];
+  String _monthName(BuildContext context, int month) {
+    final locale = Localizations.localeOf(context).toString();
+    return DateFormat.MMMM(locale).format(DateTime(2020, month, 1));
   }
 }
 

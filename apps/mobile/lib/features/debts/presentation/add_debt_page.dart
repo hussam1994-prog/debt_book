@@ -133,7 +133,7 @@ class _AddDebtPageState extends ConsumerState<AddDebtPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text(context.l10n.errorGeneric(e.toString()))),
         );
       }
     }

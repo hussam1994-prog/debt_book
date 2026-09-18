@@ -70,7 +70,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('فشل تسجيل الدخول: $e')),
+          SnackBar(content: Text(context.l10n.loginFailed(e.toString()))),
         );
       }
     } finally {
@@ -97,7 +97,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('فشل تسجيل الدخول: $e')),
+          SnackBar(content: Text(context.l10n.loginFailed(e.toString()))),
         );
       }
     } finally {
@@ -138,7 +138,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('فشل إنشاء الحساب: $e')),
+          SnackBar(content: Text(context.l10n.signupFailed(e.toString()))),
         );
       }
     } finally {
@@ -218,7 +218,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text(context.l10n.errorGeneric(e.toString()))),
         );
       }
     } finally {

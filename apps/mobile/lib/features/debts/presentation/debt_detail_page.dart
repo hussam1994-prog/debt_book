@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/localization/l10n_extension.dart';
+import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/whatsapp/whatsapp_service.dart';
@@ -78,7 +79,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text(context.l10n.errorGeneric(e.toString()))),
         );
       }
     }
@@ -334,7 +335,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                   child: const Icon(Icons.payment, color: AppColors.primary),
                 ),
                 title: Text(
-                  '${payment.amount.amount} IQD',
+                  AppFormatters.money(context, payment.amount.amount),
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(_formatDate(payment.paymentDate)),
@@ -367,7 +368,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, st) => Center(child: Text('Error: $e')),
+      error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
     );
   }
 
@@ -412,7 +413,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                   ),
                 ),
                 title: Text(
-                  '${installment.amount.amount} IQD',
+                  AppFormatters.money(context, installment.amount.amount),
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(
@@ -451,7 +452,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, st) => Center(child: Text('Error: $e')),
+      error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
     );
   }
 
@@ -647,7 +648,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                               builder: (context, balanceSnapshot) {
                                 final balance = balanceSnapshot.data;
                                 return Text(
-                                  '${l10n.balance}: ${balance != null ? balance.amount : "---"} IQD',
+                                  '${l10n.balance}: ${balance != null ? AppFormatters.money(context, balance.amount) : "---"}',
                                   style: TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,

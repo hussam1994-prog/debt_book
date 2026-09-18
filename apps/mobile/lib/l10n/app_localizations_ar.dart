@@ -669,4 +669,100 @@ class AppLocalizationsAr extends AppLocalizations {
   String weeklySummaryBody(int active, int overdue, int total) {
     return 'لديك $active دين نشط، $overdue متأخر، إجمالي $total دينار';
   }
+
+  @override
+  String errorGeneric(String message) {
+    return 'خطأ: $message';
+  }
+
+  @override
+  String loginFailed(String error) {
+    return 'فشل تسجيل الدخول: $error';
+  }
+
+  @override
+  String signupFailed(String error) {
+    return 'فشل إنشاء الحساب: $error';
+  }
+
+  @override
+  String get noPaymentsInWeek => 'لا توجد دفعات في آخر 7 أيام.';
+
+  @override
+  String uploadFailed(String error) {
+    return 'فشل الرفع: $error';
+  }
+
+  @override
+  String downloadFailed(String error) {
+    return 'فشل التنزيل: $error';
+  }
+
+  @override
+  String deleteFailed(String error) {
+    return 'فشل الحذف: $error';
+  }
+
+  @override
+  String exportFailedGeneric(String error) {
+    return 'فشل التصدير: $error';
+  }
+
+  @override
+  String amountWithCurrency(String amount) {
+    return '$amount د.ع';
+  }
+
+  @override
+  String amountWithDinar(String amount) {
+    return '$amount دينار';
+  }
+
+  @override
+  String get noData => 'لا توجد بيانات';
+
+  @override
+  String excelExportFailed(String error) {
+    return 'فشل تصدير Excel: $error';
+  }
+
+  @override
+  String get pdfStatement => 'كشف PDF';
+
+  @override
+  String sendPdfFailed(String error) {
+    return 'فشل إرسال PDF: $error';
+  }
+
+  @override
+  String installmentsUpdated(int count) {
+    return 'تم تحديث $count قسط';
+  }
+
+  @override
+  String get switchGoogleAccount => 'تبديل حساب Google';
+
+  @override
+  String get switchGoogleAccountSubtitle => 'تسجيل دخول بحساب Google آخر';
+
+  @override
+  String switchAccountFailed(String error) {
+    return 'فشل تبديل الحساب: $error';
+  }
+
+  @override
+  String resetSettingsFailed(String error) {
+    return 'فشلت إعادة التعيين: $error';
+  }
+
+  @override
+  String get top5Debtors => 'أعلى 5 مدينين';
+
+  @override
+  String get monthlyStats => 'الإحصائيات الشهرية';
+
+  @override
+  String newDebtsAndPayments(int debts, int payments) {
+    return '$debts دين جديد • $payments دفعة';
+  }
 }

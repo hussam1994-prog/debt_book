@@ -674,4 +674,101 @@ class AppLocalizationsEn extends AppLocalizations {
   String weeklySummaryBody(int active, int overdue, int total) {
     return 'You have $active active debts, $overdue overdue, total $total IQD';
   }
+
+  @override
+  String errorGeneric(String message) {
+    return 'Error: $message';
+  }
+
+  @override
+  String loginFailed(String error) {
+    return 'Login failed: $error';
+  }
+
+  @override
+  String signupFailed(String error) {
+    return 'Signup failed: $error';
+  }
+
+  @override
+  String get noPaymentsInWeek => 'No payments in the last 7 days.';
+
+  @override
+  String uploadFailed(String error) {
+    return 'Upload failed: $error';
+  }
+
+  @override
+  String downloadFailed(String error) {
+    return 'Download failed: $error';
+  }
+
+  @override
+  String deleteFailed(String error) {
+    return 'Delete failed: $error';
+  }
+
+  @override
+  String exportFailedGeneric(String error) {
+    return 'Export failed: $error';
+  }
+
+  @override
+  String amountWithCurrency(String amount) {
+    return '$amount IQD';
+  }
+
+  @override
+  String amountWithDinar(String amount) {
+    return '$amount IQD';
+  }
+
+  @override
+  String get noData => 'No data';
+
+  @override
+  String excelExportFailed(String error) {
+    return 'Excel export failed: $error';
+  }
+
+  @override
+  String get pdfStatement => 'PDF Statement';
+
+  @override
+  String sendPdfFailed(String error) {
+    return 'Failed to send PDF: $error';
+  }
+
+  @override
+  String installmentsUpdated(int count) {
+    return 'Updated $count installment(s)';
+  }
+
+  @override
+  String get switchGoogleAccount => 'Switch Google Account';
+
+  @override
+  String get switchGoogleAccountSubtitle =>
+      'Sign in with a different Google account';
+
+  @override
+  String switchAccountFailed(String error) {
+    return 'Switch account failed: $error';
+  }
+
+  @override
+  String resetSettingsFailed(String error) {
+    return 'Failed to reset settings: $error';
+  }
+
+  @override
+  String get top5Debtors => 'Top 5 Debtors';
+
+  @override
+  String get monthlyStats => 'Monthly Statistics';
+
+  @override
+  String newDebtsAndPayments(int debts, int payments) {
+    return '$debts new debt(s) • $payments payment(s)';
+  }
 }

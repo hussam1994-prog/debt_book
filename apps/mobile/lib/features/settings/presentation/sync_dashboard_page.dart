@@ -63,7 +63,7 @@ class _SyncDashboardPageState extends ConsumerState<SyncDashboardPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text(context.l10n.errorGeneric(e.toString()))),
         );
       }
     }
@@ -236,7 +236,7 @@ class _SyncDashboardPageState extends ConsumerState<SyncDashboardPage> {
             ],
           ),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, st) => Center(child: Text('Error: $e')),
+          error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
         ),
       ),
     );

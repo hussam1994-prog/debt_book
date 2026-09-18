@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/localization/l10n_extension.dart';
+import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_card.dart';
@@ -192,7 +193,7 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('فشل التصدير: $e')),
+        SnackBar(content: Text(context.l10n.exportFailedGeneric(e.toString()))),
       );
     }
   }
@@ -310,7 +311,7 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
                       _summaryItem(
                         icon: Icons.account_balance_wallet,
                         label: l10n.totalOutstanding,
-                        value: '$totalOutstanding IQD',
+                        value: AppFormatters.money(context, totalOutstanding),
                       ),
                     ],
                   ),
@@ -345,7 +346,7 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, st) => Center(child: Text('Error: $e')),
+      error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
     );
   }
 
@@ -409,7 +410,7 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
                         style: textTheme.bodyMedium,
                       ),
                       Text(
-                        '${debt.amount.amount} IQD',
+                        AppFormatters.money(context, debt.amount.amount),
                         style: textTheme.titleMedium,
                       ),
                     ],

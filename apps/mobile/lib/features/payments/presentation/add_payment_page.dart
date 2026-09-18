@@ -104,7 +104,7 @@ class _AddPaymentPageState extends ConsumerState<AddPaymentPage> {
                   if (paidCount > 0 && mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('تم تحديث $paidCount قسط'),
+                        content: Text(context.l10n.installmentsUpdated(paidCount)),
                       ),
                     );
                   }
@@ -113,7 +113,7 @@ class _AddPaymentPageState extends ConsumerState<AddPaymentPage> {
                 } catch (e) {
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error: $e')),
+                      SnackBar(content: Text(context.l10n.errorGeneric(e.toString()))),
                     );
                   }
                 }

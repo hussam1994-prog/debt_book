@@ -1369,6 +1369,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You have {active} active debts, {overdue} overdue, total {total} IQD'**
   String weeklySummaryBody(int active, int overdue, int total);
+
+  /// No description provided for @errorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {message}'**
+  String errorGeneric(String message);
+
+  /// No description provided for @loginFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Login failed: {error}'**
+  String loginFailed(String error);
+
+  /// No description provided for @signupFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Signup failed: {error}'**
+  String signupFailed(String error);
+
+  /// No description provided for @noPaymentsInWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'No payments in the last 7 days.'**
+  String get noPaymentsInWeek;
+
+  /// No description provided for @uploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload failed: {error}'**
+  String uploadFailed(String error);
+
+  /// No description provided for @downloadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Download failed: {error}'**
+  String downloadFailed(String error);
+
+  /// No description provided for @deleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete failed: {error}'**
+  String deleteFailed(String error);
+
+  /// No description provided for @exportFailedGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
+  String exportFailedGeneric(String error);
+
+  /// No description provided for @amountWithCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} IQD'**
+  String amountWithCurrency(String amount);
+
+  /// No description provided for @amountWithDinar.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} IQD'**
+  String amountWithDinar(String amount);
+
+  /// No description provided for @noData.
+  ///
+  /// In en, this message translates to:
+  /// **'No data'**
+  String get noData;
+
+  /// No description provided for @excelExportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Excel export failed: {error}'**
+  String excelExportFailed(String error);
+
+  /// No description provided for @pdfStatement.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF Statement'**
+  String get pdfStatement;
+
+  /// No description provided for @sendPdfFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send PDF: {error}'**
+  String sendPdfFailed(String error);
+
+  /// No description provided for @installmentsUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {count} installment(s)'**
+  String installmentsUpdated(int count);
+
+  /// No description provided for @switchGoogleAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch Google Account'**
+  String get switchGoogleAccount;
+
+  /// No description provided for @switchGoogleAccountSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with a different Google account'**
+  String get switchGoogleAccountSubtitle;
+
+  /// No description provided for @switchAccountFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch account failed: {error}'**
+  String switchAccountFailed(String error);
+
+  /// No description provided for @resetSettingsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to reset settings: {error}'**
+  String resetSettingsFailed(String error);
+
+  /// No description provided for @top5Debtors.
+  ///
+  /// In en, this message translates to:
+  /// **'Top 5 Debtors'**
+  String get top5Debtors;
+
+  /// No description provided for @monthlyStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Statistics'**
+  String get monthlyStats;
+
+  /// No description provided for @newDebtsAndPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'{debts} new debt(s) • {payments} payment(s)'**
+  String newDebtsAndPayments(int debts, int payments);
 }
 
 class _AppLocalizationsDelegate

@@ -47,7 +47,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       logger.error('Integrity check failed', error: e);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text(context.l10n.errorGeneric(e.toString()))),
         );
       }
     } finally {
@@ -88,7 +88,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text(context.l10n.errorGeneric(e.toString()))),
         );
       }
     } finally {
@@ -142,7 +142,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('تبديل حساب Google'),
+        title: Text(context.l10n.switchGoogleAccount),
         content: const Text(
             'سيتم تسجيل خروجك من الحساب الحالي. هل تريد المتابعة؟'),
         actions: [
@@ -172,7 +172,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('فشل تبديل الحساب: $e')),
+          SnackBar(content: Text(context.l10n.switchAccountFailed(e.toString()))),
         );
       }
     }
@@ -224,7 +224,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('فشلت إعادة التعيين: $e')),
+        SnackBar(content: Text(context.l10n.resetSettingsFailed(e.toString()))),
       );
     }
   }
@@ -413,8 +413,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   // ✅ تبديل حساب Google
                   ListTile(
                     leading: const Icon(Icons.switch_account),
-                    title: const Text('تبديل حساب Google'),
-                    subtitle: const Text('تسجيل دخول بحساب Google آخر'),
+                    title: Text(context.l10n.switchGoogleAccount),
+                    subtitle: Text(context.l10n.switchGoogleAccountSubtitle),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: _confirmSwitchAccount,
                   ),

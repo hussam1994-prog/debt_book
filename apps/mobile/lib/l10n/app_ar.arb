@@ -223,5 +223,94 @@
       "overdue": { "type": "int" },
       "total": { "type": "int" }
     }
+  },
+  "errorGeneric": "خطأ: {message}",
+  "@errorGeneric": {
+    "placeholders": { "message": { "type": "String" } }
+  },
+  "loginFailed": "فشل تسجيل الدخول: {error}",
+  "@loginFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "signupFailed": "فشل إنشاء الحساب: {error}",
+  "@signupFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "noPaymentsInWeek": "لا توجد دفعات في آخر 7 أيام.",
+  "uploadFailed": "فشل الرفع: {error}",
+  "@uploadFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "downloadFailed": "فشل التنزيل: {error}",
+  "@downloadFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "deleteFailed": "فشل الحذف: {error}",
+  "@deleteFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "exportFailedGeneric": "فشل التصدير: {error}",
+  "@exportFailedGeneric": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "amountWithCurrency": "{amount} د.ع",
+  "@amountWithCurrency": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "amountWithDinar": "{amount} دينار",
+  "@amountWithDinar": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "noData": "لا توجد بيانات",
+  "excelExportFailed": "فشل تصدير Excel: {error}",
+  "@excelExportFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "pdfStatement": "كشف PDF",
+  "sendPdfFailed": "فشل إرسال PDF: {error}",
+  "@sendPdfFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+    "installmentsUpdated": "تم تحديث {count} قسط",
+  "@installmentsUpdated": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "switchGoogleAccount": "تبديل حساب Google",
+  "switchGoogleAccountSubtitle": "تسجيل دخول بحساب Google آخر",
+  "switchAccountFailed": "فشل تبديل الحساب: {error}",
+  "@switchAccountFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "resetSettingsFailed": "فشلت إعادة التعيين: {error}",
+  "@resetSettingsFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "top5Debtors": "أعلى 5 مدينين",
+  "excelExportFailed": "فشل تصدير Excel: {error}",
+  "@excelExportFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+    "installmentsUpdated": "تم تحديث {count} قسط",
+  "@installmentsUpdated": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "switchGoogleAccount": "تبديل حساب Google",
+  "switchGoogleAccountSubtitle": "تسجيل دخول بحساب Google آخر",
+  "switchAccountFailed": "فشل تبديل الحساب: {error}",
+  "@switchAccountFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "resetSettingsFailed": "فشلت إعادة التعيين: {error}",
+  "@resetSettingsFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+    "monthlyStats": "الإحصائيات الشهرية",
+  "noData": "لا توجد بيانات",
+  "newDebtsAndPayments": "{debts} دين جديد • {payments} دفعة",
+  "@newDebtsAndPayments": {
+    "placeholders": {
+      "debts": { "type": "int" },
+      "payments": { "type": "int" }
+    }
   }
 }

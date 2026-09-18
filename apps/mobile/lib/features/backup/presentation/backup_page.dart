@@ -107,7 +107,7 @@ class _BackupPageState extends ConsumerState<BackupPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${context.l10n.backupFailed}: $e')),
+          SnackBar(content: Text(context.l10n.backupFailedWithError(e.toString()))),
         );
       }
     } finally {
@@ -138,13 +138,13 @@ class _BackupPageState extends ConsumerState<BackupPage> {
         await _loadCloudBackups();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('فشل: ${result.errorMessage}')),
+          SnackBar(content: Text(context.l10n.errorGeneric(result.errorMessage ?? ''))),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('فشل الرفع: $e')),
+          SnackBar(content: Text(context.l10n.uploadFailed(e.toString()))),
         );
       }
     } finally {
@@ -207,7 +207,7 @@ class _BackupPageState extends ConsumerState<BackupPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${l10n.restoreFailed}: $e')),
+          SnackBar(content: Text(l10n.restoreFailedWithError(e.toString()))),
         );
       }
     } finally {
@@ -279,14 +279,14 @@ class _BackupPageState extends ConsumerState<BackupPage> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('فشل: ${result.errorMessage}')),
+            SnackBar(content: Text(context.l10n.errorGeneric(result.errorMessage ?? ''))),
           );
         }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('فشل التنزيل: $e')),
+          SnackBar(content: Text(context.l10n.downloadFailed(e.toString()))),
         );
       }
     } finally {
@@ -322,7 +322,7 @@ class _BackupPageState extends ConsumerState<BackupPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('فشل الحذف: $e')),
+          SnackBar(content: Text(context.l10n.deleteFailed(e.toString()))),
         );
       }
     }

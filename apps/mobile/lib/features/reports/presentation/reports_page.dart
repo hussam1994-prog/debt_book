@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/localization/l10n_extension.dart';
+import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/empty_state.dart';
@@ -65,7 +66,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Export failed: $e')),
+          SnackBar(content: Text(context.l10n.exportFailedGeneric(e.toString()))),
         );
       }
     }
@@ -112,7 +113,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Export failed: $e')),
+          SnackBar(content: Text(context.l10n.exportFailedGeneric(e.toString()))),
         );
       }
     }
@@ -159,7 +160,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('فشل تصدير Excel: $e')),
+          SnackBar(content: Text(context.l10n.excelExportFailed(e.toString()))),
         );
       }
     }
@@ -270,7 +271,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
                     loading: () => const ChartSkeleton(),
                     error: (e, st) => SizedBox(
                       height: 220,
-                      child: Center(child: Text('Error: $e')),
+                      child: Center(child: Text(context.l10n.errorGeneric(e.toString()))),
                     ),
                   ),
                 ),
@@ -279,7 +280,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
               const SizedBox(height: AppSpacing.lg),
 
               // ─── رسم أعلى 5 مدينين ───
-              Text('أعلى 5 مدينين', style: textTheme.titleLarge),
+              Text(context.l10n.top5Debtors, style: textTheme.titleLarge),
               const SizedBox(height: AppSpacing.sm),
               Card(
                 child: Padding(
@@ -290,7 +291,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
                     loading: () => const ChartSkeleton(),
                     error: (e, st) => SizedBox(
                       height: 250,
-                      child: Center(child: Text('Error: $e')),
+                      child: Center(child: Text(context.l10n.errorGeneric(e.toString()))),
                     ),
                   ),
                 ),
@@ -315,7 +316,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, st) => Center(child: Text('Error: $e')),
+                error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
               ),
 
               const SizedBox(height: AppSpacing.xl),
@@ -404,7 +405,7 @@ class _StatBox extends StatelessWidget {
               valueAsync.when(
                 data: (value) {
                   final display = isMoney
-                      ? '${(value as Money).amount} IQD'
+                      ? AppFormatters.money(context, (value as Money).amount)
                       : '$value';
                   return Text(
                     display,
@@ -435,7 +436,7 @@ class _DebtTile extends ConsumerWidget {
     return ListTile(
       leading: const Icon(Icons.error, color: AppColors.error),
       title: Text(debt.description ?? 'Debt'),
-      subtitle: Text('${debt.amount.amount} IQD'),
+      subtitle: Text(AppFormatters.money(context, debt.amount.amount)),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => context.go('/debt/${debt.id.value}'),
     );

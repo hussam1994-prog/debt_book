@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/localization/l10n_extension.dart';
+import '../../../core/localization/app_formatters.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/whatsapp/whatsapp_service.dart';
@@ -137,7 +138,7 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
               ),
               ListTile(
                 leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
-                title: const Text('كشف PDF'),
+                title: Text(context.l10n.pdfStatement),
                 subtitle: const Text('ملف كامل يمكن مشاركته'),
                 onTap: () => Navigator.pop(ctx, 'pdf'),
               ),
@@ -192,7 +193,7 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text(context.l10n.errorGeneric(e.toString()))),
         );
       }
     }
@@ -256,7 +257,7 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('فشل إرسال PDF: $e')),
+          SnackBar(content: Text(context.l10n.sendPdfFailed(e.toString()))),
         );
       }
     }
@@ -306,7 +307,7 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text(context.l10n.errorGeneric(e.toString()))),
         );
       }
     }
@@ -411,7 +412,7 @@ class _PersonDetailPageState extends ConsumerState<PersonDetailPage> {
                     },
                     loading: () =>
                         const Center(child: CircularProgressIndicator()),
-                    error: (e, st) => Center(child: Text('Error: $e')),
+                    error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
                   ),
                 ),
               ],
@@ -748,7 +749,7 @@ class _DebtCard extends ConsumerWidget {
               Row(
                 children: [
                   Text(
-                    '${_formatAmount(currentBalance)} IQD',
+                    AppFormatters.money(context, currentBalance),
                     style: textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: currentBalance > 0

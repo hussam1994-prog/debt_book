@@ -2,6 +2,7 @@ import 'package:domain/domain.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/localization/app_formatters.dart';
 import '../../../core/theme/app_theme.dart';
 
 class TopDebtorsChart extends StatelessWidget {
@@ -37,7 +38,7 @@ class TopDebtorsChart extends StatelessWidget {
               touchTooltipData: BarTouchTooltipData(
                 getTooltipItem: (group, groupIndex, rod, rodIndex) {
                   return BarTooltipItem(
-                    '${top[group.x].personName}\n${_formatAmount(rod.toY.toInt())} IQD',
+                    '${top[group.x].personName}\n${AppFormatters.money(context, rod.toY.toInt())}',
                     const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,

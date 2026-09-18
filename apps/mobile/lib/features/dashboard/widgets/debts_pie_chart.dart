@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 
 class DebtsPieChart extends StatelessWidget {
@@ -19,7 +20,7 @@ class DebtsPieChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final total = activeCount + overdueCount + completedCount;
     if (total == 0) {
-      return const Center(child: Text('لا توجد بيانات'));
+      return Center(child: Text(AppLocalizations.of(context)!.noData));
     }
 
     return SizedBox(

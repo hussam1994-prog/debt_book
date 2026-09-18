@@ -1,6 +1,7 @@
 import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/localization/app_formatters.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_design.dart';
 
@@ -71,7 +72,7 @@ class PersonCard extends StatelessWidget {
 
                     // المبلغ
                     Text(
-                      '${_formatAmount(summary.totalOutstanding.amount)} IQD',
+                      AppFormatters.money(context, summary.totalOutstanding.amount),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

@@ -223,5 +223,94 @@
       "overdue": { "type": "int" },
       "total": { "type": "int" }
     }
+  },
+  "errorGeneric": "Error: {message}",
+  "@errorGeneric": {
+    "placeholders": { "message": { "type": "String" } }
+  },
+  "loginFailed": "Login failed: {error}",
+  "@loginFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "signupFailed": "Signup failed: {error}",
+  "@signupFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "noPaymentsInWeek": "No payments in the last 7 days.",
+  "uploadFailed": "Upload failed: {error}",
+  "@uploadFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "downloadFailed": "Download failed: {error}",
+  "@downloadFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "deleteFailed": "Delete failed: {error}",
+  "@deleteFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "exportFailedGeneric": "Export failed: {error}",
+  "@exportFailedGeneric": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "amountWithCurrency": "{amount} IQD",
+  "@amountWithCurrency": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "amountWithDinar": "{amount} IQD",
+  "@amountWithDinar": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "noData": "No data",
+  "excelExportFailed": "Excel export failed: {error}",
+  "@excelExportFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "pdfStatement": "PDF Statement",
+  "sendPdfFailed": "Failed to send PDF: {error}",
+  "@sendPdfFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+    "installmentsUpdated": "Updated {count} installment(s)",
+  "@installmentsUpdated": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "switchGoogleAccount": "Switch Google Account",
+  "switchGoogleAccountSubtitle": "Sign in with a different Google account",
+  "switchAccountFailed": "Switch account failed: {error}",
+  "@switchAccountFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "resetSettingsFailed": "Failed to reset settings: {error}",
+  "@resetSettingsFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "top5Debtors": "Top 5 Debtors",
+  "excelExportFailed": "Excel export failed: {error}",
+  "@excelExportFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+    "installmentsUpdated": "Updated {count} installment(s)",
+  "@installmentsUpdated": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "switchGoogleAccount": "Switch Google Account",
+  "switchGoogleAccountSubtitle": "Sign in with a different Google account",
+  "switchAccountFailed": "Switch account failed: {error}",
+  "@switchAccountFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "resetSettingsFailed": "Failed to reset settings: {error}",
+  "@resetSettingsFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+    "monthlyStats": "Monthly Statistics",
+  "noData": "No data",
+  "newDebtsAndPayments": "{debts} new debt(s) • {payments} payment(s)",
+  "@newDebtsAndPayments": {
+    "placeholders": {
+      "debts": { "type": "int" },
+      "payments": { "type": "int" }
+    }
   }
 }
