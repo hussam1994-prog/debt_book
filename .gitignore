@@ -1,0 +1,4 @@
+
+# Local files (not for repo)
+location app.txt
+location*.txt

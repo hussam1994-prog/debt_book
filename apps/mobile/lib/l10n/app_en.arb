@@ -271,7 +271,7 @@
   "@sendPdfFailed": {
     "placeholders": { "error": { "type": "String" } }
   },
-    "installmentsUpdated": "Updated {count} installment(s)",
+  "installmentsUpdated": "Updated {count} installment(s)",
   "@installmentsUpdated": {
     "placeholders": { "count": { "type": "int" } }
   },
@@ -286,31 +286,21 @@
     "placeholders": { "error": { "type": "String" } }
   },
   "top5Debtors": "Top 5 Debtors",
-  "excelExportFailed": "Excel export failed: {error}",
-  "@excelExportFailed": {
-    "placeholders": { "error": { "type": "String" } }
-  },
-    "installmentsUpdated": "Updated {count} installment(s)",
-  "@installmentsUpdated": {
-    "placeholders": { "count": { "type": "int" } }
-  },
-  "switchGoogleAccount": "Switch Google Account",
-  "switchGoogleAccountSubtitle": "Sign in with a different Google account",
-  "switchAccountFailed": "Switch account failed: {error}",
-  "@switchAccountFailed": {
-    "placeholders": { "error": { "type": "String" } }
-  },
-  "resetSettingsFailed": "Failed to reset settings: {error}",
-  "@resetSettingsFailed": {
-    "placeholders": { "error": { "type": "String" } }
-  },
-    "monthlyStats": "Monthly Statistics",
-  "noData": "No data",
+  "monthlyStats": "Monthly Statistics",
   "newDebtsAndPayments": "{debts} new debt(s) • {payments} payment(s)",
   "@newDebtsAndPayments": {
     "placeholders": {
       "debts": { "type": "int" },
       "payments": { "type": "int" }
     }
+  },
+  "debtDistribution": "Debt Distribution",
+  "backupFailedWithError": "Backup failed: {error}",
+  "@backupFailedWithError": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "restoreFailedWithError": "Restore failed: {error}",
+  "@restoreFailedWithError": {
+    "placeholders": { "error": { "type": "String" } }
   }
 }

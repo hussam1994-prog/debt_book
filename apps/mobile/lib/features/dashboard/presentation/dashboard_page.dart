@@ -252,8 +252,8 @@ class _BarChart extends StatelessWidget {
     return paymentsAsync.when(
       data: (payments) {
         if (payments.isEmpty) {
-          return const Padding(
-            padding: EdgeInsets.all(16),
+          return Padding(
+            padding: const EdgeInsets.all(16),
             child: Text(context.l10n.noPaymentsInWeek),
           );
         }

@@ -271,7 +271,7 @@
   "@sendPdfFailed": {
     "placeholders": { "error": { "type": "String" } }
   },
-    "installmentsUpdated": "تم تحديث {count} قسط",
+  "installmentsUpdated": "تم تحديث {count} قسط",
   "@installmentsUpdated": {
     "placeholders": { "count": { "type": "int" } }
   },
@@ -286,31 +286,21 @@
     "placeholders": { "error": { "type": "String" } }
   },
   "top5Debtors": "أعلى 5 مدينين",
-  "excelExportFailed": "فشل تصدير Excel: {error}",
-  "@excelExportFailed": {
-    "placeholders": { "error": { "type": "String" } }
-  },
-    "installmentsUpdated": "تم تحديث {count} قسط",
-  "@installmentsUpdated": {
-    "placeholders": { "count": { "type": "int" } }
-  },
-  "switchGoogleAccount": "تبديل حساب Google",
-  "switchGoogleAccountSubtitle": "تسجيل دخول بحساب Google آخر",
-  "switchAccountFailed": "فشل تبديل الحساب: {error}",
-  "@switchAccountFailed": {
-    "placeholders": { "error": { "type": "String" } }
-  },
-  "resetSettingsFailed": "فشلت إعادة التعيين: {error}",
-  "@resetSettingsFailed": {
-    "placeholders": { "error": { "type": "String" } }
-  },
-    "monthlyStats": "الإحصائيات الشهرية",
-  "noData": "لا توجد بيانات",
+  "monthlyStats": "الإحصائيات الشهرية",
   "newDebtsAndPayments": "{debts} دين جديد • {payments} دفعة",
   "@newDebtsAndPayments": {
     "placeholders": {
       "debts": { "type": "int" },
       "payments": { "type": "int" }
     }
+  },
+  "debtDistribution": "توزيع الديون",
+  "backupFailedWithError": "فشل النسخ الاحتياطي: {error}",
+  "@backupFailedWithError": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "restoreFailedWithError": "فشلت الاستعادة: {error}",
+  "@restoreFailedWithError": {
+    "placeholders": { "error": { "type": "String" } }
   }
 }

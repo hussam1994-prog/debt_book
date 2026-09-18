@@ -771,4 +771,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String newDebtsAndPayments(int debts, int payments) {
     return '$debts new debt(s) • $payments payment(s)';
   }
+
+  @override
+  String get debtDistribution => 'Debt Distribution';
+
+  @override
+  String backupFailedWithError(String error) {
+    return 'Backup failed: $error';
+  }
+
+  @override
+  String restoreFailedWithError(String error) {
+    return 'Restore failed: $error';
+  }
 }

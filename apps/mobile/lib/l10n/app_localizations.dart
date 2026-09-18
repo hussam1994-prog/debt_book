@@ -1501,6 +1501,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{debts} new debt(s) • {payments} payment(s)'**
   String newDebtsAndPayments(int debts, int payments);
+
+  /// No description provided for @debtDistribution.
+  ///
+  /// In en, this message translates to:
+  /// **'Debt Distribution'**
+  String get debtDistribution;
+
+  /// No description provided for @backupFailedWithError.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup failed: {error}'**
+  String backupFailedWithError(String error);
+
+  /// No description provided for @restoreFailedWithError.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore failed: {error}'**
+  String restoreFailedWithError(String error);
 }
 
 class _AppLocalizationsDelegate

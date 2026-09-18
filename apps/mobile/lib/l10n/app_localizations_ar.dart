@@ -765,4 +765,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String newDebtsAndPayments(int debts, int payments) {
     return '$debts دين جديد • $payments دفعة';
   }
+
+  @override
+  String get debtDistribution => 'توزيع الديون';
+
+  @override
+  String backupFailedWithError(String error) {
+    return 'فشل النسخ الاحتياطي: $error';
+  }
+
+  @override
+  String restoreFailedWithError(String error) {
+    return 'فشلت الاستعادة: $error';
+  }
 }
