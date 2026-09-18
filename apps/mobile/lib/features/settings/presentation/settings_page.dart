@@ -9,7 +9,6 @@ import '../../../core/localization/l10n_extension.dart';
 import '../../../core/notifications/fcm_service.dart';
 import '../../../core/providers.dart';
 import '../../../core/sync/background_sync.dart';
-import '../../../core/theme/app_theme.dart';        // ✅ جديد
 import '../../../core/theme/theme_provider.dart';
 import '../../../core/widgets/sync_status_banner.dart';
 import '../../dashboard/providers/analytics_providers.dart';
@@ -82,7 +81,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       final fixed = await checker.cleanupViolations();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تم تصحيح $fixed مخالفة')),
+          SnackBar(content: Text(context.l10n.cleanupSuccess(fixed))),
         );
       }
     } catch (e) {
@@ -143,16 +142,15 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(context.l10n.switchGoogleAccount),
-        content: const Text(
-            'سيتم تسجيل خروجك من الحساب الحالي. هل تريد المتابعة؟'),
+        content: Text(context.l10n.switchAccountConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('إلغاء'),
+            child: Text(context.l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('تبديل'),
+            child: Text(context.l10n.switchAccount),
           ),
         ],
       ),
@@ -172,7 +170,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.switchAccountFailed(e.toString()))),
+          SnackBar(
+            content: Text(context.l10n.switchAccountFailed(e.toString())),
+          ),
         );
       }
     }
@@ -184,15 +184,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('إعادة تعيين الإعدادات'),
-        content: const Text(
-          'سيتم إعادة المظهر واللغة إلى الوضع الافتراضي.\n\n'
-          'بياناتك (الأشخاص، الديون، الدفعات) لن تتأثر إطلاقاً.',
-        ),
+        title: Text(context.l10n.resetSettings),
+        content: Text(context.l10n.resetSettingsSubtitle),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('إلغاء'),
+            child: Text(context.l10n.cancel),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -200,7 +197,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               foregroundColor: theme.colorScheme.onError,
             ),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('إعادة تعيين'),
+            child: Text(context.l10n.resetAction),
           ),
         ],
       ),
@@ -216,15 +213,71 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('تمت إعادة الإعدادات للوضع الافتراضي'),
-          duration: Duration(seconds: 3),
+        SnackBar(
+          content: Text(context.l10n.resetSettingsDone),
+          duration: const Duration(seconds: 3),
         ),
       );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.resetSettingsFailed(e.toString()))),
+        SnackBar(
+          content: Text(context.l10n.resetSettingsFailed(e.toString())),
+        ),
+      );
+    }
+  }
+
+  // ─── المزامنة السحابية ───
+  Future<void> _runCloudSync() async {
+    final l10n = context.l10n;
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.pleaseLoginFirst)),
+      );
+      return;
+    }
+
+    final service = ref.read(cloudSyncServiceProvider);
+    final syncService = ref.read(syncServiceProvider);
+    try {
+      final result = await service.fullManualSync(
+        pushOutbox: () => syncService.syncNow(),
+      );
+
+      if (!mounted) return;
+      if (result.wasOnline) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              l10n.cloudSyncResult(
+                result.localCounts['debts'] ?? 0,
+                result.localCounts['installments'] ?? 0,
+                result.localCounts['ledger'] ?? 0,
+                result.localCounts['payments'] ?? 0,
+                result.localCounts['persons'] ?? 0,
+              ),
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              l10n.offlineDataSaved(result.localCounts['persons'] ?? 0),
+            ),
+          ),
+        );
+      }
+      ref.invalidate(peopleProvider);
+      ref.invalidate(allDebtsProvider);
+      ref.invalidate(allPaymentsProvider);
+      ref.invalidate(balancesByDebtProvider);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.cloudSyncFailed(e.toString()))),
       );
     }
   }
@@ -346,75 +399,15 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   ListTile(
                     leading: const Icon(Icons.cloud_sync),
                     title: Text(l10n.cloudSync),
-                    onTap: () async {
-                      final userId =
-                          Supabase.instance.client.auth.currentUser?.id;
-                      if (userId == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.pleaseLoginFirst)),
-                        );
-                        return;
-                      }
-
-                      final service = ref.read(cloudSyncServiceProvider);
-                      final syncService = ref.read(syncServiceProvider);
-                      try {
-                        final result = await service.fullManualSync(
-                          pushOutbox: () => syncService.syncNow(),
-                        );
-
-                        if (mounted) {
-                          if (result.wasOnline) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  l10n.cloudSyncResult(
-                                    result.localCounts['debts'] ?? 0,
-                                    result.localCounts['installments'] ?? 0,
-                                    result.localCounts['ledger'] ?? 0,
-                                    result.localCounts['payments'] ?? 0,
-                                    result.localCounts['persons'] ?? 0,
-                                  ),
-                                ),
-                              ),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'لا يوجد اتصال بالإنترنت حاليًا. '
-                                  'البيانات المحفوظة محليًا: '
-                                  '${result.localCounts['persons'] ?? 0} شخص. '
-                                  'ستتم المزامنة تلقائيًا عند عودة الاتصال.',
-                                ),
-                              ),
-                            );
-                          }
-                        }
-                        ref.invalidate(peopleProvider);
-                        ref.invalidate(allDebtsProvider);
-                        ref.invalidate(allPaymentsProvider);
-                        ref.invalidate(balancesByDebtProvider);
-                      } catch (e, st) {
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                l10n.cloudSyncFailed(e.toString()),
-                              ),
-                            ),
-                          );
-                        }
-                      }
-                    },
+                    onTap: _runCloudSync,
                   ),
                   const Divider(),
 
                   // ✅ تبديل حساب Google
                   ListTile(
                     leading: const Icon(Icons.switch_account),
-                    title: Text(context.l10n.switchGoogleAccount),
-                    subtitle: Text(context.l10n.switchGoogleAccountSubtitle),
+                    title: Text(l10n.switchGoogleAccount),
+                    subtitle: Text(l10n.switchGoogleAccountSubtitle),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: _confirmSwitchAccount,
                   ),
@@ -423,36 +416,32 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   // ✅ إعادة عرض الشرح
                   ListTile(
                     leading: const Icon(Icons.school),
-                    title: const Text('إعادة عرض الشرح'),
-                    subtitle: const Text('مشاهدة الجولة التعريفية مرة أخرى'),
+                    title: Text(l10n.showTutorialAgain),
+                    subtitle: Text(l10n.showTutorialAgainSubtitle),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () async {
                       await ref
                           .read(onboardingCompletedProvider.notifier)
                           .reset();
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content:
-                                Text('سيظهر الشرح عند إعادة فتح التطبيق'),
-                            duration: Duration(seconds: 3),
-                          ),
-                        );
-                      }
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(l10n.tutorialWillAppear),
+                          duration: const Duration(seconds: 3),
+                        ),
+                      );
                     },
                   ),
                   const Divider(),
 
-                  // ✅ إعادة تعيين الإعدادات (جديد)
+                  // ✅ إعادة تعيين الإعدادات
                   ListTile(
                     leading: const Icon(
                       Icons.settings_backup_restore,
                       color: Colors.orange,
                     ),
-                    title: const Text('إعادة تعيين الإعدادات'),
-                    subtitle: const Text(
-                      'استرجاع المظهر واللغة للوضع الافتراضي',
-                    ),
+                    title: Text(l10n.resetSettings),
+                    subtitle: Text(l10n.resetSettingsShort),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: _confirmResetSettings,
                   ),

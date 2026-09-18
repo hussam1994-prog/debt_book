@@ -784,4 +784,261 @@ class AppLocalizationsEn extends AppLocalizations {
   String restoreFailedWithError(String error) {
     return 'Restore failed: $error';
   }
+
+  @override
+  String get debtFallback => 'Debt';
+
+  @override
+  String get unknownPerson => 'Unknown';
+
+  @override
+  String get exportPdfTooltip => 'Export PDF';
+
+  @override
+  String get switchAccountConfirm =>
+      'You will be signed out of the current account. Continue?';
+
+  @override
+  String get resetSettingsSubtitle =>
+      'Theme and language will return to defaults.\n\nYour data (people, debts, payments) will NOT be affected.';
+
+  @override
+  String get resetAction => 'Reset';
+
+  @override
+  String get resetSettingsDone => 'Settings reset to defaults';
+
+  @override
+  String get showTutorialAgain => 'Show Tutorial Again';
+
+  @override
+  String get showTutorialAgainSubtitle => 'Watch the onboarding tour again';
+
+  @override
+  String get tutorialWillAppear =>
+      'The tutorial will appear when you reopen the app';
+
+  @override
+  String cleanupSuccess(int count) {
+    return 'Fixed $count violation(s)';
+  }
+
+  @override
+  String get resetSettingsShort => 'Restore theme and language to defaults';
+
+  @override
+  String offlineDataSaved(int count) {
+    return 'No internet connection. Local data: $count people. Will sync automatically when connection returns.';
+  }
+
+  @override
+  String get resetSettings => 'Reset Settings';
+
+  @override
+  String get switchAccount => 'Switch';
+
+  @override
+  String get databaseFileNotFound => 'Database file not found';
+
+  @override
+  String uploadSuccess(String size) {
+    return '✅ Uploaded successfully ($size KB)';
+  }
+
+  @override
+  String downloadSuccess(String size) {
+    return '✅ Downloaded ($size KB). You can restore it from the local list.';
+  }
+
+  @override
+  String get backupDeleted => '✅ Deleted';
+
+  @override
+  String get restoreFromCloud => 'Restore from Cloud';
+
+  @override
+  String get restoreFromCloudConfirm =>
+      'The backup will be downloaded from cloud. You can restore it later from local backups. Continue?';
+
+  @override
+  String get download => 'Download';
+
+  @override
+  String get deleteCloudBackup => 'Delete Cloud Backup';
+
+  @override
+  String get deleteCloudBackupConfirm =>
+      'Are you sure you want to delete this backup from the cloud?';
+
+  @override
+  String get localTab => 'Local';
+
+  @override
+  String get cloudTab => 'Cloud';
+
+  @override
+  String get uploadBackup => 'Upload Backup';
+
+  @override
+  String get share => 'Share';
+
+  @override
+  String get noCloudBackups => 'No cloud backups';
+
+  @override
+  String get noCloudBackupsHint =>
+      'Tap \"Upload Backup\" to create your first cloud backup';
+
+  @override
+  String get deleteFromCloud => 'Delete from cloud';
+
+  @override
+  String get encrypted => 'Encrypted 🔒';
+
+  @override
+  String get aggregateReportTooltip => 'Export Aggregate Report';
+
+  @override
+  String get multiPersonReportTooltip => 'Multi-Person Report';
+
+  @override
+  String get excelExportTooltip => 'Export Excel';
+
+  @override
+  String get activeLabel => 'Active';
+
+  @override
+  String get overdueLabel => 'Overdue';
+
+  @override
+  String get completedLabel => 'Completed';
+
+  @override
+  String get monthlyDebtTrend => 'Monthly Debt Trend';
+
+  @override
+  String get reportsRefreshed => 'Reports refreshed locally';
+
+  @override
+  String get exportDone => 'Export Complete';
+
+  @override
+  String get shareFileQuestion => 'Do you want to share the file?';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get noDataToExport => 'No data to export';
+
+  @override
+  String get exportReport => 'Export Report';
+
+  @override
+  String get simpleTextFile => 'Simple text file';
+
+  @override
+  String get officialReport => 'Official report';
+
+  @override
+  String get professionalTable => 'Professional formatted table';
+
+  @override
+  String get groupedDebtsReport => 'Grouped Debts Report';
+
+  @override
+  String get individualView => 'Individual View';
+
+  @override
+  String get groupedView => 'Grouped View';
+
+  @override
+  String get voiceSearchUnavailable =>
+      'Voice search unavailable. Please grant permission and install the language pack.';
+
+  @override
+  String get voiceNoMatch => 'Speech not recognized. Please try again.';
+
+  @override
+  String get voiceSearchTooltip => 'Voice Search';
+
+  @override
+  String get voiceListening => '🎤 Listening...';
+
+  @override
+  String get quickAdd => 'Quick Add';
+
+  @override
+  String get newPerson => 'New Person';
+
+  @override
+  String get newDebt => 'New Debt';
+
+  @override
+  String get add => 'Add';
+
+  @override
+  String get dataRefreshed => 'Data refreshed locally';
+
+  @override
+  String get choosePersonColor => 'Choose Person Color';
+
+  @override
+  String get removeColor => 'Remove Color';
+
+  @override
+  String get noPhoneForPerson => 'This person has no phone number';
+
+  @override
+  String get sendStatement => 'Send Statement';
+
+  @override
+  String get textMessage => 'Text Message';
+
+  @override
+  String get balanceSummaryInMessage => 'Balance summary in a message';
+
+  @override
+  String get fullPdfFile => 'Full file you can share';
+
+  @override
+  String mrMrs(String name) {
+    return 'Mr./Ms. $name';
+  }
+
+  @override
+  String get outstandingAmounts => 'Outstanding amounts:';
+
+  @override
+  String statementTotal(int total) {
+    return 'Total: $total IQD';
+  }
+
+  @override
+  String get statementTitle => 'Statement';
+
+  @override
+  String statementShareText(String name, int total) {
+    return 'Statement - $name\nTotal: $total IQD';
+  }
+
+  @override
+  String fromAmount(String amount) {
+    return 'from $amount';
+  }
+
+  @override
+  String get statusPaid => 'Paid';
+
+  @override
+  String get statusOverdue => 'Overdue';
+
+  @override
+  String get statusCancelled => 'Cancelled';
+
+  @override
+  String get statusActive => 'Active';
+
+  @override
+  String get changeColorTooltip => 'Change Color';
 }

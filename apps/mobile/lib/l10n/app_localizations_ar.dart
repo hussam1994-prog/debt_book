@@ -778,4 +778,260 @@ class AppLocalizationsAr extends AppLocalizations {
   String restoreFailedWithError(String error) {
     return 'فشلت الاستعادة: $error';
   }
+
+  @override
+  String get debtFallback => 'دين';
+
+  @override
+  String get unknownPerson => 'غير معروف';
+
+  @override
+  String get exportPdfTooltip => 'تصدير PDF';
+
+  @override
+  String get switchAccountConfirm =>
+      'سيتم تسجيل خروجك من الحساب الحالي. هل تريد المتابعة؟';
+
+  @override
+  String get resetSettingsSubtitle =>
+      'سيتم إعادة المظهر واللغة إلى الوضع الافتراضي.\n\nبياناتك (الأشخاص، الديون، الدفعات) لن تتأثر إطلاقاً.';
+
+  @override
+  String get resetAction => 'إعادة تعيين';
+
+  @override
+  String get resetSettingsDone => 'تمت إعادة الإعدادات للوضع الافتراضي';
+
+  @override
+  String get showTutorialAgain => 'إعادة عرض الشرح';
+
+  @override
+  String get showTutorialAgainSubtitle => 'مشاهدة الجولة التعريفية مرة أخرى';
+
+  @override
+  String get tutorialWillAppear => 'سيظهر الشرح عند إعادة فتح التطبيق';
+
+  @override
+  String cleanupSuccess(int count) {
+    return 'تم تصحيح $count مخالفة';
+  }
+
+  @override
+  String get resetSettingsShort => 'استرجاع المظهر واللغة للوضع الافتراضي';
+
+  @override
+  String offlineDataSaved(int count) {
+    return 'لا يوجد اتصال بالإنترنت حاليًا. البيانات المحفوظة محليًا: $count شخص. ستتم المزامنة تلقائيًا عند عودة الاتصال.';
+  }
+
+  @override
+  String get resetSettings => 'إعادة تعيين الإعدادات';
+
+  @override
+  String get switchAccount => 'تبديل';
+
+  @override
+  String get databaseFileNotFound => 'ملف قاعدة البيانات غير موجود';
+
+  @override
+  String uploadSuccess(String size) {
+    return '✅ تم الرفع بنجاح ($size KB)';
+  }
+
+  @override
+  String downloadSuccess(String size) {
+    return '✅ تم التنزيل ($size KB). يمكنك استعادتها من القائمة المحلية.';
+  }
+
+  @override
+  String get backupDeleted => '✅ تم الحذف';
+
+  @override
+  String get restoreFromCloud => 'استعادة من السحابة';
+
+  @override
+  String get restoreFromCloudConfirm =>
+      'سيتم تنزيل النسخة من السحابة. يمكنك استعادتها لاحقاً من النسخ المحلية. متابعة؟';
+
+  @override
+  String get download => 'تنزيل';
+
+  @override
+  String get deleteCloudBackup => 'حذف نسخة سحابية';
+
+  @override
+  String get deleteCloudBackupConfirm =>
+      'هل أنت متأكد من حذف هذه النسخة من السحابة؟';
+
+  @override
+  String get localTab => 'محلي';
+
+  @override
+  String get cloudTab => 'سحابي';
+
+  @override
+  String get uploadBackup => 'رفع نسخة';
+
+  @override
+  String get share => 'مشاركة';
+
+  @override
+  String get noCloudBackups => 'لا توجد نسخ سحابية';
+
+  @override
+  String get noCloudBackupsHint =>
+      'اضغط \"رفع نسخة\" لإنشاء أول نسخة احتياطية سحابية';
+
+  @override
+  String get deleteFromCloud => 'حذف من السحابة';
+
+  @override
+  String get encrypted => 'مشفر 🔒';
+
+  @override
+  String get aggregateReportTooltip => 'تصدير تقرير مجمّع';
+
+  @override
+  String get multiPersonReportTooltip => 'تقرير متعدد';
+
+  @override
+  String get excelExportTooltip => 'تصدير Excel';
+
+  @override
+  String get activeLabel => 'نشط';
+
+  @override
+  String get overdueLabel => 'متأخر';
+
+  @override
+  String get completedLabel => 'مكتمل';
+
+  @override
+  String get monthlyDebtTrend => 'تطور الديون الشهري';
+
+  @override
+  String get reportsRefreshed => 'تم تحديث التقارير محليًا';
+
+  @override
+  String get exportDone => 'تم التصدير';
+
+  @override
+  String get shareFileQuestion => 'هل تريد مشاركة الملف؟';
+
+  @override
+  String get close => 'إغلاق';
+
+  @override
+  String get noDataToExport => 'لا توجد بيانات للتصدير';
+
+  @override
+  String get exportReport => 'تصدير التقرير';
+
+  @override
+  String get simpleTextFile => 'ملف نصي بسيط';
+
+  @override
+  String get officialReport => 'تقرير رسمي';
+
+  @override
+  String get professionalTable => 'جدول بتنسيق احترافي';
+
+  @override
+  String get groupedDebtsReport => 'تقرير الديون المجمّع';
+
+  @override
+  String get individualView => 'عرض فردي';
+
+  @override
+  String get groupedView => 'عرض مجمّع';
+
+  @override
+  String get voiceSearchUnavailable =>
+      'البحث الصوتي غير متاح. تأكد من منح الإذن وتثبيت حزمة اللغة.';
+
+  @override
+  String get voiceNoMatch => 'لم يتم التعرف على الكلام. حاول مرة أخرى.';
+
+  @override
+  String get voiceSearchTooltip => 'بحث صوتي';
+
+  @override
+  String get voiceListening => '🎤 جارٍ الاستماع...';
+
+  @override
+  String get quickAdd => 'إضافة سريعة';
+
+  @override
+  String get newPerson => 'شخص جديد';
+
+  @override
+  String get newDebt => 'دين جديد';
+
+  @override
+  String get add => 'إضافة';
+
+  @override
+  String get dataRefreshed => 'تم تحديث البيانات محليًا';
+
+  @override
+  String get choosePersonColor => 'اختر لون الشخص';
+
+  @override
+  String get removeColor => 'إزالة اللون';
+
+  @override
+  String get noPhoneForPerson => 'لا يوجد رقم هاتف لهذا الشخص';
+
+  @override
+  String get sendStatement => 'إرسال كشف الحساب';
+
+  @override
+  String get textMessage => 'رسالة نصية';
+
+  @override
+  String get balanceSummaryInMessage => 'ملخص الأرصدة في رسالة';
+
+  @override
+  String get fullPdfFile => 'ملف كامل يمكن مشاركته';
+
+  @override
+  String mrMrs(String name) {
+    return 'السيد/ة $name';
+  }
+
+  @override
+  String get outstandingAmounts => 'المستحقات المالية:';
+
+  @override
+  String statementTotal(int total) {
+    return 'الإجمالي: $total دينار';
+  }
+
+  @override
+  String get statementTitle => 'كشف حساب';
+
+  @override
+  String statementShareText(String name, int total) {
+    return 'كشف حساب - $name\nالإجمالي: $total دينار';
+  }
+
+  @override
+  String fromAmount(String amount) {
+    return 'من $amount';
+  }
+
+  @override
+  String get statusPaid => 'مدفوع';
+
+  @override
+  String get statusOverdue => 'متأخر';
+
+  @override
+  String get statusCancelled => 'ملغى';
+
+  @override
+  String get statusActive => 'نشط';
+
+  @override
+  String get changeColorTooltip => 'تغيير اللون';
 }

@@ -302,5 +302,116 @@
   "restoreFailedWithError": "Restore failed: {error}",
   "@restoreFailedWithError": {
     "placeholders": { "error": { "type": "String" } }
-  }
+  },
+  "debtFallback": "Debt",
+  "unknownPerson": "Unknown",
+  "exportPdfTooltip": "Export PDF",
+  "switchAccountConfirm": "You will be signed out of the current account. Continue?",
+  "resetSettingsSubtitle": "Theme and language will return to defaults.\n\nYour data (people, debts, payments) will NOT be affected.",
+  "resetAction": "Reset",
+  "resetSettingsDone": "Settings reset to defaults",
+  "showTutorialAgain": "Show Tutorial Again",
+  "showTutorialAgainSubtitle": "Watch the onboarding tour again",
+  "tutorialWillAppear": "The tutorial will appear when you reopen the app",
+    "cleanupSuccess": "Fixed {count} violation(s)",
+  "@cleanupSuccess": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "resetSettingsShort": "Restore theme and language to defaults",
+  "offlineDataSaved": "No internet connection. Local data: {count} people. Will sync automatically when connection returns.",
+  "@offlineDataSaved": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "resetSettings": "Reset Settings",
+  "switchAccount": "Switch",
+  "databaseFileNotFound": "Database file not found",
+  "uploadSuccess": "✅ Uploaded successfully ({size} KB)",
+  "@uploadSuccess": {
+    "placeholders": { "size": { "type": "String" } }
+  },
+  "downloadSuccess": "✅ Downloaded ({size} KB). You can restore it from the local list.",
+  "@downloadSuccess": {
+    "placeholders": { "size": { "type": "String" } }
+  },
+  "backupDeleted": "✅ Deleted",
+  "restoreFromCloud": "Restore from Cloud",
+  "restoreFromCloudConfirm": "The backup will be downloaded from cloud. You can restore it later from local backups. Continue?",
+  "download": "Download",
+  "deleteCloudBackup": "Delete Cloud Backup",
+  "deleteCloudBackupConfirm": "Are you sure you want to delete this backup from the cloud?",
+  "localTab": "Local",
+  "cloudTab": "Cloud",
+  "uploadBackup": "Upload Backup",
+  "share": "Share",
+  "noCloudBackups": "No cloud backups",
+  "noCloudBackupsHint": "Tap \"Upload Backup\" to create your first cloud backup",
+  "deleteFromCloud": "Delete from cloud",
+  "encrypted": "Encrypted 🔒",
+  "aggregateReportTooltip": "Export Aggregate Report",
+  "multiPersonReportTooltip": "Multi-Person Report",
+  "excelExportTooltip": "Export Excel",
+  "activeLabel": "Active",
+  "overdueLabel": "Overdue",
+  "completedLabel": "Completed",
+  "monthlyDebtTrend": "Monthly Debt Trend",
+  "reportsRefreshed": "Reports refreshed locally",
+  "exportDone": "Export Complete",
+  "shareFileQuestion": "Do you want to share the file?",
+  "close": "Close",
+  "noDataToExport": "No data to export",
+  "exportReport": "Export Report",
+  "simpleTextFile": "Simple text file",
+  "officialReport": "Official report",
+  "professionalTable": "Professional formatted table",
+  "groupedDebtsReport": "Grouped Debts Report",
+  "individualView": "Individual View",
+  "groupedView": "Grouped View",
+  "aggregateReportTooltip": "Export Aggregate Report",
+  "noDataToExport": "No data to export",
+  "exportReport": "Export Report",
+  "simpleTextFile": "Simple text file",
+  "officialReport": "Official report",
+  "professionalTable": "Professional formatted table",
+  "voiceSearchUnavailable": "Voice search unavailable. Please grant permission and install the language pack.",
+  "voiceNoMatch": "Speech not recognized. Please try again.",
+  "voiceSearchTooltip": "Voice Search",
+  "voiceListening": "🎤 Listening...",
+  "quickAdd": "Quick Add",
+  "newPerson": "New Person",
+  "newDebt": "New Debt",
+  "add": "Add",
+  "dataRefreshed": "Data refreshed locally",
+  "choosePersonColor": "Choose Person Color",
+  "removeColor": "Remove Color",
+  "noPhoneForPerson": "This person has no phone number",
+  "sendStatement": "Send Statement",
+  "textMessage": "Text Message",
+  "balanceSummaryInMessage": "Balance summary in a message",
+  "fullPdfFile": "Full file you can share",
+  "mrMrs": "Mr./Ms. {name}",
+  "@mrMrs": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "outstandingAmounts": "Outstanding amounts:",
+  "statementTotal": "Total: {total} IQD",
+  "@statementTotal": {
+    "placeholders": { "total": { "type": "int" } }
+  },
+  "statementTitle": "Statement",
+  "statementShareText": "Statement - {name}\nTotal: {total} IQD",
+  "@statementShareText": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "total": { "type": "int" }
+    }
+  },
+  "fromAmount": "from {amount}",
+  "@fromAmount": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "statusPaid": "Paid",
+  "statusOverdue": "Overdue",
+  "statusCancelled": "Cancelled",
+  "statusActive": "Active",
+  "changeColorTooltip": "Change Color"
 }

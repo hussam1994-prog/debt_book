@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../../core/localization/l10n_extension.dart';
 import '../../../core/localization/app_formatters.dart';
+import '../../../core/localization/l10n_extension.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/empty_state.dart';
@@ -31,7 +31,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
     ref.invalidate(debtsGroupedByPersonProvider);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم تحديث التقارير محليًا')),
+        SnackBar(content: Text(context.l10n.reportsRefreshed)),
       );
     }
   }
@@ -42,13 +42,14 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
       final allDebts = await ref.read(allDebtsProvider.future);
       final balances = await ref.read(balancesByDebtProvider.future);
       final personRepo = ref.read(personRepositoryProvider);
+      final unknown = context.l10n.unknownPerson;
 
       final rows = <Map<String, String>>[];
       for (final debt in allDebts) {
         final person = await personRepo.findById(debt.personId);
         final balance = balances[debt.id] ?? Money.zero;
         rows.add({
-          'person': person?.name ?? 'Unknown',
+          'person': person?.name ?? unknown,
           'description': debt.description ?? '',
           'originalAmount': '${debt.amount.amount}',
           'balance': '${balance.amount}',
@@ -78,13 +79,14 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
       final allDebts = await ref.read(allDebtsProvider.future);
       final balances = await ref.read(balancesByDebtProvider.future);
       final personRepo = ref.read(personRepositoryProvider);
+      final unknown = context.l10n.unknownPerson;
 
       final rows = <Map<String, String>>[];
       for (final debt in allDebts) {
         final person = await personRepo.findById(debt.personId);
         final balance = balances[debt.id] ?? Money.zero;
         rows.add({
-          'person': person?.name ?? 'Unknown',
+          'person': person?.name ?? unknown,
           'description': debt.description ?? '',
           'originalAmount': '${debt.amount.amount}',
           'balance': '${balance.amount}',
@@ -119,19 +121,20 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
     }
   }
 
-  // ─── ✅ تصدير Excel ───
+  // ─── تصدير Excel ───
   Future<void> _exportToExcel() async {
     try {
       final allDebts = await ref.read(allDebtsProvider.future);
       final balances = await ref.read(balancesByDebtProvider.future);
       final personRepo = ref.read(personRepositoryProvider);
+      final unknown = context.l10n.unknownPerson;
 
       final rows = <Map<String, String>>[];
       for (final debt in allDebts) {
         final person = await personRepo.findById(debt.personId);
         final balance = balances[debt.id] ?? Money.zero;
         rows.add({
-          'person': person?.name ?? 'Unknown',
+          'person': person?.name ?? unknown,
           'description': debt.description ?? '',
           'originalAmount': '${debt.amount.amount}',
           'balance': '${balance.amount}',
@@ -151,8 +154,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
       };
 
       final service = ref.read(excelExportServiceProvider);
-      final file =
-          await service.exportDebtsToExcel(rows: rows, labels: labels);
+      final file = await service.exportDebtsToExcel(rows: rows, labels: labels);
 
       if (mounted) {
         _showShareDialog(file.path);
@@ -167,19 +169,20 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
   }
 
   void _showShareDialog(String filePath) {
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('تم التصدير'),
-        content: const Text('هل تريد مشاركة الملف؟'),
+        title: Text(l10n.exportDone),
+        content: Text(l10n.shareFileQuestion),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('إغلاق'),
+            child: Text(l10n.close),
           ),
           ElevatedButton.icon(
             icon: const Icon(Icons.share),
-            label: const Text('مشاركة'),
+            label: Text(l10n.share),
             onPressed: () async {
               Navigator.pop(dialogContext);
               await SharePlus.instance.share(
@@ -215,21 +218,19 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
             tooltip: l10n.refresh,
             onPressed: _refreshLocal,
           ),
-          // ✅ تقرير متعدد
           IconButton(
             icon: const Icon(Icons.group),
-            tooltip: 'تقرير متعدد',
+            tooltip: l10n.multiPersonReportTooltip,
             onPressed: () => context.go('/multi-person-report'),
           ),
           IconButton(
             icon: const Icon(Icons.picture_as_pdf),
-            tooltip: 'Export PDF',
+            tooltip: l10n.exportPdfTooltip,
             onPressed: _exportToPdf,
           ),
-          // ✅ Excel
           IconButton(
             icon: const Icon(Icons.table_chart, color: Colors.green),
-            tooltip: 'تصدير Excel',
+            tooltip: l10n.excelExportTooltip,
             onPressed: _exportToExcel,
           ),
           IconButton(
@@ -258,7 +259,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
               const SizedBox(height: AppSpacing.lg),
 
               // ─── رسم الاتجاه الشهري ───
-              Text('تطور الديون الشهري', style: textTheme.titleLarge),
+              Text(l10n.monthlyDebtTrend, style: textTheme.titleLarge),
               const SizedBox(height: AppSpacing.sm),
               Card(
                 child: Padding(
@@ -271,7 +272,9 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
                     loading: () => const ChartSkeleton(),
                     error: (e, st) => SizedBox(
                       height: 220,
-                      child: Center(child: Text(context.l10n.errorGeneric(e.toString()))),
+                      child: Center(
+                        child: Text(l10n.errorGeneric(e.toString())),
+                      ),
                     ),
                   ),
                 ),
@@ -280,7 +283,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
               const SizedBox(height: AppSpacing.lg),
 
               // ─── رسم أعلى 5 مدينين ───
-              Text(context.l10n.top5Debtors, style: textTheme.titleLarge),
+              Text(l10n.top5Debtors, style: textTheme.titleLarge),
               const SizedBox(height: AppSpacing.sm),
               Card(
                 child: Padding(
@@ -291,7 +294,9 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
                     loading: () => const ChartSkeleton(),
                     error: (e, st) => SizedBox(
                       height: 250,
-                      child: Center(child: Text(context.l10n.errorGeneric(e.toString()))),
+                      child: Center(
+                        child: Text(l10n.errorGeneric(e.toString())),
+                      ),
                     ),
                   ),
                 ),
@@ -316,7 +321,9 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
+                error: (e, st) => Center(
+                  child: Text(l10n.errorGeneric(e.toString())),
+                ),
               ),
 
               const SizedBox(height: AppSpacing.xl),
@@ -435,7 +442,7 @@ class _DebtTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return ListTile(
       leading: const Icon(Icons.error, color: AppColors.error),
-      title: Text(debt.description ?? 'Debt'),
+      title: Text(debt.description ?? context.l10n.debtFallback),
       subtitle: Text(AppFormatters.money(context, debt.amount.amount)),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => context.go('/debt/${debt.id.value}'),

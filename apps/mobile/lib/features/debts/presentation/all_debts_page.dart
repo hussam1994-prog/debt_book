@@ -1,12 +1,11 @@
-import 'dart:io';
 import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../../core/localization/l10n_extension.dart';
 import '../../../core/localization/app_formatters.dart';
+import '../../../core/localization/l10n_extension.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_card.dart';
@@ -61,11 +60,13 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
 
   // ─── ✅ تصدير التقرير المجمّع (PDF / CSV / Excel) ───
   Future<void> _exportGroupedReport() async {
+    final l10n = context.l10n;
     final summariesAsync = ref.read(debtsGroupedByPersonProvider);
     final summaries = await summariesAsync.value;
     if (summaries == null || summaries.isEmpty) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('لا توجد بيانات للتصدير')),
+        SnackBar(content: Text(l10n.noDataToExport)),
       );
       return;
     }
@@ -91,21 +92,20 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
               ),
               const SizedBox(height: 16),
               Text(
-                'تصدير التقرير',
+                l10n.exportReport,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 12),
               ListTile(
                 leading: const Icon(Icons.table_view, color: Colors.blue),
                 title: const Text('CSV'),
-                subtitle: const Text('ملف نصي بسيط'),
+                subtitle: Text(l10n.simpleTextFile),
                 onTap: () => Navigator.pop(ctx, 'csv'),
               ),
               ListTile(
-                leading:
-                    const Icon(Icons.picture_as_pdf, color: Colors.red),
+                leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
                 title: const Text('PDF'),
-                subtitle: const Text('تقرير رسمي'),
+                subtitle: Text(l10n.officialReport),
                 onTap: () => Navigator.pop(ctx, 'pdf'),
               ),
               ListTile(
@@ -114,7 +114,7 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
                   color: Colors.green,
                 ),
                 title: const Text('Excel'),
-                subtitle: const Text('جدول بتنسيق احترافي'),
+                subtitle: Text(l10n.professionalTable),
                 onTap: () => Navigator.pop(ctx, 'excel'),
               ),
             ],
@@ -135,7 +135,7 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
         if (!mounted) return;
         await SharePlus.instance.share(
           ShareParams(
-            text: 'تقرير الديون المجمّع',
+            text: l10n.groupedDebtsReport,
             files: [XFile(file.path)],
           ),
         );
@@ -155,12 +155,11 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
         if (!mounted) return;
         await SharePlus.instance.share(
           ShareParams(
-            text: 'تقرير الديون المجمّع',
+            text: l10n.groupedDebtsReport,
             files: [XFile(file.path)],
           ),
         );
       } else if (action == 'excel') {
-        // ✅ Excel
         final rows = summaries.map((s) => <String, String>{
               'person': s.personName,
               'totalOutstanding': '${s.totalOutstanding.amount}',
@@ -185,7 +184,7 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
         if (!mounted) return;
         await SharePlus.instance.share(
           ShareParams(
-            text: 'تقرير الديون المجمّع',
+            text: l10n.groupedDebtsReport,
             files: [XFile(file.path)],
           ),
         );
@@ -212,7 +211,7 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
         actions: [
           IconButton(
             icon: Icon(_grouped ? Icons.list : Icons.people),
-            tooltip: _grouped ? 'عرض فردي' : 'عرض مجمّع',
+            tooltip: _grouped ? l10n.individualView : l10n.groupedView,
             onPressed: () {
               setState(() {
                 _grouped = !_grouped;
@@ -222,7 +221,7 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
           if (_grouped)
             IconButton(
               icon: const Icon(Icons.download),
-              tooltip: 'تصدير تقرير مجمّع',
+              tooltip: l10n.aggregateReportTooltip,
               onPressed: _exportGroupedReport,
             ),
           IconButton(
@@ -346,7 +345,9 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
+      error: (e, st) => Center(
+        child: Text(context.l10n.errorGeneric(e.toString())),
+      ),
     );
   }
 
@@ -384,7 +385,7 @@ class _AllDebtsPageState extends ConsumerState<AllDebtsPage> {
 
                 final entry = debts[index];
                 final debt = entry.$1;
-                final personName = entry.$2;
+                final personName = entry.$2 ?? l10n.unknownPerson;
 
                 final desc = debt.description?.toLowerCase() ?? '';
                 final matchesQuery = _query.isEmpty ||

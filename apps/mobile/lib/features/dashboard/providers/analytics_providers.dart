@@ -15,16 +15,19 @@ final allPaymentsProvider = FutureProvider<List<Payment>>((ref) async {
   return payments.where((p) => !p.isDeleted).toList();
 });
 
-/// ✅ إضافة المزود المفقود: يجمع كل الديون مع اسم الشخص
+/// ✅ إضافة المزود المفقود: يجمع كل الديون مع اسم الشخص.
+///
+/// ⚠️ الاسم قد يكون `null` إذا لم يُعثر على الشخص.
+/// الترجمة (Unknown) تتم في UI عبر `l10n.unknownPerson`.
 final allDebtsWithPersonNameProvider =
-    FutureProvider<List<(Debt, String)>>((ref) async {
+    FutureProvider<List<(Debt, String?)>>((ref) async {
   final debts = await ref.watch(allDebtsProvider.future);
   final personRepo = ref.watch(personRepositoryProvider);
 
-  final result = <(Debt, String)>[];
+  final result = <(Debt, String?)>[];
   for (final debt in debts) {
     final person = await personRepo.findById(debt.personId);
-    result.add((debt, person?.name ?? 'Unknown'));
+    result.add((debt, person?.name));
   }
   return result;
 });
@@ -121,16 +124,12 @@ final debtStatsProvider = FutureProvider<Map<String, int>>((ref) async {
   for (final d in debts) {
     if (d.isDeleted) continue;
 
-    // ✅ عدّل هذه الشروط حسب قيم DebtStatus الفعلية
     if (d.status == DebtStatus.cancelled) {
       continue; // تجاهل الملغاة
     }
 
     // إذا كان الدين "مكتمل" (رصيده صفر)، احسبه كمكتمل
-    // بدلاً من الاعتماد على DebtStatus.completed غير الموجود
-    final balance = await ref
-        .read(getBalanceProvider)
-        .call(d.id);
+    final balance = await ref.read(getBalanceProvider).call(d.id);
 
     if (balance.amount <= 0) {
       completed++;
@@ -143,7 +142,8 @@ final debtStatsProvider = FutureProvider<Map<String, int>>((ref) async {
   return {'active': active, 'overdue': overdue, 'completed': completed};
 });
 
-final monthlyTrendProvider = FutureProvider<List<MapEntry<DateTime, double>>>((ref) async {
+final monthlyTrendProvider =
+    FutureProvider<List<MapEntry<DateTime, double>>>((ref) async {
   final ledgerRepo = ref.watch(ledgerRepositoryProvider);
   final entries = await ledgerRepo.findAll();
 

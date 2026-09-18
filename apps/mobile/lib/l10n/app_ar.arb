@@ -302,5 +302,116 @@
   "restoreFailedWithError": "فشلت الاستعادة: {error}",
   "@restoreFailedWithError": {
     "placeholders": { "error": { "type": "String" } }
-  }
+  },
+  "debtFallback": "دين",
+  "unknownPerson": "غير معروف",
+  "exportPdfTooltip": "تصدير PDF",
+    "switchAccountConfirm": "سيتم تسجيل خروجك من الحساب الحالي. هل تريد المتابعة؟",
+  "resetSettingsSubtitle": "سيتم إعادة المظهر واللغة إلى الوضع الافتراضي.\n\nبياناتك (الأشخاص، الديون، الدفعات) لن تتأثر إطلاقاً.",
+  "resetAction": "إعادة تعيين",
+  "resetSettingsDone": "تمت إعادة الإعدادات للوضع الافتراضي",
+  "showTutorialAgain": "إعادة عرض الشرح",
+  "showTutorialAgainSubtitle": "مشاهدة الجولة التعريفية مرة أخرى",
+  "tutorialWillAppear": "سيظهر الشرح عند إعادة فتح التطبيق",
+    "cleanupSuccess": "تم تصحيح {count} مخالفة",
+  "@cleanupSuccess": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "resetSettingsShort": "استرجاع المظهر واللغة للوضع الافتراضي",
+  "offlineDataSaved": "لا يوجد اتصال بالإنترنت حاليًا. البيانات المحفوظة محليًا: {count} شخص. ستتم المزامنة تلقائيًا عند عودة الاتصال.",
+  "@offlineDataSaved": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "resetSettings": "إعادة تعيين الإعدادات",
+  "switchAccount": "تبديل",
+  "databaseFileNotFound": "ملف قاعدة البيانات غير موجود",
+  "uploadSuccess": "✅ تم الرفع بنجاح ({size} KB)",
+  "@uploadSuccess": {
+    "placeholders": { "size": { "type": "String" } }
+  },
+  "downloadSuccess": "✅ تم التنزيل ({size} KB). يمكنك استعادتها من القائمة المحلية.",
+  "@downloadSuccess": {
+    "placeholders": { "size": { "type": "String" } }
+  },
+  "backupDeleted": "✅ تم الحذف",
+  "restoreFromCloud": "استعادة من السحابة",
+  "restoreFromCloudConfirm": "سيتم تنزيل النسخة من السحابة. يمكنك استعادتها لاحقاً من النسخ المحلية. متابعة؟",
+  "download": "تنزيل",
+  "deleteCloudBackup": "حذف نسخة سحابية",
+  "deleteCloudBackupConfirm": "هل أنت متأكد من حذف هذه النسخة من السحابة؟",
+  "localTab": "محلي",
+  "cloudTab": "سحابي",
+  "uploadBackup": "رفع نسخة",
+  "share": "مشاركة",
+  "noCloudBackups": "لا توجد نسخ سحابية",
+  "noCloudBackupsHint": "اضغط \"رفع نسخة\" لإنشاء أول نسخة احتياطية سحابية",
+  "deleteFromCloud": "حذف من السحابة",
+  "encrypted": "مشفر 🔒",
+  "aggregateReportTooltip": "تصدير تقرير مجمّع",
+  "multiPersonReportTooltip": "تقرير متعدد",
+  "excelExportTooltip": "تصدير Excel",
+  "activeLabel": "نشط",
+  "overdueLabel": "متأخر",
+  "completedLabel": "مكتمل",
+  "monthlyDebtTrend": "تطور الديون الشهري",
+  "reportsRefreshed": "تم تحديث التقارير محليًا",
+  "exportDone": "تم التصدير",
+  "shareFileQuestion": "هل تريد مشاركة الملف؟",
+  "close": "إغلاق",
+  "noDataToExport": "لا توجد بيانات للتصدير",
+  "exportReport": "تصدير التقرير",
+  "simpleTextFile": "ملف نصي بسيط",
+  "officialReport": "تقرير رسمي",
+  "professionalTable": "جدول بتنسيق احترافي",
+  "groupedDebtsReport": "تقرير الديون المجمّع",
+  "individualView": "عرض فردي",
+  "groupedView": "عرض مجمّع",
+  "aggregateReportTooltip": "تصدير تقرير مجمّع",
+  "noDataToExport": "لا توجد بيانات للتصدير",
+  "exportReport": "تصدير التقرير",
+  "simpleTextFile": "ملف نصي بسيط",
+  "officialReport": "تقرير رسمي",
+  "professionalTable": "جدول بتنسيق احترافي",
+  "voiceSearchUnavailable": "البحث الصوتي غير متاح. تأكد من منح الإذن وتثبيت حزمة اللغة.",
+  "voiceNoMatch": "لم يتم التعرف على الكلام. حاول مرة أخرى.",
+  "voiceSearchTooltip": "بحث صوتي",
+  "voiceListening": "🎤 جارٍ الاستماع...",
+  "quickAdd": "إضافة سريعة",
+  "newPerson": "شخص جديد",
+  "newDebt": "دين جديد",
+  "add": "إضافة",
+  "dataRefreshed": "تم تحديث البيانات محليًا",
+  "choosePersonColor": "اختر لون الشخص",
+  "removeColor": "إزالة اللون",
+  "noPhoneForPerson": "لا يوجد رقم هاتف لهذا الشخص",
+  "sendStatement": "إرسال كشف الحساب",
+  "textMessage": "رسالة نصية",
+  "balanceSummaryInMessage": "ملخص الأرصدة في رسالة",
+  "fullPdfFile": "ملف كامل يمكن مشاركته",
+  "mrMrs": "السيد/ة {name}",
+  "@mrMrs": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "outstandingAmounts": "المستحقات المالية:",
+  "statementTotal": "الإجمالي: {total} دينار",
+  "@statementTotal": {
+    "placeholders": { "total": { "type": "int" } }
+  },
+  "statementTitle": "كشف حساب",
+  "statementShareText": "كشف حساب - {name}\nالإجمالي: {total} دينار",
+  "@statementShareText": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "total": { "type": "int" }
+    }
+  },
+  "fromAmount": "من {amount}",
+  "@fromAmount": {
+    "placeholders": { "amount": { "type": "String" } }
+  },
+  "statusPaid": "مدفوع",
+  "statusOverdue": "متأخر",
+  "statusCancelled": "ملغى",
+  "statusActive": "نشط",
+  "changeColorTooltip": "تغيير اللون"
 }

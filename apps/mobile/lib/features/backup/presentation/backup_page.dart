@@ -12,6 +12,7 @@ import '../../../core/localization/l10n_extension.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/empty_state.dart';
+import '../../../l10n/app_localizations.dart';
 
 class BackupPage extends ConsumerStatefulWidget {
   const BackupPage({super.key});
@@ -47,7 +48,7 @@ class _BackupPageState extends ConsumerState<BackupPage> {
         setState(() => _localBackups = []);
       }
     } catch (e) {
-      debugPrint('Error loading backups: $e');
+      ref.read(loggingServiceProvider).error('Loading local backups failed', error: e);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -62,7 +63,7 @@ class _BackupPageState extends ConsumerState<BackupPage> {
         setState(() => _cloudBackups = backups);
       }
     } catch (e) {
-      debugPrint('Error loading cloud backups: $e');
+      ref.read(loggingServiceProvider).error('Loading cloud backups failed', error: e);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -77,7 +78,7 @@ class _BackupPageState extends ConsumerState<BackupPage> {
       if (!await dbFile.exists()) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('ملف قاعدة البيانات غير موجود')),
+            SnackBar(content: Text(context.l10n.databaseFileNotFound)),
           );
         }
         return;
@@ -89,8 +90,7 @@ class _BackupPageState extends ConsumerState<BackupPage> {
       }
 
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final backupPath =
-          p.join(backupDir.path, 'backup_$timestamp.db');
+      final backupPath = p.join(backupDir.path, 'backup_$timestamp.db');
 
       await dbFile.copy(backupPath);
 
@@ -127,18 +127,22 @@ class _BackupPageState extends ConsumerState<BackupPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '✅ تم الرفع بنجاح (${(result.size! / 1024).toStringAsFixed(1)} KB)',
+              context.l10n.uploadSuccess(
+                (result.size! / 1024).toStringAsFixed(1),
+              ),
             ),
             backgroundColor: Colors.green,
           ),
         );
-        // ✅ نظّف النسخ القديمة (احتفظ بـ 5)
+        // نظّف النسخ القديمة (احتفظ بـ 5)
         await ref.read(cloudBackupServiceProvider).cleanupOldBackups();
-        // ✅ حدّث القائمة السحابية
+        // حدّث القائمة السحابية
         await _loadCloudBackups();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.errorGeneric(result.errorMessage ?? ''))),
+          SnackBar(
+            content: Text(context.l10n.errorGeneric(result.errorMessage ?? '')),
+          ),
         );
       }
     } catch (e) {
@@ -217,21 +221,20 @@ class _BackupPageState extends ConsumerState<BackupPage> {
 
   // ─── تنزيل نسخة سحابية ───
   Future<void> _restoreCloudBackup(CloudBackupInfo backup) async {
+    final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('استعادة من السحابة'),
-        content: const Text(
-          'سيتم تنزيل النسخة من السحابة. يمكنك استعادتها لاحقاً من النسخ المحلية. متابعة؟',
-        ),
+        title: Text(l10n.restoreFromCloud),
+        content: Text(l10n.restoreFromCloudConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('إلغاء'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('تنزيل'),
+            child: Text(l10n.download),
           ),
         ],
       ),
@@ -247,7 +250,7 @@ class _BackupPageState extends ConsumerState<BackupPage> {
       if (!mounted) return;
 
       if (result.success) {
-        // ✅ بعد التنزيل، انسخ الملف إلى مجلد backups المحلي
+        // بعد التنزيل، انسخ الملف إلى مجلد backups المحلي
         final docsDir = await getApplicationDocumentsDirectory();
         final backupDir = Directory(p.join(docsDir.path, 'backups'));
         if (!await backupDir.exists()) {
@@ -261,15 +264,16 @@ class _BackupPageState extends ConsumerState<BackupPage> {
         );
         await downloadedFile.copy(localPath);
 
-        // ✅ حدّث القائمة المحلية
+        // حدّث القائمة المحلية
         await _loadLocalBackups();
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                '✅ تم التنزيل (${(result.size! / 1024).toStringAsFixed(1)} KB). '
-                'يمكنك استعادتها من القائمة المحلية.',
+                context.l10n.downloadSuccess(
+                  (result.size! / 1024).toStringAsFixed(1),
+                ),
               ),
               backgroundColor: Colors.green,
               duration: const Duration(seconds: 5),
@@ -279,7 +283,9 @@ class _BackupPageState extends ConsumerState<BackupPage> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(context.l10n.errorGeneric(result.errorMessage ?? ''))),
+            SnackBar(
+              content: Text(context.l10n.errorGeneric(result.errorMessage ?? '')),
+            ),
           );
         }
       }
@@ -330,19 +336,20 @@ class _BackupPageState extends ConsumerState<BackupPage> {
 
   // ─── حذف نسخة سحابية ───
   Future<void> _deleteCloudBackup(CloudBackupInfo backup) async {
+    final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('حذف نسخة سحابية'),
-        content: const Text('هل أنت متأكد من حذف هذه النسخة من السحابة؟'),
+        title: Text(l10n.deleteCloudBackup),
+        content: Text(l10n.deleteCloudBackupConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('إلغاء'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('حذف'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -357,7 +364,7 @@ class _BackupPageState extends ConsumerState<BackupPage> {
 
       if (ok && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('✅ تم الحذف')),
+          SnackBar(content: Text(l10n.backupDeleted)),
         );
         await _loadCloudBackups();
       }
@@ -408,7 +415,7 @@ class _BackupPageState extends ConsumerState<BackupPage> {
               children: [
                 Expanded(
                   child: _TabButton(
-                    label: 'محلي',
+                    label: l10n.localTab,
                     icon: Icons.phone_android,
                     isActive: !_showCloud,
                     onTap: () => _toggleView(false),
@@ -416,7 +423,7 @@ class _BackupPageState extends ConsumerState<BackupPage> {
                 ),
                 Expanded(
                   child: _TabButton(
-                    label: 'سحابي',
+                    label: l10n.cloudTab,
                     icon: Icons.cloud,
                     isActive: _showCloud,
                     onTap: () => _toggleView(true),
@@ -442,13 +449,13 @@ class _BackupPageState extends ConsumerState<BackupPage> {
             : (_showCloud ? _uploadCloudBackup : _createLocalBackup),
         backgroundColor: AppColors.primary,
         icon: Icon(_showCloud ? Icons.cloud_upload : Icons.backup),
-        label: Text(_showCloud ? 'رفع نسخة' : l10n.createBackup),
+        label: Text(_showCloud ? l10n.uploadBackup : l10n.createBackup),
       ),
     );
   }
 
   // ─── العرض المحلي ───
-  Widget _buildLocalView(dynamic l10n) {
+  Widget _buildLocalView(AppLocalizations l10n) {
     if (_localBackups.isEmpty) {
       return EmptyState(
         icon: Icons.folder_open,
@@ -526,7 +533,7 @@ class _BackupPageState extends ConsumerState<BackupPage> {
                       children: [
                         const Icon(Icons.share, size: 18),
                         const SizedBox(width: 8),
-                        const Text('مشاركة'),
+                        Text(l10n.share),
                       ],
                     ),
                   ),
@@ -553,13 +560,13 @@ class _BackupPageState extends ConsumerState<BackupPage> {
   }
 
   // ─── العرض السحابي ───
-  Widget _buildCloudView(dynamic l10n) {
+  Widget _buildCloudView(AppLocalizations l10n) {
     if (_cloudBackups.isEmpty) {
       return EmptyState(
         icon: Icons.cloud_off,
-        title: 'لا توجد نسخ سحابية',
-        subtitle: 'اضغط "رفع نسخة" لإنشاء أول نسخة احتياطية سحابية',
-        actionLabel: 'رفع نسخة',
+        title: l10n.noCloudBackups,
+        subtitle: l10n.noCloudBackupsHint,
+        actionLabel: l10n.uploadBackup,
         onAction: _uploadCloudBackup,
       );
     }
@@ -592,7 +599,7 @@ class _BackupPageState extends ConsumerState<BackupPage> {
               ),
               subtitle: Text(
                 '${(backup.fileSize / 1024).toStringAsFixed(1)} KB'
-                '${backup.encrypted ? " • مشفر 🔒" : ""}',
+                '${backup.encrypted ? " • ${l10n.encrypted}" : ""}',
                 style: const TextStyle(fontSize: 11),
               ),
               trailing: PopupMenuButton<String>(
@@ -607,25 +614,25 @@ class _BackupPageState extends ConsumerState<BackupPage> {
                   }
                 },
                 itemBuilder: (context) => [
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'download',
                     child: Row(
                       children: [
-                        Icon(Icons.download, size: 18),
-                        SizedBox(width: 8),
-                        Text('تنزيل'),
+                        const Icon(Icons.download, size: 18),
+                        const SizedBox(width: 8),
+                        Text(l10n.download),
                       ],
                     ),
                   ),
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'delete',
                     child: Row(
                       children: [
-                        Icon(Icons.delete, size: 18, color: Colors.red),
-                        SizedBox(width: 8),
+                        const Icon(Icons.delete, size: 18, color: Colors.red),
+                        const SizedBox(width: 8),
                         Text(
-                          'حذف من السحابة',
-                          style: TextStyle(color: Colors.red),
+                          l10n.deleteFromCloud,
+                          style: const TextStyle(color: Colors.red),
                         ),
                       ],
                     ),

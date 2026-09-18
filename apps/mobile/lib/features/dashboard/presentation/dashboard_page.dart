@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/localization/l10n_extension.dart';
 import '../../../core/localization/app_formatters.dart';
+import '../../../core/localization/l10n_extension.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/empty_state.dart';
@@ -47,9 +47,9 @@ class DashboardPage extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.analytics),
-            tooltip: 'الإحصائيات الشهرية',
+            tooltip: l10n.monthlyStats,
             onPressed: () => context.go('/monthly-stats'),
-),
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: l10n.refresh,
@@ -97,7 +97,7 @@ class DashboardPage extends ConsumerWidget {
                     const SizedBox(height: AppSpacing.lg),
 
                     // ─── الرسم الدائري لتوزيع الديون ───
-                    Text(context.l10n.debtDistribution, style: textTheme.titleLarge),
+                    Text(l10n.debtDistribution, style: textTheme.titleLarge),
                     const SizedBox(height: AppSpacing.sm),
                     Card(
                       child: Padding(
@@ -114,11 +114,11 @@ class DashboardPage extends ConsumerWidget {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  _legendItem('نشط', AppColors.success),
+                                  _legendItem(l10n.activeLabel, AppColors.success),
                                   const SizedBox(width: 16),
-                                  _legendItem('متأخر', AppColors.error),
+                                  _legendItem(l10n.overdueLabel, AppColors.error),
                                   const SizedBox(width: 16),
-                                  _legendItem('مكتمل', AppColors.info),
+                                  _legendItem(l10n.completedLabel, AppColors.info),
                                 ],
                               ),
                             ],
@@ -127,8 +127,9 @@ class DashboardPage extends ConsumerWidget {
                             height: 220,
                             child: Center(child: CircularProgressIndicator()),
                           ),
-                          error: (e, st) =>
-                              Center(child: Text(context.l10n.errorGeneric(e.toString()))),
+                          error: (e, st) => Center(
+                            child: Text(l10n.errorGeneric(e.toString())),
+                          ),
                         ),
                       ),
                     ),
@@ -161,7 +162,9 @@ class DashboardPage extends ConsumerWidget {
                       },
                       loading: () =>
                           const Center(child: CircularProgressIndicator()),
-                      error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
+                      error: (e, st) => Center(
+                        child: Text(l10n.errorGeneric(e.toString())),
+                      ),
                     ),
                   ],
                 ),
@@ -310,7 +313,9 @@ class _BarChart extends StatelessWidget {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
+      error: (e, st) => Center(
+        child: Text(context.l10n.errorGeneric(e.toString())),
+      ),
     );
   }
 }
@@ -323,7 +328,7 @@ class _DebtCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListTile(
-      title: Text(debt.description ?? 'Debt'),
+      title: Text(debt.description ?? context.l10n.debtFallback),
       subtitle: Text(AppFormatters.money(context, debt.amount.amount)),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => context.go('/debt/${debt.id.value}'),

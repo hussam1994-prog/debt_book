@@ -59,8 +59,10 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
     await ref.read(peoplePaginatedProvider.notifier).refresh();
   }
 
-  // ─── ✅ البحث الصوتي المحسّن (عربي + إنجليزي) ───
+  // ─── البحث الصوتي المحسّن (عربي + إنجليزي) ───
   Future<void> _toggleVoiceSearch() async {
+    final logger = ref.read(loggingServiceProvider);
+
     if (_isListening) {
       await _voiceService.stopListening();
       if (mounted) setState(() => _isListening = false);
@@ -71,10 +73,8 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
     if (!available) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'البحث الصوتي غير متاح. تأكد من منح الإذن وتثبيت حزمة اللغة.',
-            ),
+          SnackBar(
+            content: Text(context.l10n.voiceSearchUnavailable),
           ),
         );
       }
@@ -83,15 +83,15 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
 
     setState(() => _isListening = true);
 
-    // ✅ تحديد اللغة من إعدادات التطبيق
+    // تحديد اللغة من إعدادات التطبيق
     final currentLocale = ref.read(localeProvider);
     final langCode = currentLocale.languageCode; // 'ar' أو 'en'
 
-    debugPrint('🎤 Starting voice search: $langCode');
+    logger.info('Starting voice search: $langCode');
 
     await _voiceService.startListening(
       preferredLanguageCode: langCode,
-      // ✅ نتيجة جزئية (تعرض أثناء الكلام)
+      // نتيجة جزئية (تعرض أثناء الكلام)
       onPartialResult: (text) {
         if (mounted && text.isNotEmpty) {
           _searchController.text = text;
@@ -100,7 +100,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
           });
         }
       },
-      // ✅ نتيجة نهائية
+      // نتيجة نهائية
       onResult: (text) {
         if (mounted) {
           _searchController.text = text;
@@ -110,16 +110,16 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
           });
         }
       },
-      // ✅ معالجة الأخطاء
+      // معالجة الأخطاء
       onError: (error) {
-        debugPrint('❌ Voice error: $error');
+        logger.error('Voice error', error: error);
         if (mounted) {
           setState(() => _isListening = false);
           if (error.contains('no_match')) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('لم يتم التعرف على الكلام. حاول مرة أخرى.'),
-                duration: Duration(seconds: 2),
+              SnackBar(
+                content: Text(context.l10n.voiceNoMatch),
+                duration: const Duration(seconds: 2),
               ),
             );
           }
@@ -218,17 +218,15 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: _isListening
-                    ? '🎤 جارٍ الاستماع...'
-                    : l10n.searchHint,
+                hintText: _isListening ? l10n.voiceListening : l10n.searchHint,
                 prefixIcon: const Icon(Icons.search),
-                // ✅ زر الميكروفون
+                // زر الميكروفون
                 suffixIcon: IconButton(
                   icon: Icon(
                     _isListening ? Icons.mic : Icons.mic_none,
                     color: _isListening ? Colors.red : null,
                   ),
-                  tooltip: 'بحث صوتي',
+                  tooltip: l10n.voiceSearchTooltip,
                   onPressed: _toggleVoiceSearch,
                 ),
                 border: OutlineInputBorder(
@@ -256,7 +254,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                           icon: Icons.people_outline,
                           title: l10n.noPeople,
                           subtitle: l10n.noPeople,
-                          actionLabel: 'إضافة شخص',
+                          actionLabel: l10n.addPerson,
                           onAction: () => _showAddPersonDialog(context),
                         ))
                   : ListView.builder(
@@ -304,12 +302,13 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
         onPressed: () => _showQuickAddSheet(context),
         backgroundColor: AppColors.primary,
         icon: const Icon(Icons.add),
-        label: const Text('إضافة'),
+        label: Text(l10n.add),
       ),
     );
   }
 
   void _showQuickAddSheet(BuildContext context) {
+    final l10n = context.l10n;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -332,7 +331,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
               ),
               const SizedBox(height: 20),
               Text(
-                'إضافة سريعة',
+                l10n.quickAdd,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 24),
@@ -341,7 +340,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                   _quickActionItem(
                     context,
                     Icons.person_add,
-                    'شخص جديد',
+                    l10n.newPerson,
                     () {
                       Navigator.pop(ctx);
                       _showAddPersonDialog(context);
@@ -351,7 +350,7 @@ class _PeoplePageState extends ConsumerState<PeoplePage> {
                   _quickActionItem(
                     context,
                     Icons.receipt_long,
-                    'دين جديد',
+                    l10n.newDebt,
                     () {
                       Navigator.pop(ctx);
                       context.go('/all-debts');

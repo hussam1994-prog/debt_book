@@ -1519,6 +1519,474 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Restore failed: {error}'**
   String restoreFailedWithError(String error);
+
+  /// No description provided for @debtFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Debt'**
+  String get debtFallback;
+
+  /// No description provided for @unknownPerson.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get unknownPerson;
+
+  /// No description provided for @exportPdfTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Export PDF'**
+  String get exportPdfTooltip;
+
+  /// No description provided for @switchAccountConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'You will be signed out of the current account. Continue?'**
+  String get switchAccountConfirm;
+
+  /// No description provided for @resetSettingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme and language will return to defaults.\n\nYour data (people, debts, payments) will NOT be affected.'**
+  String get resetSettingsSubtitle;
+
+  /// No description provided for @resetAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get resetAction;
+
+  /// No description provided for @resetSettingsDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings reset to defaults'**
+  String get resetSettingsDone;
+
+  /// No description provided for @showTutorialAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Tutorial Again'**
+  String get showTutorialAgain;
+
+  /// No description provided for @showTutorialAgainSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch the onboarding tour again'**
+  String get showTutorialAgainSubtitle;
+
+  /// No description provided for @tutorialWillAppear.
+  ///
+  /// In en, this message translates to:
+  /// **'The tutorial will appear when you reopen the app'**
+  String get tutorialWillAppear;
+
+  /// No description provided for @cleanupSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed {count} violation(s)'**
+  String cleanupSuccess(int count);
+
+  /// No description provided for @resetSettingsShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore theme and language to defaults'**
+  String get resetSettingsShort;
+
+  /// No description provided for @offlineDataSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection. Local data: {count} people. Will sync automatically when connection returns.'**
+  String offlineDataSaved(int count);
+
+  /// No description provided for @resetSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Settings'**
+  String get resetSettings;
+
+  /// No description provided for @switchAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch'**
+  String get switchAccount;
+
+  /// No description provided for @databaseFileNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Database file not found'**
+  String get databaseFileNotFound;
+
+  /// No description provided for @uploadSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'✅ Uploaded successfully ({size} KB)'**
+  String uploadSuccess(String size);
+
+  /// No description provided for @downloadSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'✅ Downloaded ({size} KB). You can restore it from the local list.'**
+  String downloadSuccess(String size);
+
+  /// No description provided for @backupDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'✅ Deleted'**
+  String get backupDeleted;
+
+  /// No description provided for @restoreFromCloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from Cloud'**
+  String get restoreFromCloud;
+
+  /// No description provided for @restoreFromCloudConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup will be downloaded from cloud. You can restore it later from local backups. Continue?'**
+  String get restoreFromCloudConfirm;
+
+  /// No description provided for @download.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get download;
+
+  /// No description provided for @deleteCloudBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Cloud Backup'**
+  String get deleteCloudBackup;
+
+  /// No description provided for @deleteCloudBackupConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this backup from the cloud?'**
+  String get deleteCloudBackupConfirm;
+
+  /// No description provided for @localTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Local'**
+  String get localTab;
+
+  /// No description provided for @cloudTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud'**
+  String get cloudTab;
+
+  /// No description provided for @uploadBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Backup'**
+  String get uploadBackup;
+
+  /// No description provided for @share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get share;
+
+  /// No description provided for @noCloudBackups.
+  ///
+  /// In en, this message translates to:
+  /// **'No cloud backups'**
+  String get noCloudBackups;
+
+  /// No description provided for @noCloudBackupsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap \"Upload Backup\" to create your first cloud backup'**
+  String get noCloudBackupsHint;
+
+  /// No description provided for @deleteFromCloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete from cloud'**
+  String get deleteFromCloud;
+
+  /// No description provided for @encrypted.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypted 🔒'**
+  String get encrypted;
+
+  /// No description provided for @aggregateReportTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Aggregate Report'**
+  String get aggregateReportTooltip;
+
+  /// No description provided for @multiPersonReportTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Multi-Person Report'**
+  String get multiPersonReportTooltip;
+
+  /// No description provided for @excelExportTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Excel'**
+  String get excelExportTooltip;
+
+  /// No description provided for @activeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get activeLabel;
+
+  /// No description provided for @overdueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get overdueLabel;
+
+  /// No description provided for @completedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completedLabel;
+
+  /// No description provided for @monthlyDebtTrend.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Debt Trend'**
+  String get monthlyDebtTrend;
+
+  /// No description provided for @reportsRefreshed.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports refreshed locally'**
+  String get reportsRefreshed;
+
+  /// No description provided for @exportDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Complete'**
+  String get exportDone;
+
+  /// No description provided for @shareFileQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to share the file?'**
+  String get shareFileQuestion;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @noDataToExport.
+  ///
+  /// In en, this message translates to:
+  /// **'No data to export'**
+  String get noDataToExport;
+
+  /// No description provided for @exportReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Report'**
+  String get exportReport;
+
+  /// No description provided for @simpleTextFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Simple text file'**
+  String get simpleTextFile;
+
+  /// No description provided for @officialReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Official report'**
+  String get officialReport;
+
+  /// No description provided for @professionalTable.
+  ///
+  /// In en, this message translates to:
+  /// **'Professional formatted table'**
+  String get professionalTable;
+
+  /// No description provided for @groupedDebtsReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Grouped Debts Report'**
+  String get groupedDebtsReport;
+
+  /// No description provided for @individualView.
+  ///
+  /// In en, this message translates to:
+  /// **'Individual View'**
+  String get individualView;
+
+  /// No description provided for @groupedView.
+  ///
+  /// In en, this message translates to:
+  /// **'Grouped View'**
+  String get groupedView;
+
+  /// No description provided for @voiceSearchUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice search unavailable. Please grant permission and install the language pack.'**
+  String get voiceSearchUnavailable;
+
+  /// No description provided for @voiceNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Speech not recognized. Please try again.'**
+  String get voiceNoMatch;
+
+  /// No description provided for @voiceSearchTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice Search'**
+  String get voiceSearchTooltip;
+
+  /// No description provided for @voiceListening.
+  ///
+  /// In en, this message translates to:
+  /// **'🎤 Listening...'**
+  String get voiceListening;
+
+  /// No description provided for @quickAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Add'**
+  String get quickAdd;
+
+  /// No description provided for @newPerson.
+  ///
+  /// In en, this message translates to:
+  /// **'New Person'**
+  String get newPerson;
+
+  /// No description provided for @newDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'New Debt'**
+  String get newDebt;
+
+  /// No description provided for @add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
+  /// No description provided for @dataRefreshed.
+  ///
+  /// In en, this message translates to:
+  /// **'Data refreshed locally'**
+  String get dataRefreshed;
+
+  /// No description provided for @choosePersonColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Person Color'**
+  String get choosePersonColor;
+
+  /// No description provided for @removeColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Color'**
+  String get removeColor;
+
+  /// No description provided for @noPhoneForPerson.
+  ///
+  /// In en, this message translates to:
+  /// **'This person has no phone number'**
+  String get noPhoneForPerson;
+
+  /// No description provided for @sendStatement.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Statement'**
+  String get sendStatement;
+
+  /// No description provided for @textMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Text Message'**
+  String get textMessage;
+
+  /// No description provided for @balanceSummaryInMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance summary in a message'**
+  String get balanceSummaryInMessage;
+
+  /// No description provided for @fullPdfFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Full file you can share'**
+  String get fullPdfFile;
+
+  /// No description provided for @mrMrs.
+  ///
+  /// In en, this message translates to:
+  /// **'Mr./Ms. {name}'**
+  String mrMrs(String name);
+
+  /// No description provided for @outstandingAmounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Outstanding amounts:'**
+  String get outstandingAmounts;
+
+  /// No description provided for @statementTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total: {total} IQD'**
+  String statementTotal(int total);
+
+  /// No description provided for @statementTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Statement'**
+  String get statementTitle;
+
+  /// No description provided for @statementShareText.
+  ///
+  /// In en, this message translates to:
+  /// **'Statement - {name}\nTotal: {total} IQD'**
+  String statementShareText(String name, int total);
+
+  /// No description provided for @fromAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'from {amount}'**
+  String fromAmount(String amount);
+
+  /// No description provided for @statusPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get statusPaid;
+
+  /// No description provided for @statusOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get statusOverdue;
+
+  /// No description provided for @statusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get statusCancelled;
+
+  /// No description provided for @statusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get statusActive;
+
+  /// No description provided for @changeColorTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Color'**
+  String get changeColorTooltip;
 }
 
 class _AppLocalizationsDelegate
