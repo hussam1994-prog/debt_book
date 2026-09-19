@@ -271,7 +271,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get payment => 'دفعة';
 
   @override
-  String get reversal => 'عكس';
+  String get reversal => 'عكس دفعة';
 
   @override
   String get adjustment => 'تسوية';
