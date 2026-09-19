@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../connectivity/connectivity_provider.dart';
+import '../localization/l10n_extension.dart';
 import '../sync/sync_status_provider.dart';
 
 class SyncStatusBanner extends ConsumerWidget {
@@ -9,6 +10,7 @@ class SyncStatusBanner extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final syncStatus = ref.watch(syncStatusProvider);
     final connectivity = ref.watch(connectivityProvider);
     final colorScheme = Theme.of(context).colorScheme;
@@ -21,11 +23,11 @@ class SyncStatusBanner extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.cloud_off, size: 16, color: Colors.red),
+              const Icon(Icons.cloud_off, size: 16, color: Colors.red),
               const SizedBox(width: 8),
               Text(
-                'غير متصل',
-                style: TextStyle(color: Colors.red, fontSize: 12),
+                l10n.offlineLabel,
+                style: const TextStyle(color: Colors.red, fontSize: 12),
               ),
             ],
           ),
@@ -38,32 +40,34 @@ class SyncStatusBanner extends ConsumerWidget {
     Color color;
 
     if (syncStatus.isSyncing) {
-      text = 'جار المزامنة...';
+      text = l10n.syncingNow;
       icon = Icons.sync;
       color = colorScheme.primary;
     } else if (syncStatus.lastSyncTime != null) {
       final diff = DateTime.now().difference(syncStatus.lastSyncTime!);
       String timeAgo;
       if (diff.inSeconds < 60) {
-        timeAgo = 'قبل ${diff.inSeconds} ثانية';
+        timeAgo = l10n.secondsAgo(diff.inSeconds);
       } else if (diff.inMinutes < 60) {
-        timeAgo = 'قبل ${diff.inMinutes} دقيقة';
+        timeAgo = l10n.minutesAgo(diff.inMinutes);
       } else {
-        timeAgo = 'قبل ${diff.inHours} ساعة';
+        timeAgo = l10n.hoursAgo(diff.inHours);
       }
 
-      // ✅ إظهار الأعداد إذا كانت متوفرة
       final counts = syncStatus.counts;
       if (counts != null && counts.isNotEmpty) {
-        text = 'آخر مزامنة: $timeAgo • '
-            '${counts['persons'] ?? 0} أشخاص، ${counts['debts'] ?? 0} ديون';
+        text = l10n.lastSyncWithCounts(
+          timeAgo,
+          counts['persons'] ?? 0,
+          counts['debts'] ?? 0,
+        );
       } else {
-        text = 'آخر مزامنة: $timeAgo';
+        text = l10n.lastSyncAt(timeAgo);
       }
       icon = Icons.cloud_done;
       color = Colors.green;
     } else {
-      text = 'جاهز للمزامنة';
+      text = l10n.syncReady;
       icon = Icons.cloud_outlined;
       color = colorScheme.onSurfaceVariant;
     }
@@ -77,9 +81,12 @@ class SyncStatusBanner extends ConsumerWidget {
           children: [
             Icon(icon, size: 16, color: color),
             const SizedBox(width: 8),
-            Text(
-              text,
-              style: TextStyle(color: color, fontSize: 12),
+            Flexible(
+              child: Text(
+                text,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: color, fontSize: 12),
+              ),
             ),
           ],
         ),

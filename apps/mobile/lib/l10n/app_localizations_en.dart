@@ -1041,4 +1041,142 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get changeColorTooltip => 'Change Color';
+
+  @override
+  String get totalOutstandingLabel => 'Total Outstanding';
+
+  @override
+  String get totalPaymentsLabel => 'Total Payments';
+
+  @override
+  String get debtsAndPayments6Months => 'Debts & Payments (Last 6 Months)';
+
+  @override
+  String get monthlyDetails => 'Monthly Details';
+
+  @override
+  String get paymentReceivedTitleEn => 'Payment Received';
+
+  @override
+  String get noPhoneNumber => 'No phone number for this person';
+
+  @override
+  String get detailsRefreshed => 'Details refreshed locally';
+
+  @override
+  String get noPhoneForWhatsApp => 'No phone number to send via WhatsApp';
+
+  @override
+  String get offlineLabel => 'Offline';
+
+  @override
+  String get syncingNow => 'Syncing...';
+
+  @override
+  String get syncReady => 'Ready to sync';
+
+  @override
+  String lastSyncAt(String time) {
+    return 'Last sync: $time';
+  }
+
+  @override
+  String secondsAgo(int count) {
+    return '$count seconds ago';
+  }
+
+  @override
+  String minutesAgo(int count) {
+    return '$count minutes ago';
+  }
+
+  @override
+  String hoursAgo(int count) {
+    return '$count hours ago';
+  }
+
+  @override
+  String lastSyncWithCounts(String time, int persons, int debts) {
+    return 'Last sync: $time • $persons people, $debts debts';
+  }
+
+  @override
+  String get continueWithGoogle => 'Continue with Google';
+
+  @override
+  String get orDivider => 'or';
+
+  @override
+  String get invalidCredentials => 'Invalid email or password';
+
+  @override
+  String get emailNotConfirmed => 'Please confirm your email address';
+
+  @override
+  String get networkError => 'Check your internet connection';
+
+  @override
+  String daysAgo(int count) {
+    return '$count days ago';
+  }
+
+  @override
+  String whatsappReminder(String name, int amount) {
+    return 'Hello $name,\nThis is a friendly reminder about the outstanding amount: $amount IQD.\nThank you for your cooperation. 🙏';
+  }
+
+  @override
+  String whatsappReminderUrgent(String name, int amount) {
+    return 'Dear $name,\nOutstanding amount: $amount IQD.\nPlease settle as soon as possible.\nThank you.';
+  }
+
+  @override
+  String whatsappReminderOverdue(String name, int amount, String dueDate) {
+    return '$name,\nOverdue amount: $amount IQD.\nDue date was: $dueDate.\nPlease settle as soon as possible.';
+  }
+
+  @override
+  String whatsappThankYou(String name) {
+    return 'Thank you so much $name! 🙏\nYour payment has been received successfully.\nWe look forward to serving you again.';
+  }
+
+  @override
+  String whatsappPostpone(String name) {
+    return '$name,\nYour due date has been postponed.\nThank you for your cooperation.';
+  }
+
+  @override
+  String whatsappCongratulations(String name) {
+    return '🎉 Congratulations $name!\nYou have paid off all your debts.\nThank you for being an excellent client. ⭐';
+  }
+
+  @override
+  String whatsappDefault(String name) {
+    return 'Hello $name,\nThis is a reminder from Debt Book.';
+  }
+
+  @override
+  String get multiPersonReportTitle => 'Multi-Person Report';
+
+  @override
+  String get clearSelection => 'Clear Selection';
+
+  @override
+  String personsSelected(int count) {
+    return '$count person(s) selected';
+  }
+
+  @override
+  String get noPeopleForReport => 'No people';
+
+  @override
+  String get generating => 'Generating...';
+
+  @override
+  String get generatePdf => 'Generate PDF';
+
+  @override
+  String reportsForCount(int count) {
+    return 'Reports for $count people';
+  }
 }

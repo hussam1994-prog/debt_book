@@ -307,6 +307,7 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp>
           await notificationService.scheduleUpcomingDebtReminders(
             debts: debts,
             balances: balances,
+            locale: locale,
           );
 
           final now = DateTime.now();
@@ -325,6 +326,7 @@ class _DebtBookAppState extends ConsumerState<DebtBookApp>
             activeDebts: active,
             overdueDebts: overdue,
             totalOutstanding: totalOutstanding,
+            locale: locale,
           );
         } catch (_) {}
       } else {

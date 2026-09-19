@@ -1034,4 +1034,142 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get changeColorTooltip => 'تغيير اللون';
+
+  @override
+  String get totalOutstandingLabel => 'إجمالي المستحقات';
+
+  @override
+  String get totalPaymentsLabel => 'إجمالي الدفعات';
+
+  @override
+  String get debtsAndPayments6Months => 'الديون والدفعات (آخر 6 أشهر)';
+
+  @override
+  String get monthlyDetails => 'التفاصيل الشهرية';
+
+  @override
+  String get paymentReceivedTitleEn => 'تم استلام دفعة';
+
+  @override
+  String get noPhoneNumber => 'لا يوجد رقم هاتف لهذا الشخص';
+
+  @override
+  String get detailsRefreshed => 'تم تحديث التفاصيل محليًا';
+
+  @override
+  String get noPhoneForWhatsApp => 'لا يوجد رقم هاتف للإرسال عبر واتساب';
+
+  @override
+  String get offlineLabel => 'غير متصل';
+
+  @override
+  String get syncingNow => 'جار المزامنة...';
+
+  @override
+  String get syncReady => 'جاهز للمزامنة';
+
+  @override
+  String lastSyncAt(String time) {
+    return 'آخر مزامنة: $time';
+  }
+
+  @override
+  String secondsAgo(int count) {
+    return 'قبل $count ثانية';
+  }
+
+  @override
+  String minutesAgo(int count) {
+    return 'قبل $count دقيقة';
+  }
+
+  @override
+  String hoursAgo(int count) {
+    return 'قبل $count ساعة';
+  }
+
+  @override
+  String lastSyncWithCounts(String time, int persons, int debts) {
+    return 'آخر مزامنة: $time • $persons أشخاص، $debts ديون';
+  }
+
+  @override
+  String get continueWithGoogle => 'المتابعة بحساب Google';
+
+  @override
+  String get orDivider => 'أو';
+
+  @override
+  String get invalidCredentials => 'البريد أو كلمة المرور خاطئة';
+
+  @override
+  String get emailNotConfirmed => 'يرجى تأكيد بريدك الإلكتروني';
+
+  @override
+  String get networkError => 'تحقق من اتصالك بالإنترنت';
+
+  @override
+  String daysAgo(int count) {
+    return 'قبل $count يوم';
+  }
+
+  @override
+  String whatsappReminder(String name, int amount) {
+    return 'مرحبًا $name،\nهذا تذكير لطيف بالمبلغ المستحق: $amount دينار.\nشكرًا لتعاونك. 🙏';
+  }
+
+  @override
+  String whatsappReminderUrgent(String name, int amount) {
+    return 'عزيزي $name،\nالمبلغ المستحق: $amount دينار.\nيرجى التسديد في أقرب وقت ممكن.\nشكرًا.';
+  }
+
+  @override
+  String whatsappReminderOverdue(String name, int amount, String dueDate) {
+    return '$name،\nالمبلغ المتأخر: $amount دينار.\nكان موعد الاستحقاق: $dueDate.\nنرجو التسديد بأسرع وقت.';
+  }
+
+  @override
+  String whatsappThankYou(String name) {
+    return 'شكرًا جزيلًا $name! 🙏\nتم استلام دفعتك بنجاح.\nنتطلع للتعامل معك مرة أخرى.';
+  }
+
+  @override
+  String whatsappPostpone(String name) {
+    return '$name،\nتم تأجيل موعد استحقاقك.\nشكرًا لتعاونك.';
+  }
+
+  @override
+  String whatsappCongratulations(String name) {
+    return '🎉 تهانينا $name!\nلقد سددت جميع ديونك.\nشكرًا لكونك عميلًا رائعًا. ⭐';
+  }
+
+  @override
+  String whatsappDefault(String name) {
+    return 'مرحبًا $name،\nهذا تذكير من دفتر الديون.';
+  }
+
+  @override
+  String get multiPersonReportTitle => 'تقرير متعدد الأشخاص';
+
+  @override
+  String get clearSelection => 'إلغاء التحديد';
+
+  @override
+  String personsSelected(int count) {
+    return '$count شخص محدد';
+  }
+
+  @override
+  String get noPeopleForReport => 'لا يوجد أشخاص';
+
+  @override
+  String get generating => 'جارٍ التوليد...';
+
+  @override
+  String get generatePdf => 'توليد PDF';
+
+  @override
+  String reportsForCount(int count) {
+    return 'تقارير $count أشخاص';
+  }
 }

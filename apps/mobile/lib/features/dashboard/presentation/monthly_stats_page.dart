@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/localization/app_formatters.dart';
 import '../../../core/localization/l10n_extension.dart';
 import '../../../core/theme/app_theme.dart';
 import '../providers/monthly_stats_provider.dart';
@@ -29,6 +30,7 @@ class MonthlyStatsPage extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
+            tooltip: l10n.refresh,
             onPressed: () {
               ref.invalidate(monthlyStatsProvider);
               ref.invalidate(totalDebtsAmountProvider);
@@ -54,7 +56,7 @@ class MonthlyStatsPage extends ConsumerWidget {
                 Expanded(
                   child: _TotalCard(
                     icon: Icons.receipt_long,
-                    label: 'إجمالي المستحقات',
+                    label: l10n.totalOutstandingLabel,
                     valueAsync: totalDebtsAsync,
                     color: AppColors.error,
                   ),
@@ -63,7 +65,7 @@ class MonthlyStatsPage extends ConsumerWidget {
                 Expanded(
                   child: _TotalCard(
                     icon: Icons.payments,
-                    label: 'إجمالي الدفعات',
+                    label: l10n.totalPaymentsLabel,
                     valueAsync: totalPaymentsAsync,
                     color: AppColors.success,
                   ),
@@ -74,7 +76,7 @@ class MonthlyStatsPage extends ConsumerWidget {
 
             // ─── رسم بياني ───
             Text(
-              'الديون والدفعات (آخر 6 أشهر)',
+              l10n.debtsAndPayments6Months,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -88,7 +90,9 @@ class MonthlyStatsPage extends ConsumerWidget {
                     loading: () => const Center(
                       child: CircularProgressIndicator(),
                     ),
-                    error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
+                    error: (e, st) => Center(
+                      child: Text(l10n.errorGeneric(e.toString())),
+                    ),
                   ),
                 ),
               ),
@@ -97,7 +101,7 @@ class MonthlyStatsPage extends ConsumerWidget {
 
             // ─── أعلى 5 مدينين ───
             Text(
-              'أعلى 5 مدينين',
+              l10n.top5Debtors,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -145,7 +149,10 @@ class MonthlyStatsPage extends ConsumerWidget {
                                 ),
                               ),
                               Text(
-                                '${d['amount']} دينار',
+                                AppFormatters.money(
+                                  context,
+                                  d['amount'] as int,
+                                ),
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.error,
@@ -163,7 +170,9 @@ class MonthlyStatsPage extends ConsumerWidget {
                       child: CircularProgressIndicator(),
                     ),
                   ),
-                  error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
+                  error: (e, st) => Center(
+                    child: Text(l10n.errorGeneric(e.toString())),
+                  ),
                 ),
               ),
             ),
@@ -171,7 +180,7 @@ class MonthlyStatsPage extends ConsumerWidget {
 
             // ─── جدول شهري ───
             Text(
-              'التفاصيل الشهرية',
+              l10n.monthlyDetails,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -187,7 +196,10 @@ class MonthlyStatsPage extends ConsumerWidget {
                           dense: true,
                           title: Text('$monthName ${s.month.year}'),
                           subtitle: Text(
-                            '${s.newDebts} دين جديد • ${s.payments} دفعة',
+                            l10n.newDebtsAndPayments(
+                              s.newDebts,
+                              s.payments,
+                            ),
                           ),
                           trailing: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
@@ -220,7 +232,9 @@ class MonthlyStatsPage extends ConsumerWidget {
                       child: CircularProgressIndicator(),
                     ),
                   ),
-                  error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
+                  error: (e, st) => Center(
+                    child: Text(l10n.errorGeneric(e.toString())),
+                  ),
                 ),
               ),
             ),
@@ -263,11 +277,12 @@ class _TotalCard extends StatelessWidget {
               label,
               style: Theme.of(context).textTheme.bodySmall,
               textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 4),
             valueAsync.when(
               data: (v) => Text(
-                _formatAmount(v),
+                AppFormatters.number(context, v),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -279,25 +294,12 @@ class _TotalCard extends StatelessWidget {
                 width: 20,
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
-              // ✅ معاملان
               error: (e, st) => const Text('---'),
             ),
           ],
         ),
       ),
     );
-  }
-
-  String _formatAmount(int amount) {
-    final str = amount.toString();
-    final buffer = StringBuffer();
-    for (int i = 0; i < str.length; i++) {
-      buffer.write(str[i]);
-      if ((str.length - i - 1) % 3 == 0 && i != str.length - 1) {
-        buffer.write(',');
-      }
-    }
-    return buffer.toString();
   }
 }
 
@@ -352,7 +354,7 @@ class _MonthlyBarChart extends StatelessWidget {
                 return Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(
-                    _shortMonth(stats[idx].month.month),
+                    _shortMonth(context, stats[idx].month.month),
                     style: const TextStyle(fontSize: 11),
                   ),
                 );
@@ -379,11 +381,9 @@ class _MonthlyBarChart extends StatelessWidget {
     );
   }
 
-  String _shortMonth(int month) {
-    const names = [
-      'ينا', 'فبر', 'مار', 'أبر', 'ماي', 'يون',
-      'يول', 'أغس', 'سبت', 'أكت', 'نوف', 'ديس',
-    ];
-    return names[month - 1];
+  String _shortMonth(BuildContext context, int month) {
+    final locale = Localizations.localeOf(context).toString();
+    // استخدام DateFormat يعرض أسماء الأشهر حسب اللغة تلقائياً
+    return DateFormat.MMM(locale).format(DateTime(2020, month, 1));
   }
 }

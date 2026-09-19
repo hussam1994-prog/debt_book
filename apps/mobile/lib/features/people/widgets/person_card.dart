@@ -2,6 +2,7 @@ import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/localization/app_formatters.dart';
+import '../../../../core/localization/l10n_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_design.dart';
 
@@ -21,6 +22,7 @@ class PersonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final hasOverdue = summary.lastDueDate != null &&
         summary.lastDueDate!.isBefore(DateTime.now()) &&
         summary.totalOutstanding.amount > 0;
@@ -30,8 +32,8 @@ class PersonCard extends StatelessWidget {
         ? AppColors.info
         : (hasOverdue ? AppColors.error : AppColors.success);
     final statusLabel = isSettled
-        ? 'مكتمل'
-        : (hasOverdue ? 'متأخر' : 'نشط');
+        ? l10n.completedLabel
+        : (hasOverdue ? l10n.overdueLabel : l10n.activeLabel);
 
     return Card(
       child: InkWell(
@@ -41,17 +43,14 @@ class PersonCard extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Row(
             children: [
-              // الأفاتار
               _buildAvatar(),
 
               const SizedBox(width: AppSpacing.md),
 
-              // المعلومات
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // الاسم + الشارة
                     Row(
                       children: [
                         Expanded(
@@ -70,21 +69,24 @@ class PersonCard extends StatelessWidget {
 
                     const SizedBox(height: 8),
 
-                    // المبلغ
                     Text(
-                      AppFormatters.money(context, summary.totalOutstanding.amount),
+                      AppFormatters.money(
+                        context,
+                        summary.totalOutstanding.amount,
+                      ),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: isSettled
                             ? AppColors.info
-                            : (hasOverdue ? AppColors.error : AppColors.primary),
+                            : (hasOverdue
+                                ? AppColors.error
+                                : AppColors.primary),
                       ),
                     ),
 
                     const SizedBox(height: 6),
 
-                    // التفاصيل السفلية
                     Row(
                       children: [
                         _metaChip(Icons.receipt_long, '${summary.debtCount}'),
@@ -92,7 +94,10 @@ class PersonCard extends StatelessWidget {
                           const SizedBox(width: 12),
                           _metaChip(
                             Icons.event,
-                            '${summary.lastDueDate!.day}/${summary.lastDueDate!.month}',
+                            AppFormatters.date(
+                              context,
+                              summary.lastDueDate!,
+                            ),
                           ),
                         ],
                       ],
@@ -101,7 +106,6 @@ class PersonCard extends StatelessWidget {
                 ),
               ),
 
-              // سهم
               Icon(Icons.chevron_left, color: Colors.grey.shade400),
             ],
           ),
@@ -116,9 +120,9 @@ class PersonCard extends StatelessWidget {
       width: 52,
       height: 52,
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         shape: BoxShape.circle,
-        border: Border.all(color: color.withOpacity(0.3), width: 2),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 2),
       ),
       alignment: Alignment.center,
       child: Text(
@@ -136,7 +140,7 @@ class PersonCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
@@ -162,17 +166,5 @@ class PersonCard extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  String _formatAmount(int amount) {
-    final str = amount.abs().toString();
-    final buffer = StringBuffer();
-    for (int i = 0; i < str.length; i++) {
-      buffer.write(str[i]);
-      if ((str.length - i - 1) % 3 == 0 && i != str.length - 1) {
-        buffer.write(',');
-      }
-    }
-    return amount < 0 ? '-$buffer' : buffer.toString();
   }
 }

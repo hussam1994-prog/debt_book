@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/providers.dart';
+import '../../core/theme/theme_provider.dart';
 import '../../core/notifications/notification_service.dart';
 import '../../features/dashboard/providers/analytics_providers.dart';
 import '../../features/people/providers/people_providers.dart';
@@ -220,11 +221,14 @@ class RealtimeService {
           .getSingleOrNull();
 
       // ✅ استخدم الـ provider الموحّد بدلاً من نسخة جديدة
+           // ✅ استخدم الـ provider الموحّد بدلاً من نسخة جديدة
       final notifService = _ref.read(notificationServiceProvider);
+      final locale = _ref.read(localeProvider);
       await notifService.showPaymentReceivedNotification(
         id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
         personName: person?.name ?? 'شخص',
         amount: amount,
+        locale: locale,
       );
     } catch (e) {
       _ref

@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../l10n/app_localizations.dart';
+
 class WhatsAppService {
   // ─────────────────────────────────────────────
   // 1. إرسال رسالة نصية
@@ -15,7 +17,9 @@ class WhatsAppService {
   }) async {
     final intlPhone = normalizeIraqiPhone(phone);
     if (intlPhone == null) {
-      debugPrint('❌ Invalid phone: $phone');
+      if (kDebugMode) {
+        debugPrint('Invalid phone: $phone');
+      }
       return;
     }
 
@@ -39,12 +43,12 @@ class WhatsAppService {
   }) async {
     final file = File(filePath);
     if (!await file.exists()) {
-      debugPrint('❌ File not found: $filePath');
+      if (kDebugMode) {
+        debugPrint('File not found: $filePath');
+      }
       return;
     }
 
-    // ✅ share_plus يدعم مشاركة الملفات
-    // المستخدم سيختار واتساب من نافذة المشاركة
     await SharePlus.instance.share(
       ShareParams(
         text: message,
@@ -53,26 +57,30 @@ class WhatsAppService {
     );
   }
 
-  /// إرسال PDF مباشرة لرقم محدد
-  /// ملاحظة: واتساب لا يدعم إرسال الملفات عبر wa.me مباشرة
-  /// لذا نستخدم share_plus مع توجيه المستخدم.
+  /// إرسال PDF مباشرة لرقم محدد.
+  ///
+  /// ⚠️ واتساب لا يدعم إرسال الملفات عبر wa.me مباشرة —
+  /// نستخدم share_plus مع توجيه المستخدم.
+  ///
+  /// [phoneLabel] هو نص اختياري لعرض الرقم داخل الرسالة
+  /// (مترجم من الاستدعاء — مثال: "Phone" / "الرقم").
   static Future<void> sendPdfToNumber({
     required String phone,
     required String filePath,
     required String message,
+    required String phoneLabel,
   }) async {
-    // 1. أولاً: أرسل النص عبر wa.me
     final intlPhone = normalizeIraqiPhone(phone);
     if (intlPhone == null) {
-      debugPrint('❌ Invalid phone: $phone');
+      if (kDebugMode) {
+        debugPrint('Invalid phone: $phone');
+      }
       return;
     }
 
-    // 2. افتح واتساب مع الرقم والرسالة (المستخدم يضيف الملف يدويًا)
-    // أو الأفضل: استخدم SharePlus
     await sendPdfFile(
       filePath: filePath,
-      message: '$message\n\nالرقم: +$intlPhone',
+      message: '$message\n\n$phoneLabel: +$intlPhone',
     );
   }
 
@@ -130,9 +138,11 @@ class WhatsAppService {
       intlPhone = '964$clean';
     }
 
-    // ✅ التحقق من الطول
+    // التحقق من الطول
     if (intlPhone.length < 13 || intlPhone.length > 14) {
-      debugPrint('⚠️ Unusual phone length: $intlPhone (${intlPhone.length})');
+      if (kDebugMode) {
+        debugPrint('Unusual phone length: $intlPhone (${intlPhone.length})');
+      }
     }
 
     return intlPhone;
@@ -143,7 +153,11 @@ class WhatsAppService {
   // ─────────────────────────────────────────────
 
   /// قوالب رسائل جاهزة للاستخدام.
+  ///
+  /// ⚠️ يتطلب [l10n] من `AppLocalizations.of(context)!`
+  /// لأنه service ثابت لا يملك `BuildContext`.
   static String getTemplate({
+    required AppLocalizations l10n,
     required String template,
     required String personName,
     int? amount,
@@ -151,39 +165,29 @@ class WhatsAppService {
   }) {
     switch (template) {
       case 'reminder':
-        return 'مرحبًا $personName،\n'
-            'هذا تذكير لطيف بالمبلغ المستحق: $amount دينار.\n'
-            'شكرًا لتعاونك. 🙏';
+        return l10n.whatsappReminder(personName, amount ?? 0);
 
       case 'reminder_urgent':
-        return 'عزيزي $personName،\n'
-            'المبلغ المستحق: $amount دينار.\n'
-            'يرجى التسديد في أقرب وقت ممكن.\n'
-            'شكرًا.';
+        return l10n.whatsappReminderUrgent(personName, amount ?? 0);
 
       case 'reminder_overdue':
-        return '$personName،\n'
-            'المبلغ المتأخر: $amount دينار.\n'
-            'كان موعد الاستحقاق: $dueDate.\n'
-            'نرجو التسديد بأسرع وقت.';
+        return l10n.whatsappReminderOverdue(
+          personName,
+          amount ?? 0,
+          dueDate ?? '',
+        );
 
       case 'thank_you':
-        return 'شكرًا جزيلًا $personName! 🙏\n'
-            'تم استلام دفعتك بنجاح.\n'
-            'نتطلع للتعامل معك مرة أخرى.';
+        return l10n.whatsappThankYou(personName);
 
       case 'postpone':
-        return '$personName،\n'
-            'تم تأجيل موعد استحقاقك.\n'
-            'شكرًا لتعاونك.';
+        return l10n.whatsappPostpone(personName);
 
       case 'congratulations':
-        return '🎉 تهانينا $personName!\n'
-            'لقد سددت جميع ديونك.\n'
-            'شكرًا لكونك عميلًا رائعًا. ⭐';
+        return l10n.whatsappCongratulations(personName);
 
       default:
-        return 'مرحبًا $personName،\nهذا تذكير من دفتر الديون.';
+        return l10n.whatsappDefault(personName);
     }
   }
 }

@@ -413,5 +413,100 @@
   "statusOverdue": "متأخر",
   "statusCancelled": "ملغى",
   "statusActive": "نشط",
-  "changeColorTooltip": "تغيير اللون"
+  "changeColorTooltip": "تغيير اللون",
+  "totalOutstandingLabel": "إجمالي المستحقات",
+  "totalPaymentsLabel": "إجمالي الدفعات",
+  "debtsAndPayments6Months": "الديون والدفعات (آخر 6 أشهر)",
+  "monthlyDetails": "التفاصيل الشهرية",
+  "paymentReceivedTitleEn": "تم استلام دفعة",
+  "noPhoneNumber": "لا يوجد رقم هاتف لهذا الشخص",
+  "detailsRefreshed": "تم تحديث التفاصيل محليًا",
+  "noPhoneForWhatsApp": "لا يوجد رقم هاتف للإرسال عبر واتساب",
+  "offlineLabel": "غير متصل",
+  "syncingNow": "جار المزامنة...",
+  "syncReady": "جاهز للمزامنة",
+  "lastSyncAt": "آخر مزامنة: {time}",
+  "@lastSyncAt": {
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "secondsAgo": "قبل {count} ثانية",
+  "@secondsAgo": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "minutesAgo": "قبل {count} دقيقة",
+  "@minutesAgo": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "hoursAgo": "قبل {count} ساعة",
+  "@hoursAgo": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "lastSyncWithCounts": "آخر مزامنة: {time} • {persons} أشخاص، {debts} ديون",
+  "@lastSyncWithCounts": {
+    "placeholders": {
+      "time": { "type": "String" },
+      "persons": { "type": "int" },
+      "debts": { "type": "int" }
+    }
+  },
+  "continueWithGoogle": "المتابعة بحساب Google",
+  "orDivider": "أو",
+  "invalidCredentials": "البريد أو كلمة المرور خاطئة",
+  "emailNotConfirmed": "يرجى تأكيد بريدك الإلكتروني",
+  "networkError": "تحقق من اتصالك بالإنترنت",
+  "daysAgo": "قبل {count} يوم",
+  "@daysAgo": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "whatsappReminder": "مرحبًا {name}،\nهذا تذكير لطيف بالمبلغ المستحق: {amount} دينار.\nشكرًا لتعاونك. 🙏",
+  "@whatsappReminder": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "amount": { "type": "int" }
+    }
+  },
+  "whatsappReminderUrgent": "عزيزي {name}،\nالمبلغ المستحق: {amount} دينار.\nيرجى التسديد في أقرب وقت ممكن.\nشكرًا.",
+  "@whatsappReminderUrgent": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "amount": { "type": "int" }
+    }
+  },
+  "whatsappReminderOverdue": "{name}،\nالمبلغ المتأخر: {amount} دينار.\nكان موعد الاستحقاق: {dueDate}.\nنرجو التسديد بأسرع وقت.",
+  "@whatsappReminderOverdue": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "amount": { "type": "int" },
+      "dueDate": { "type": "String" }
+    }
+  },
+  "whatsappThankYou": "شكرًا جزيلًا {name}! 🙏\nتم استلام دفعتك بنجاح.\nنتطلع للتعامل معك مرة أخرى.",
+  "@whatsappThankYou": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "whatsappPostpone": "{name}،\nتم تأجيل موعد استحقاقك.\nشكرًا لتعاونك.",
+  "@whatsappPostpone": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "whatsappCongratulations": "🎉 تهانينا {name}!\nلقد سددت جميع ديونك.\nشكرًا لكونك عميلًا رائعًا. ⭐",
+  "@whatsappCongratulations": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "whatsappDefault": "مرحبًا {name}،\nهذا تذكير من دفتر الديون.",
+  "@whatsappDefault": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "multiPersonReportTitle": "تقرير متعدد الأشخاص",
+  "clearSelection": "إلغاء التحديد",
+  "personsSelected": "{count} شخص محدد",
+  "@personsSelected": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "noPeopleForReport": "لا يوجد أشخاص",
+  "generating": "جارٍ التوليد...",
+  "generatePdf": "توليد PDF",
+  "reportsForCount": "تقارير {count} أشخاص",
+  "@reportsForCount": {
+    "placeholders": { "count": { "type": "int" } }
+  }
 }

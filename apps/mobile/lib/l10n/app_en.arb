@@ -413,5 +413,100 @@
   "statusOverdue": "Overdue",
   "statusCancelled": "Cancelled",
   "statusActive": "Active",
-  "changeColorTooltip": "Change Color"
+  "changeColorTooltip": "Change Color",
+  "totalOutstandingLabel": "Total Outstanding",
+  "totalPaymentsLabel": "Total Payments",
+  "debtsAndPayments6Months": "Debts & Payments (Last 6 Months)",
+  "monthlyDetails": "Monthly Details",
+  "paymentReceivedTitleEn": "Payment Received",
+  "noPhoneNumber": "No phone number for this person",
+  "detailsRefreshed": "Details refreshed locally",
+  "noPhoneForWhatsApp": "No phone number to send via WhatsApp",
+  "offlineLabel": "Offline",
+  "syncingNow": "Syncing...",
+  "syncReady": "Ready to sync",
+  "lastSyncAt": "Last sync: {time}",
+  "@lastSyncAt": {
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "secondsAgo": "{count} seconds ago",
+  "@secondsAgo": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "minutesAgo": "{count} minutes ago",
+  "@minutesAgo": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "hoursAgo": "{count} hours ago",
+  "@hoursAgo": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "lastSyncWithCounts": "Last sync: {time} • {persons} people, {debts} debts",
+  "@lastSyncWithCounts": {
+    "placeholders": {
+      "time": { "type": "String" },
+      "persons": { "type": "int" },
+      "debts": { "type": "int" }
+    }
+  },
+  "continueWithGoogle": "Continue with Google",
+  "orDivider": "or",
+  "invalidCredentials": "Invalid email or password",
+  "emailNotConfirmed": "Please confirm your email address",
+  "networkError": "Check your internet connection",
+  "daysAgo": "{count} days ago",
+  "@daysAgo": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "whatsappReminder": "Hello {name},\nThis is a friendly reminder about the outstanding amount: {amount} IQD.\nThank you for your cooperation. 🙏",
+  "@whatsappReminder": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "amount": { "type": "int" }
+    }
+  },
+  "whatsappReminderUrgent": "Dear {name},\nOutstanding amount: {amount} IQD.\nPlease settle as soon as possible.\nThank you.",
+  "@whatsappReminderUrgent": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "amount": { "type": "int" }
+    }
+  },
+  "whatsappReminderOverdue": "{name},\nOverdue amount: {amount} IQD.\nDue date was: {dueDate}.\nPlease settle as soon as possible.",
+  "@whatsappReminderOverdue": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "amount": { "type": "int" },
+      "dueDate": { "type": "String" }
+    }
+  },
+  "whatsappThankYou": "Thank you so much {name}! 🙏\nYour payment has been received successfully.\nWe look forward to serving you again.",
+  "@whatsappThankYou": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "whatsappPostpone": "{name},\nYour due date has been postponed.\nThank you for your cooperation.",
+  "@whatsappPostpone": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "whatsappCongratulations": "🎉 Congratulations {name}!\nYou have paid off all your debts.\nThank you for being an excellent client. ⭐",
+  "@whatsappCongratulations": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "whatsappDefault": "Hello {name},\nThis is a reminder from Debt Book.",
+  "@whatsappDefault": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "multiPersonReportTitle": "Multi-Person Report",
+  "clearSelection": "Clear Selection",
+  "personsSelected": "{count} person(s) selected",
+  "@personsSelected": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "noPeopleForReport": "No people",
+  "generating": "Generating...",
+  "generatePdf": "Generate PDF",
+  "reportsForCount": "Reports for {count} people",
+  "@reportsForCount": {
+    "placeholders": { "count": { "type": "int" } }
+  }
 }

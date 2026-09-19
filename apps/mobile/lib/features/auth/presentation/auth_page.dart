@@ -24,7 +24,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   @override
   void initState() {
     super.initState();
-    // ✅ محاولة silent sign-in تلقائيًا عند فتح الصفحة
+    // محاولة silent sign-in تلقائياً عند فتح الصفحة
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _trySilentSignIn();
     });
@@ -35,8 +35,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
       final result =
           await ref.read(googleAuthServiceProvider).signInSilently();
       if (result != null) {
-        debugPrint('✅ Silent sign-in succeeded');
-        // main.dart سيتولى التوجيه
+        ref.read(loggingServiceProvider).info('Silent sign-in succeeded');
       }
     } catch (_) {
       // فشل صامت - لا نُزعج المستخدم
@@ -106,10 +105,11 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   }
 
   String _friendlyAuthError(AuthException e) {
+    final l10n = context.l10n;
     final msg = e.message.toLowerCase();
-    if (msg.contains('invalid login')) return 'البريد أو كلمة المرور خاطئة';
-    if (msg.contains('email not confirmed')) return 'يرجى تأكيد بريدك الإلكتروني';
-    if (msg.contains('network')) return 'تحقق من اتصالك بالإنترنت';
+    if (msg.contains('invalid login')) return l10n.invalidCredentials;
+    if (msg.contains('email not confirmed')) return l10n.emailNotConfirmed;
+    if (msg.contains('network')) return l10n.networkError;
     return e.message;
   }
 
@@ -268,9 +268,9 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : _GoogleLogo(),
-                    label: const Text(
-                      'المتابعة بحساب Google',
-                      style: TextStyle(
+                    label: Text(
+                      l10n.continueWithGoogle,
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),
@@ -294,7 +294,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Text(
-                        'أو',
+                        l10n.orDivider,
                         style: TextStyle(
                           color: Colors.grey.shade600,
                           fontSize: 13,

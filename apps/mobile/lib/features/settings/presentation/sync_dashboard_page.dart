@@ -9,6 +9,7 @@ import '../../../core/localization/l10n_extension.dart';
 import '../../../core/providers.dart';
 import '../../../core/sync/outbox_stats_provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 
 class SyncDashboardPage extends ConsumerStatefulWidget {
   const SyncDashboardPage({super.key});
@@ -38,7 +39,7 @@ class _SyncDashboardPageState extends ConsumerState<SyncDashboardPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${context.l10n.syncFailed}: $e'),
+            content: Text(context.l10n.syncFailed),
             backgroundColor: Colors.red,
           ),
         );
@@ -129,7 +130,7 @@ class _SyncDashboardPageState extends ConsumerState<SyncDashboardPage> {
                 icon: Icons.cloud_sync,
                 title: l10n.lastSync,
                 value: stats.lastSyncedAt != null
-                    ? _timeAgo(stats.lastSyncedAt!, l10n)
+                    ? _timeAgo(context, stats.lastSyncedAt!, l10n)
                     : l10n.neverSynced,
                 color: Colors.green,
               ),
@@ -218,9 +219,12 @@ class _SyncDashboardPageState extends ConsumerState<SyncDashboardPage> {
                           const Icon(Icons.info_outline,
                               color: AppColors.primary, size: 20),
                           const SizedBox(width: 8),
-                          Text(
-                            l10n.howSyncWorks,
-                            style: Theme.of(context).textTheme.titleMedium,
+                          Flexible(
+                            child: Text(
+                              l10n.howSyncWorks,
+                              style: Theme.of(context).textTheme.titleMedium,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ],
                       ),
@@ -236,18 +240,20 @@ class _SyncDashboardPageState extends ConsumerState<SyncDashboardPage> {
             ],
           ),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
+          error: (e, st) => Center(
+            child: Text(context.l10n.errorGeneric(e.toString())),
+          ),
         ),
       ),
     );
   }
 
-  String _timeAgo(DateTime dt, dynamic l10n) {
+  String _timeAgo(BuildContext context, DateTime dt, AppLocalizations l10n) {
     final diff = DateTime.now().difference(dt);
-    if (diff.inSeconds < 60) return 'قبل ${diff.inSeconds} ث';
-    if (diff.inMinutes < 60) return 'قبل ${diff.inMinutes} د';
-    if (diff.inHours < 24) return 'قبل ${diff.inHours} س';
-    return 'قبل ${diff.inDays} ي';
+    if (diff.inSeconds < 60) return l10n.secondsAgo(diff.inSeconds);
+    if (diff.inMinutes < 60) return l10n.minutesAgo(diff.inMinutes);
+    if (diff.inHours < 24) return l10n.hoursAgo(diff.inHours);
+    return l10n.daysAgo(diff.inDays);
   }
 }
 
@@ -292,6 +298,7 @@ class _InfoCard extends StatelessWidget {
                         .textTheme
                         .titleMedium
                         ?.copyWith(fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -333,6 +340,7 @@ class _StatCard extends StatelessWidget {
               label,
               style: const TextStyle(fontSize: 11),
               textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

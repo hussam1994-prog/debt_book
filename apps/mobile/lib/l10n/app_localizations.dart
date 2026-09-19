@@ -1987,6 +1987,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Change Color'**
   String get changeColorTooltip;
+
+  /// No description provided for @totalOutstandingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Outstanding'**
+  String get totalOutstandingLabel;
+
+  /// No description provided for @totalPaymentsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Payments'**
+  String get totalPaymentsLabel;
+
+  /// No description provided for @debtsAndPayments6Months.
+  ///
+  /// In en, this message translates to:
+  /// **'Debts & Payments (Last 6 Months)'**
+  String get debtsAndPayments6Months;
+
+  /// No description provided for @monthlyDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Details'**
+  String get monthlyDetails;
+
+  /// No description provided for @paymentReceivedTitleEn.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Received'**
+  String get paymentReceivedTitleEn;
+
+  /// No description provided for @noPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'No phone number for this person'**
+  String get noPhoneNumber;
+
+  /// No description provided for @detailsRefreshed.
+  ///
+  /// In en, this message translates to:
+  /// **'Details refreshed locally'**
+  String get detailsRefreshed;
+
+  /// No description provided for @noPhoneForWhatsApp.
+  ///
+  /// In en, this message translates to:
+  /// **'No phone number to send via WhatsApp'**
+  String get noPhoneForWhatsApp;
+
+  /// No description provided for @offlineLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get offlineLabel;
+
+  /// No description provided for @syncingNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing...'**
+  String get syncingNow;
+
+  /// No description provided for @syncReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to sync'**
+  String get syncReady;
+
+  /// No description provided for @lastSyncAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Last sync: {time}'**
+  String lastSyncAt(String time);
+
+  /// No description provided for @secondsAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} seconds ago'**
+  String secondsAgo(int count);
+
+  /// No description provided for @minutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} minutes ago'**
+  String minutesAgo(int count);
+
+  /// No description provided for @hoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} hours ago'**
+  String hoursAgo(int count);
+
+  /// No description provided for @lastSyncWithCounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Last sync: {time} • {persons} people, {debts} debts'**
+  String lastSyncWithCounts(String time, int persons, int debts);
+
+  /// No description provided for @continueWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get continueWithGoogle;
+
+  /// No description provided for @orDivider.
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get orDivider;
+
+  /// No description provided for @invalidCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email or password'**
+  String get invalidCredentials;
+
+  /// No description provided for @emailNotConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm your email address'**
+  String get emailNotConfirmed;
+
+  /// No description provided for @networkError.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your internet connection'**
+  String get networkError;
+
+  /// No description provided for @daysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days ago'**
+  String daysAgo(int count);
+
+  /// No description provided for @whatsappReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello {name},\nThis is a friendly reminder about the outstanding amount: {amount} IQD.\nThank you for your cooperation. 🙏'**
+  String whatsappReminder(String name, int amount);
+
+  /// No description provided for @whatsappReminderUrgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Dear {name},\nOutstanding amount: {amount} IQD.\nPlease settle as soon as possible.\nThank you.'**
+  String whatsappReminderUrgent(String name, int amount);
+
+  /// No description provided for @whatsappReminderOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'{name},\nOverdue amount: {amount} IQD.\nDue date was: {dueDate}.\nPlease settle as soon as possible.'**
+  String whatsappReminderOverdue(String name, int amount, String dueDate);
+
+  /// No description provided for @whatsappThankYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you so much {name}! 🙏\nYour payment has been received successfully.\nWe look forward to serving you again.'**
+  String whatsappThankYou(String name);
+
+  /// No description provided for @whatsappPostpone.
+  ///
+  /// In en, this message translates to:
+  /// **'{name},\nYour due date has been postponed.\nThank you for your cooperation.'**
+  String whatsappPostpone(String name);
+
+  /// No description provided for @whatsappCongratulations.
+  ///
+  /// In en, this message translates to:
+  /// **'🎉 Congratulations {name}!\nYou have paid off all your debts.\nThank you for being an excellent client. ⭐'**
+  String whatsappCongratulations(String name);
+
+  /// No description provided for @whatsappDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello {name},\nThis is a reminder from Debt Book.'**
+  String whatsappDefault(String name);
+
+  /// No description provided for @multiPersonReportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Multi-Person Report'**
+  String get multiPersonReportTitle;
+
+  /// No description provided for @clearSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Selection'**
+  String get clearSelection;
+
+  /// No description provided for @personsSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} person(s) selected'**
+  String personsSelected(int count);
+
+  /// No description provided for @noPeopleForReport.
+  ///
+  /// In en, this message translates to:
+  /// **'No people'**
+  String get noPeopleForReport;
+
+  /// No description provided for @generating.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating...'**
+  String get generating;
+
+  /// No description provided for @generatePdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate PDF'**
+  String get generatePdf;
+
+  /// No description provided for @reportsForCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports for {count} people'**
+  String reportsForCount(int count);
 }
 
 class _AppLocalizationsDelegate

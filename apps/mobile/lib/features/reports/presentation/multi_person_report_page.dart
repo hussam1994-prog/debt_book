@@ -29,7 +29,7 @@ class _MultiPersonReportPageState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('تقرير متعدد الأشخاص'),
+        title: Text(l10n.multiPersonReportTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/reports'),
@@ -38,7 +38,7 @@ class _MultiPersonReportPageState
           if (_selectedIds.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.clear_all),
-              tooltip: 'إلغاء التحديد',
+              tooltip: l10n.clearSelection,
               onPressed: () => setState(() => _selectedIds.clear()),
             ),
         ],
@@ -51,7 +51,7 @@ class _MultiPersonReportPageState
             padding: const EdgeInsets.all(AppSpacing.md),
             color: AppColors.primary.withValues(alpha: 0.05),
             child: Text(
-              '${_selectedIds.length} شخص محدد',
+              l10n.personsSelected(_selectedIds.length),
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 color: AppColors.primary,
@@ -65,8 +65,8 @@ class _MultiPersonReportPageState
             child: peopleAsync.when(
               data: (people) {
                 if (people.isEmpty) {
-                  return const Center(
-                    child: Text('لا يوجد أشخاص'),
+                  return Center(
+                    child: Text(l10n.noPeopleForReport),
                   );
                 }
                 return ListView.builder(
@@ -86,13 +86,19 @@ class _MultiPersonReportPageState
                           }
                         });
                       },
-                      title: Text(person.name),
+                      title: Text(
+                        person.name,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                       subtitle: person.phone != null
-                          ? Text(person.phone!)
+                          ? Text(
+                              person.phone!,
+                              overflow: TextOverflow.ellipsis,
+                            )
                           : null,
                       secondary: CircleAvatar(
-                        backgroundColor:
-                            AppColors.forName(person.name).withValues(alpha: 0.15),
+                        backgroundColor: AppColors.forName(person.name)
+                            .withValues(alpha: 0.15),
                         child: Text(
                           person.name.substring(0, 1).toUpperCase(),
                           style: TextStyle(
@@ -106,7 +112,9 @@ class _MultiPersonReportPageState
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
+              error: (e, st) => Center(
+                child: Text(l10n.errorGeneric(e.toString())),
+              ),
             ),
           ),
 
@@ -132,7 +140,8 @@ class _MultiPersonReportPageState
                         )
                       : const Icon(Icons.picture_as_pdf),
                   label: Text(
-                    _isGenerating ? 'جارٍ التوليد...' : 'توليد PDF',
+                    _isGenerating ? l10n.generating : l10n.generatePdf,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.primary,
@@ -191,11 +200,7 @@ class _MultiPersonReportPageState
         });
       }
 
-      // ✅ أنشئ PDF موحّد
       final pdfService = ref.read(pdfExportServiceProvider);
-      // ملاحظة: نحتاج دالة جديدة في pdf_service.
-      // سنستخدم exportPersonStatementToPdf لكل شخص ودمجها.
-      // للتبسيط: أرسل ملفات منفصلة.
       final files = <XFile>[];
 
       for (final data in reportData) {
@@ -219,7 +224,7 @@ class _MultiPersonReportPageState
       if (mounted && files.isNotEmpty) {
         await SharePlus.instance.share(
           ShareParams(
-            text: 'تقارير ${files.length} أشخاص',
+            text: l10n.reportsForCount(files.length),
             files: files,
           ),
         );

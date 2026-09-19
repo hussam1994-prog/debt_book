@@ -66,11 +66,11 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
           : 'غير محدد';
 
       final message = WhatsAppService.getTemplate(
-        template: template,
-        personName: person.name,
-        amount: balance.amount,
-        dueDate: dueDateStr,
-      );
+  l10n: context.l10n,
+  template: 'reminder',
+  personName: person.name,
+  amount: balance.amount,
+);
 
       await WhatsAppService.sendReminder(
         phone: person.phone!,

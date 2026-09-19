@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:domain/domain.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -10,12 +11,22 @@ import 'package:timezone/timezone.dart' as tz;
 import '../observability/logging_service.dart';
 
 /// ─── قنوات الإشعارات (Android) ───
+///
+/// ⚠️ ملاحظة: أسماء القنوات تظهر في إعدادات Android مرة واحدة فقط.
+/// نستخدم أسماء ثنائية اللغة (عربي + إنجليزي) لتوضيح الغرض.
 class NotificationChannels {
   static const dueSoon = 'due_soon_v2';
   static const overdue = 'overdue_v2';
   static const payments = 'payments_v2';
   static const summary = 'summary_v2';
   static const general = 'general_v2';
+
+  // أسماء القنوات (ثابتة — لا تتغير بعد التثبيت)
+  static const dueSoonName = 'تذكيرات الاستحقاق / Due Reminders';
+  static const overdueName = 'الديون المتأخرة / Overdue Debts';
+  static const paymentsName = 'الدفعات / Payments';
+  static const summaryName = 'الملخصات / Summaries';
+  static const generalName = 'عام / General';
 }
 
 /// ─── مفاتيح التخزين ───
@@ -30,6 +41,62 @@ class NotifPrefs {
   static const remindOverdue = 'notif_remind_overdue';
   static const weeklySummary = 'notif_weekly_summary';
   static const paymentAlerts = 'notif_payment_alerts';
+}
+
+/// Helper للحصول على نص مترجم بدون BuildContext.
+///
+/// يستخدم [Locale] لعرض النصوص العربية أو الإنجليزية.
+class NotificationTexts {
+  NotificationTexts._();
+
+  static bool _isAr(Locale locale) => locale.languageCode == 'ar';
+
+  static String paymentReceivedTitle(Locale locale) =>
+      _isAr(locale) ? '💰 تم استلام دفعة' : '💰 Payment Received';
+
+  static String paymentReceivedBody(Locale locale, String name, int amount) =>
+      _isAr(locale)
+          ? '$name دفع $amount دينار'
+          : '$name paid $amount IQD';
+
+  static String newDebtTitle(Locale locale) =>
+      _isAr(locale) ? 'دين جديد' : 'New Debt';
+
+  static String newDebtBody(Locale locale, int amount) => _isAr(locale)
+      ? 'تمت إضافة دين بقيمة $amount دينار'
+      : 'A debt of $amount IQD was added';
+
+  static String debtDueInWeek(Locale locale) =>
+      _isAr(locale) ? '⏰ دين يستحق بعد أسبوع' : '⏰ Debt due in a week';
+
+  static String debtDueInThreeDays(Locale locale) =>
+      _isAr(locale) ? '⏰ دين يستحق بعد 3 أيام' : '⏰ Debt due in 3 days';
+
+  static String debtDueTomorrow(Locale locale) =>
+      _isAr(locale) ? '🔔 دين يستحق غدًا' : '🔔 Debt due tomorrow';
+
+  static String debtOverdueTitle(Locale locale) =>
+      _isAr(locale) ? '⚠️ دين متأخر' : '⚠️ Overdue Debt';
+
+  static String weeklySummaryTitle(Locale locale) =>
+      _isAr(locale) ? '📊 الملخص الأسبوعي' : '📊 Weekly Summary';
+
+  static String weeklySummaryBody(
+    Locale locale, {
+    required int active,
+    required int overdue,
+    required int total,
+  }) =>
+      _isAr(locale)
+          ? 'لديك $active دين نشط، $overdue متأخر، إجمالي $total دينار'
+          : 'You have $active active debts, $overdue overdue, total $total IQD';
+
+  static String debtFallback(Locale locale) =>
+      _isAr(locale) ? 'دين' : 'Debt';
+
+  static String amountWithDinar(Locale locale, int amount) => _isAr(locale)
+      ? '$amount دينار'
+      : '$amount IQD';
 }
 
 class NotificationService {
@@ -83,36 +150,36 @@ class NotificationService {
 
     await androidImpl.createNotificationChannel(const AndroidNotificationChannel(
       NotificationChannels.dueSoon,
-      'تذكيرات الاستحقاق',
-      description: 'تنبيهات قبل موعد استحقاق الديون',
+      NotificationChannels.dueSoonName,
+      description: 'تنبيهات قبل موعد استحقاق الديون / Due reminders',
       importance: Importance.high,
     ));
 
     await androidImpl.createNotificationChannel(const AndroidNotificationChannel(
       NotificationChannels.overdue,
-      'الديون المتأخرة',
-      description: 'تنبيهات للديون التي تجاوزت موعد استحقاقها',
+      NotificationChannels.overdueName,
+      description: 'تنبيهات للديون المتأخرة / Overdue notifications',
       importance: Importance.max,
     ));
 
     await androidImpl.createNotificationChannel(const AndroidNotificationChannel(
       NotificationChannels.payments,
-      'الدفعات',
-      description: 'إشعارات عند استلام دفعات جديدة',
+      NotificationChannels.paymentsName,
+      description: 'إشعارات عند استلام دفعات جديدة / New payment alerts',
       importance: Importance.defaultImportance,
     ));
 
     await androidImpl.createNotificationChannel(const AndroidNotificationChannel(
       NotificationChannels.summary,
-      'الملخصات',
-      description: 'ملخصات أسبوعية وشهرية',
+      NotificationChannels.summaryName,
+      description: 'ملخصات أسبوعية / Weekly summaries',
       importance: Importance.low,
     ));
 
     await androidImpl.createNotificationChannel(const AndroidNotificationChannel(
       NotificationChannels.general,
-      'عام',
-      description: 'إشعارات عامة',
+      NotificationChannels.generalName,
+      description: 'إشعارات عامة / General notifications',
       importance: Importance.defaultImportance,
     ));
   }
@@ -181,8 +248,8 @@ class NotificationService {
 
     const androidDetails = AndroidNotificationDetails(
       NotificationChannels.general,
-      'عام',
-      channelDescription: 'إشعارات عامة',
+      NotificationChannels.generalName,
+      channelDescription: 'إشعارات عامة / General notifications',
       importance: Importance.defaultImportance,
       priority: Priority.defaultPriority,
       icon: '@mipmap/ic_launcher',
@@ -200,10 +267,14 @@ class NotificationService {
     }
   }
 
+  /// إشعار استلام دفعة جديدة.
+  ///
+  /// ⚠️ يستخدم [NotificationTexts] لأن هذا service لا يملك BuildContext.
   Future<void> showPaymentReceivedNotification({
     required int id,
     required String personName,
     required int amount,
+    required Locale locale,
   }) async {
     if (!_isSupported) return;
     if (!await _isEnabled()) return;
@@ -213,8 +284,8 @@ class NotificationService {
 
     const androidDetails = AndroidNotificationDetails(
       NotificationChannels.payments,
-      'الدفعات',
-      channelDescription: 'إشعارات عند استلام دفعات',
+      NotificationChannels.paymentsName,
+      channelDescription: 'إشعارات عند استلام دفعات / Payment alerts',
       importance: Importance.defaultImportance,
       priority: Priority.defaultPriority,
       icon: '@mipmap/ic_launcher',
@@ -223,8 +294,8 @@ class NotificationService {
     try {
       await _plugin.show(
         id,
-        '💰 تم استلام دفعة',
-        '$personName دفع $amount دينار',
+        NotificationTexts.paymentReceivedTitle(locale),
+        NotificationTexts.paymentReceivedBody(locale, personName, amount),
         const NotificationDetails(android: androidDetails),
       );
     } catch (e) {
@@ -260,8 +331,8 @@ class NotificationService {
 
     const androidDetails = AndroidNotificationDetails(
       NotificationChannels.dueSoon,
-      'تذكيرات الاستحقاق',
-      channelDescription: 'تنبيهات قبل موعد استحقاق الديون',
+      NotificationChannels.dueSoonName,
+      channelDescription: 'تنبيهات قبل موعد استحقاق الديون / Due reminders',
       importance: Importance.high,
       priority: Priority.high,
       icon: '@mipmap/ic_launcher',
@@ -283,9 +354,13 @@ class NotificationService {
     }
   }
 
+  /// جدولة تذكيرات الديون القادمة.
+  ///
+  /// ⚠️ يتطلب [locale] لتوليد النصوص المترجمة.
   Future<void> scheduleUpcomingDebtReminders({
     required List<Debt> debts,
     required Map<DebtId, Money> balances,
+    required Locale locale,
   }) async {
     if (!_isSupported) return;
     if (!await _isEnabled()) return;
@@ -308,15 +383,16 @@ class NotificationService {
       if (debt.dueDate == null) continue;
 
       final dueDate = debt.dueDate!;
-      final desc = debt.description ?? 'دين';
+      final desc = debt.description ?? NotificationTexts.debtFallback(locale);
       final baseId = debt.id.value.hashCode;
+      final amountText = NotificationTexts.amountWithDinar(locale, balance.amount);
 
       if (dueDate.isAfter(now)) {
         if (remind7) {
           await scheduleReminderBeforeDays(
             id: baseId + 7,
-            title: '⏰ دين يستحق بعد أسبوع',
-            body: '$desc - ${balance.amount} دينار',
+            title: NotificationTexts.debtDueInWeek(locale),
+            body: '$desc - $amountText',
             dueDate: dueDate,
             daysBefore: 7,
           );
@@ -324,8 +400,8 @@ class NotificationService {
         if (remind3) {
           await scheduleReminderBeforeDays(
             id: baseId + 3,
-            title: '⏰ دين يستحق بعد 3 أيام',
-            body: '$desc - ${balance.amount} دينار',
+            title: NotificationTexts.debtDueInThreeDays(locale),
+            body: '$desc - $amountText',
             dueDate: dueDate,
             daysBefore: 3,
           );
@@ -333,8 +409,8 @@ class NotificationService {
         if (remind1) {
           await scheduleReminderBeforeDays(
             id: baseId + 1,
-            title: '🔔 دين يستحق غدًا',
-            body: '$desc - ${balance.amount} دينار',
+            title: NotificationTexts.debtDueTomorrow(locale),
+            body: '$desc - $amountText',
             dueDate: dueDate,
             daysBefore: 1,
           );
@@ -344,6 +420,7 @@ class NotificationService {
           id: baseId,
           description: desc,
           balance: balance.amount,
+          locale: locale,
         );
       }
     }
@@ -353,6 +430,7 @@ class NotificationService {
     required int id,
     required String description,
     required int balance,
+    required Locale locale,
   }) async {
     if (!_isSupported || !_initialized) return;
 
@@ -372,18 +450,20 @@ class NotificationService {
 
     const androidDetails = AndroidNotificationDetails(
       NotificationChannels.overdue,
-      'الديون المتأخرة',
-      channelDescription: 'تنبيهات للديون المتأخرة',
+      NotificationChannels.overdueName,
+      channelDescription: 'تنبيهات للديون المتأخرة / Overdue alerts',
       importance: Importance.max,
       priority: Priority.max,
       icon: '@mipmap/ic_launcher',
     );
 
+    final amountText = NotificationTexts.amountWithDinar(locale, balance);
+
     try {
       await _plugin.zonedSchedule(
         id,
-        '⚠️ دين متأخر',
-        '$description - $balance دينار',
+        NotificationTexts.debtOverdueTitle(locale),
+        '$description - $amountText',
         scheduled,
         const NotificationDetails(android: androidDetails),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -400,6 +480,7 @@ class NotificationService {
     required int activeDebts,
     required int overdueDebts,
     required int totalOutstanding,
+    required Locale locale,
   }) async {
     if (!_isSupported) return;
     if (!await _isEnabled()) return;
@@ -417,8 +498,8 @@ class NotificationService {
 
     const androidDetails = AndroidNotificationDetails(
       NotificationChannels.summary,
-      'الملخصات',
-      channelDescription: 'ملخصات أسبوعية',
+      NotificationChannels.summaryName,
+      channelDescription: 'ملخصات أسبوعية / Weekly summaries',
       importance: Importance.low,
       priority: Priority.low,
       icon: '@mipmap/ic_launcher',
@@ -427,8 +508,13 @@ class NotificationService {
     try {
       await _plugin.zonedSchedule(
         999999,
-        '📊 الملخص الأسبوعي',
-        'لديك $activeDebts دين نشط، $overdueDebts متأخر، إجمالي $totalOutstanding دينار',
+        NotificationTexts.weeklySummaryTitle(locale),
+        NotificationTexts.weeklySummaryBody(
+          locale,
+          active: activeDebts,
+          overdue: overdueDebts,
+          total: totalOutstanding,
+        ),
         _nextSunday9AM(),
         const NotificationDetails(android: androidDetails),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
