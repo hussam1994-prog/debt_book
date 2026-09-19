@@ -63,7 +63,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
       if (e.type == GoogleAuthErrorType.cancelled) return;
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.arabicMessage)),
+          SnackBar(content: Text(e.localizedMessage(context.l10n))),
         );
       }
     } catch (e) {
@@ -267,7 +267,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                             width: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : _GoogleLogo(),
+                        : const _GoogleLogo(),
                     label: Text(
                       l10n.continueWithGoogle,
                       style: const TextStyle(
@@ -384,9 +384,11 @@ class _AuthPageState extends ConsumerState<AuthPage> {
 
 // ─── شعار Google مصمم برمجيًا ───
 class _GoogleLogo extends StatelessWidget {
+  const _GoogleLogo();
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return const SizedBox(
       width: 22,
       height: 22,
       child: CustomPaint(painter: _GoogleLogoPainter()),
@@ -395,6 +397,8 @@ class _GoogleLogo extends StatelessWidget {
 }
 
 class _GoogleLogoPainter extends CustomPainter {
+  const _GoogleLogoPainter();
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..style = PaintingStyle.fill;

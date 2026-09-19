@@ -508,5 +508,17 @@
   "reportsForCount": "تقارير {count} أشخاص",
   "@reportsForCount": {
     "placeholders": { "count": { "type": "int" } }
-  }
+  },
+  "notSpecified": "غير محدد",
+  "sendWhatsappMessage": "إرسال رسالة واتساب",
+  "templateReminder": "تذكير عادي",
+  "templateUrgent": "تذكير عاجل",
+  "templateOverdue": "تذكير بالمتأخر",
+  "templateThankYou": "شكر",
+  "templatePostpone": "تأجيل",
+  "templateCongratulations": "تهنئة",
+  "loginCancelled": "تم إلغاء تسجيل الدخول",
+  "accountDataFailed": "فشل في الحصول على بيانات الحساب. حاول مرة أخرى",
+  "configError": "خطأ في إعداد التطبيق. تواصل مع الدعم",
+  "unexpectedError": "حدث خطأ غير متوقع. حاول مرة أخرى"
 }

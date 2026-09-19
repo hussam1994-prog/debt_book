@@ -1179,4 +1179,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String reportsForCount(int count) {
     return 'Reports for $count people';
   }
+
+  @override
+  String get notSpecified => 'Not specified';
+
+  @override
+  String get sendWhatsappMessage => 'Send WhatsApp message';
+
+  @override
+  String get templateReminder => 'Regular reminder';
+
+  @override
+  String get templateUrgent => 'Urgent reminder';
+
+  @override
+  String get templateOverdue => 'Overdue reminder';
+
+  @override
+  String get templateThankYou => 'Thank you';
+
+  @override
+  String get templatePostpone => 'Postpone';
+
+  @override
+  String get templateCongratulations => 'Congratulations';
+
+  @override
+  String get loginCancelled => 'Sign-in cancelled';
+
+  @override
+  String get accountDataFailed => 'Failed to get account data. Try again';
+
+  @override
+  String get configError => 'Configuration error. Contact support';
+
+  @override
+  String get unexpectedError => 'Unexpected error. Try again';
 }

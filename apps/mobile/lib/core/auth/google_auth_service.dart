@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../l10n/app_localizations.dart';
+
 /// أخطاء Google Sign-In مع رموز واضحة
 enum GoogleAuthErrorType {
   cancelled,
@@ -22,19 +24,21 @@ class GoogleAuthException implements Exception {
   @override
   String toString() => 'GoogleAuthException($type): $message';
 
-  /// رسالة عربية مناسبة للعرض
-  String get arabicMessage {
+  /// رسالة مترجمة مناسبة للعرض.
+  ///
+  /// ⚠️ يتطلب [l10n] لأن Service لا يملك `BuildContext`.
+  String localizedMessage(AppLocalizations l10n) {
     switch (type) {
       case GoogleAuthErrorType.cancelled:
-        return 'تم إلغاء تسجيل الدخول';
+        return l10n.loginCancelled;
       case GoogleAuthErrorType.network:
-        return 'تحقق من اتصالك بالإنترنت';
+        return l10n.networkError;
       case GoogleAuthErrorType.noIdToken:
-        return 'فشل في الحصول على بيانات الحساب. حاول مرة أخرى';
+        return l10n.accountDataFailed;
       case GoogleAuthErrorType.configurationError:
-        return 'خطأ في إعداد التطبيق. تواصل مع الدعم';
+        return l10n.configError;
       case GoogleAuthErrorType.unknown:
-        return 'حدث خطأ غير متوقع. حاول مرة أخرى';
+        return l10n.unexpectedError;
     }
   }
 }
@@ -55,11 +59,11 @@ class GoogleAuthService {
 
   Future<AuthResponse?> signInWithGoogle() async {
     try {
-      debugPrint('🔵 [GoogleAuth] Signing in...');
+      debugPrint('[GoogleAuth] Signing in...');
 
       final googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
-        debugPrint('🔵 [GoogleAuth] User cancelled');
+        debugPrint('[GoogleAuth] User cancelled');
         throw GoogleAuthException(
           GoogleAuthErrorType.cancelled,
           'User cancelled sign-in',
@@ -70,7 +74,7 @@ class GoogleAuthService {
     } on GoogleAuthException {
       rethrow;
     } on PlatformException catch (e) {
-      debugPrint('❌ [GoogleAuth] PlatformException: ${e.code}');
+      debugPrint('[GoogleAuth] PlatformException: ${e.code}');
       if (e.code == 'network_error') {
         throw GoogleAuthException(
           GoogleAuthErrorType.network,
@@ -84,7 +88,7 @@ class GoogleAuthService {
         e,
       );
     } catch (e) {
-      debugPrint('❌ [GoogleAuth] Unknown error: $e');
+      debugPrint('[GoogleAuth] Unknown error: $e');
       throw GoogleAuthException(
         GoogleAuthErrorType.unknown,
         e.toString(),
@@ -100,18 +104,18 @@ class GoogleAuthService {
   /// **لا يُظهر أي UI** إذا فشل.
   Future<AuthResponse?> signInSilently() async {
     try {
-      debugPrint('🔵 [GoogleAuth] Trying silent sign-in...');
+      debugPrint('[GoogleAuth] Trying silent sign-in...');
 
       final googleUser = await _googleSignIn.signInSilently();
       if (googleUser == null) {
-        debugPrint('🔵 [GoogleAuth] Silent sign-in: no cached user');
+        debugPrint('[GoogleAuth] Silent sign-in: no cached user');
         return null;
       }
 
-      debugPrint('🔵 [GoogleAuth] Silent sign-in: got cached user');
+      debugPrint('[GoogleAuth] Silent sign-in: got cached user');
       return await _authenticateWithSupabase(googleUser);
     } catch (e) {
-      debugPrint('🔵 [GoogleAuth] Silent sign-in failed: $e');
+      debugPrint('[GoogleAuth] Silent sign-in failed: $e');
       return null;
     }
   }
@@ -120,7 +124,7 @@ class GoogleAuthService {
 
   Future<AuthResponse?> switchAccount() async {
     try {
-      debugPrint('🔵 [GoogleAuth] Switching account...');
+      debugPrint('[GoogleAuth] Switching account...');
 
       try {
         await _googleSignIn.disconnect();
@@ -132,7 +136,7 @@ class GoogleAuthService {
 
       return await signInWithGoogle();
     } catch (e) {
-      debugPrint('❌ [GoogleAuth] Switch account failed: $e');
+      debugPrint('[GoogleAuth] Switch account failed: $e');
       rethrow;
     }
   }
@@ -152,7 +156,7 @@ class GoogleAuthService {
       );
     }
 
-    debugPrint('🔵 [GoogleAuth] Got tokens, signing into Supabase...');
+    debugPrint('[GoogleAuth] Got tokens, signing into Supabase...');
 
     final response = await _supabase.auth.signInWithIdToken(
       provider: OAuthProvider.google,
@@ -161,7 +165,7 @@ class GoogleAuthService {
     );
 
     debugPrint(
-        '✅ [GoogleAuth] Supabase sign-in successful: ${response.user?.email}');
+        '[GoogleAuth] Supabase sign-in successful: ${response.user?.email}');
 
     return response;
   }
@@ -191,24 +195,24 @@ class GoogleAuthService {
   /// تسجيل خروج عادي (يبقي الحساب محفوظًا على الجهاز).
   Future<void> signOut() async {
     try {
-      debugPrint('🔵 [GoogleAuth] Signing out...');
+      debugPrint('[GoogleAuth] Signing out...');
       await _googleSignIn.signOut();
       await _supabase.auth.signOut();
-      debugPrint('✅ [GoogleAuth] Signed out');
+      debugPrint('[GoogleAuth] Signed out');
     } catch (e) {
-      debugPrint('❌ [GoogleAuth] Sign out error: $e');
+      debugPrint('[GoogleAuth] Sign out error: $e');
     }
   }
 
   /// قطع الاتصال بالكامل (يلغي صلاحيات التطبيق من Google).
   Future<void> disconnect() async {
     try {
-      debugPrint('🔵 [GoogleAuth] Disconnecting...');
+      debugPrint('[GoogleAuth] Disconnecting...');
       await _googleSignIn.disconnect();
       await _supabase.auth.signOut();
-      debugPrint('✅ [GoogleAuth] Disconnected');
+      debugPrint('[GoogleAuth] Disconnected');
     } catch (e) {
-      debugPrint('❌ [GoogleAuth] Disconnect error: $e');
+      debugPrint('[GoogleAuth] Disconnect error: $e');
     }
   }
 }

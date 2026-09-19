@@ -164,7 +164,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       if (e.type == GoogleAuthErrorType.cancelled) return;
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.arabicMessage)),
+          SnackBar(content: Text(e.localizedMessage(context.l10n))),
         );
       }
     } catch (e) {

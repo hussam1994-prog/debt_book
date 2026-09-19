@@ -1172,4 +1172,41 @@ class AppLocalizationsAr extends AppLocalizations {
   String reportsForCount(int count) {
     return 'تقارير $count أشخاص';
   }
+
+  @override
+  String get notSpecified => 'غير محدد';
+
+  @override
+  String get sendWhatsappMessage => 'إرسال رسالة واتساب';
+
+  @override
+  String get templateReminder => 'تذكير عادي';
+
+  @override
+  String get templateUrgent => 'تذكير عاجل';
+
+  @override
+  String get templateOverdue => 'تذكير بالمتأخر';
+
+  @override
+  String get templateThankYou => 'شكر';
+
+  @override
+  String get templatePostpone => 'تأجيل';
+
+  @override
+  String get templateCongratulations => 'تهنئة';
+
+  @override
+  String get loginCancelled => 'تم إلغاء تسجيل الدخول';
+
+  @override
+  String get accountDataFailed =>
+      'فشل في الحصول على بيانات الحساب. حاول مرة أخرى';
+
+  @override
+  String get configError => 'خطأ في إعداد التطبيق. تواصل مع الدعم';
+
+  @override
+  String get unexpectedError => 'حدث خطأ غير متوقع. حاول مرة أخرى';
 }

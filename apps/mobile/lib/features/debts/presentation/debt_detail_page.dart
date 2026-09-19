@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/localization/l10n_extension.dart';
 import '../../../core/localization/app_formatters.dart';
+import '../../../core/localization/l10n_extension.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/whatsapp/whatsapp_service.dart';
@@ -41,20 +41,21 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
     ref.invalidate(installmentsForDebtProvider(widget.debtId));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم تحديث التفاصيل محليًا')),
+        SnackBar(content: Text(context.l10n.detailsRefreshed)),
       );
     }
   }
 
-  // ─── ✅ إرسال رسالة بقوالب جاهزة ───
+  // ─── إرسال رسالة بقوالب جاهزة ───
   Future<void> _sendTemplatedMessage(Debt debt, String template) async {
+    final l10n = context.l10n;
     try {
       final person =
           await ref.read(personRepositoryProvider).findById(debt.personId);
       if (person == null || person.phone == null || person.phone!.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('لا يوجد رقم هاتف لهذا الشخص')),
+            SnackBar(content: Text(l10n.noPhoneForPerson)),
           );
         }
         return;
@@ -63,14 +64,15 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
       final balance = await ref.read(getBalanceProvider).call(debt.id);
       final dueDateStr = debt.dueDate != null
           ? _formatDate(debt.dueDate!)
-          : 'غير محدد';
+          : l10n.notSpecified;
 
       final message = WhatsAppService.getTemplate(
-  l10n: context.l10n,
-  template: 'reminder',
-  personName: person.name,
-  amount: balance.amount,
-);
+        l10n: l10n,
+        template: template,
+        personName: person.name,
+        amount: balance.amount,
+        dueDate: dueDateStr,
+      );
 
       await WhatsAppService.sendReminder(
         phone: person.phone!,
@@ -79,7 +81,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.errorGeneric(e.toString()))),
+          SnackBar(content: Text(l10n.errorGeneric(e.toString()))),
         );
       }
     }
@@ -368,7 +370,9 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
+      error: (e, st) => Center(
+        child: Text(context.l10n.errorGeneric(e.toString())),
+      ),
     );
   }
 
@@ -452,7 +456,9 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, st) => Center(child: Text(context.l10n.errorGeneric(e.toString()))),
+      error: (e, st) => Center(
+        child: Text(context.l10n.errorGeneric(e.toString())),
+      ),
     );
   }
 
@@ -482,72 +488,72 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
             tooltip: l10n.refresh,
             onPressed: _refreshLocal,
           ),
-          // ✅ زر قوالب رسائل واتساب
+          // زر قوالب رسائل واتساب
           PopupMenuButton<String>(
             icon: const Icon(Icons.chat, color: Colors.green),
-            tooltip: 'إرسال رسالة واتساب',
+            tooltip: l10n.sendWhatsappMessage,
             onSelected: (template) {
               if (_debt != null) _sendTemplatedMessage(_debt!, template);
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'reminder',
                 child: Row(
                   children: [
-                    Text('📩', style: TextStyle(fontSize: 18)),
-                    SizedBox(width: 8),
-                    Text('تذكير عادي'),
+                    const Text('📩', style: TextStyle(fontSize: 18)),
+                    const SizedBox(width: 8),
+                    Text(l10n.templateReminder),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'reminder_urgent',
                 child: Row(
                   children: [
-                    Text('⚡', style: TextStyle(fontSize: 18)),
-                    SizedBox(width: 8),
-                    Text('تذكير عاجل'),
+                    const Text('⚡', style: TextStyle(fontSize: 18)),
+                    const SizedBox(width: 8),
+                    Text(l10n.templateUrgent),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'reminder_overdue',
                 child: Row(
                   children: [
-                    Text('⚠️', style: TextStyle(fontSize: 18)),
-                    SizedBox(width: 8),
-                    Text('تذكير بالمتأخر'),
+                    const Text('⚠️', style: TextStyle(fontSize: 18)),
+                    const SizedBox(width: 8),
+                    Text(l10n.templateOverdue),
                   ],
                 ),
               ),
               const PopupMenuDivider(),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'thank_you',
                 child: Row(
                   children: [
-                    Text('🙏', style: TextStyle(fontSize: 18)),
-                    SizedBox(width: 8),
-                    Text('شكر'),
+                    const Text('🙏', style: TextStyle(fontSize: 18)),
+                    const SizedBox(width: 8),
+                    Text(l10n.templateThankYou),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'postpone',
                 child: Row(
                   children: [
-                    Text('⏰', style: TextStyle(fontSize: 18)),
-                    SizedBox(width: 8),
-                    Text('تأجيل'),
+                    const Text('⏰', style: TextStyle(fontSize: 18)),
+                    const SizedBox(width: 8),
+                    Text(l10n.templatePostpone),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'congratulations',
                 child: Row(
                   children: [
-                    Text('🎉', style: TextStyle(fontSize: 18)),
-                    SizedBox(width: 8),
-                    Text('تهنئة'),
+                    const Text('🎉', style: TextStyle(fontSize: 18)),
+                    const SizedBox(width: 8),
+                    Text(l10n.templateCongratulations),
                   ],
                 ),
               ),
@@ -641,6 +647,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                             Text(
                               debt.description ?? l10n.description,
                               style: Theme.of(context).textTheme.titleLarge,
+                              overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 12),
                             FutureBuilder<Money>(
@@ -654,6 +661,7 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                                     fontWeight: FontWeight.bold,
                                     color: _balanceColor(context, balance),
                                   ),
+                                  overflow: TextOverflow.ellipsis,
                                 );
                               },
                             ),
@@ -664,11 +672,14 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                                   const Icon(Icons.event,
                                       size: 16, color: AppColors.textHint),
                                   const SizedBox(width: 6),
-                                  Text(
-                                    '${l10n.dueDate}: ${_formatDate(debt.dueDate!)}',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium,
+                                  Flexible(
+                                    child: Text(
+                                      '${l10n.dueDate}: ${_formatDate(debt.dueDate!)}',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -695,11 +706,11 @@ class _DebtDetailPageState extends ConsumerState<DebtDetailPage> {
                     length: 3,
                     child: Column(
                       children: [
-                        const TabBar(
+                        TabBar(
                           tabs: [
-                            Tab(text: 'دفتر الأستاذ'),
-                            Tab(text: 'الدفعات'),
-                            Tab(text: 'الأقساط'),
+                            Tab(text: l10n.ledger),
+                            Tab(text: l10n.payments),
+                            Tab(text: l10n.installments),
                           ],
                         ),
                         Expanded(

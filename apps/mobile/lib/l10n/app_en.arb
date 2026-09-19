@@ -508,5 +508,17 @@
   "reportsForCount": "Reports for {count} people",
   "@reportsForCount": {
     "placeholders": { "count": { "type": "int" } }
-  }
+  },
+  "notSpecified": "Not specified",
+  "sendWhatsappMessage": "Send WhatsApp message",
+  "templateReminder": "Regular reminder",
+  "templateUrgent": "Urgent reminder",
+  "templateOverdue": "Overdue reminder",
+  "templateThankYou": "Thank you",
+  "templatePostpone": "Postpone",
+  "templateCongratulations": "Congratulations",
+  "loginCancelled": "Sign-in cancelled",
+  "accountDataFailed": "Failed to get account data. Try again",
+  "configError": "Configuration error. Contact support",
+  "unexpectedError": "Unexpected error. Try again"
 }

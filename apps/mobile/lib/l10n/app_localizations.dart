@@ -2203,6 +2203,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reports for {count} people'**
   String reportsForCount(int count);
+
+  /// No description provided for @notSpecified.
+  ///
+  /// In en, this message translates to:
+  /// **'Not specified'**
+  String get notSpecified;
+
+  /// No description provided for @sendWhatsappMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Send WhatsApp message'**
+  String get sendWhatsappMessage;
+
+  /// No description provided for @templateReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Regular reminder'**
+  String get templateReminder;
+
+  /// No description provided for @templateUrgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Urgent reminder'**
+  String get templateUrgent;
+
+  /// No description provided for @templateOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue reminder'**
+  String get templateOverdue;
+
+  /// No description provided for @templateThankYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you'**
+  String get templateThankYou;
+
+  /// No description provided for @templatePostpone.
+  ///
+  /// In en, this message translates to:
+  /// **'Postpone'**
+  String get templatePostpone;
+
+  /// No description provided for @templateCongratulations.
+  ///
+  /// In en, this message translates to:
+  /// **'Congratulations'**
+  String get templateCongratulations;
+
+  /// No description provided for @loginCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-in cancelled'**
+  String get loginCancelled;
+
+  /// No description provided for @accountDataFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to get account data. Try again'**
+  String get accountDataFailed;
+
+  /// No description provided for @configError.
+  ///
+  /// In en, this message translates to:
+  /// **'Configuration error. Contact support'**
+  String get configError;
+
+  /// No description provided for @unexpectedError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unexpected error. Try again'**
+  String get unexpectedError;
 }
 
 class _AppLocalizationsDelegate
