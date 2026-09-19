@@ -1,6 +1,8 @@
 import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 
+import '../../../core/localization/app_formatters.dart';
+import '../../../core/localization/l10n_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_design.dart';
 
@@ -40,7 +42,7 @@ class LedgerTimeline extends StatelessWidget {
                         border: Border.all(color: Colors.white, width: 3),
                         boxShadow: [
                           BoxShadow(
-                            color: color.withOpacity(0.3),
+                            color: color.withValues(alpha: 0.3),
                             blurRadius: 6,
                             spreadRadius: 1,
                           ),
@@ -81,11 +83,14 @@ class LedgerTimeline extends StatelessWidget {
                               size: 18,
                             ),
                             const SizedBox(width: 6),
-                            Text(
-                              _entryLabel(entry.entryType),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
+                            Flexible(
+                              child: Text(
+                                _entryLabel(context, entry.entryType),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             const Spacer(),
@@ -101,7 +106,7 @@ class LedgerTimeline extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          _formatDate(entry.createdAt),
+                          AppFormatters.date(context, entry.createdAt),
                           style: const TextStyle(
                             fontSize: 12,
                             color: AppColors.textSecondary,
@@ -119,19 +124,18 @@ class LedgerTimeline extends StatelessWidget {
     );
   }
 
-  String _entryLabel(LedgerEntryType type) {
+  /// تسمية نوع القيد حسب اللغة الحالية.
+  String _entryLabel(BuildContext context, LedgerEntryType type) {
+    final l10n = context.l10n;
     switch (type) {
       case LedgerEntryType.debt_creation:
-        return 'إنشاء الدين';
+        return l10n.debtCreation;
       case LedgerEntryType.payment:
-        return 'دفعة';
+        return l10n.payment;
       case LedgerEntryType.reversal:
-        return 'عكس دفعة';
+        return l10n.reversal;
       case LedgerEntryType.adjustment:
-        return 'تسوية';
+        return l10n.adjustment;
     }
   }
-
-  String _formatDate(DateTime date) =>
-      '${date.day}/${date.month}/${date.year}';
 }

@@ -86,7 +86,7 @@
   "allowOverpayment": "السماح بالدفع الزائد",
   "debtCreation": "إنشاء دين",
   "payment": "دفعة",
-  "reversal": "عكس",
+  "reversal": "عكس دفعة",
   "adjustment": "تسوية",
   "whatsappTooltip": "إرسال رسالة واتساب",
   "whatsappGeneralMessage": "مرحباً، هذا تذكير من دفتر الديون.",
